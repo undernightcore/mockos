@@ -47,4 +47,17 @@ export default class ProjectsController {
       .paginate(page ?? 1, perPage ?? 10)
     return response.ok(projectList)
   }
+
+  public async getMemberList({ response, request, params, auth, bouncer }: HttpContextContract) {
+    await auth.authenticate()
+    const page = await request.input('page')
+    const perPage = await request.input('perPage')
+    const project = await Project.findOrFail(params.id)
+    await bouncer.with('ProjectPolicy').authorize('isMember', project)
+    const memberList = await project
+      .related('members')
+      .query()
+      .paginate(page ?? 1, perPage ?? 10)
+    return response.ok(memberList)
+  }
 }
