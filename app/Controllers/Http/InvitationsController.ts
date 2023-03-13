@@ -30,7 +30,7 @@ export default class InvitationsController {
   public async invite({ response, params, auth, bouncer }: HttpContextContract) {
     await auth.authenticate()
     const project = await Project.findOrFail(params.projectId)
-    const user = await User.findOrFail(params.userId)
+    const user = await User.findByOrFail('email', params.email)
     await bouncer.with('ProjectPolicy').authorize('isMember', project)
     await bouncer.forUser(user).with('ProjectPolicy').authorize('isAlreadyMember', project)
     await bouncer.forUser(user).with('GlobalPolicy').authorize('isVerified')
