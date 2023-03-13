@@ -2,6 +2,7 @@ import { HttpContextContract } from '@ioc:Adonis/Core/HttpContext'
 import Project from 'App/Models/Project'
 import EditProjectValidator from 'App/Validators/Project/EditProjectValidator'
 import CreateProjectValidator from 'App/Validators/Project/CreateProjectValidator'
+import Member from 'App/Models/Member'
 
 export default class ProjectsController {
   public async create({ request, response, auth }: HttpContextContract) {
@@ -54,9 +55,9 @@ export default class ProjectsController {
     const perPage = await request.input('perPage')
     const project = await Project.findOrFail(params.id)
     await bouncer.with('ProjectPolicy').authorize('isMember', project)
-    const memberList = await project
-      .related('members')
-      .query()
+    const memberList = await Member.query()
+      .where('project_id', project.id)
+      .preload('user')
       .paginate(page ?? 1, perPage ?? 10)
     return response.ok(memberList)
   }

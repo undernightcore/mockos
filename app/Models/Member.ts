@@ -1,5 +1,6 @@
 import { BaseModel, BelongsTo, belongsTo, column } from '@ioc:Adonis/Lucid/Orm'
 import Project from 'App/Models/Project'
+import User from 'App/Models/User'
 
 export default class Member extends BaseModel {
   @column({ isPrimary: true })
@@ -10,6 +11,9 @@ export default class Member extends BaseModel {
 
   @column({ serializeAs: null })
   public projectId: number
+
+  @belongsTo(() => User)
+  public user: BelongsTo<typeof User>
 
   @column({ serializeAs: null })
   public userId: number
