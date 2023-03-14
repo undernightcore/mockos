@@ -7,6 +7,7 @@ import SortRouteValidator from 'App/Validators/Route/SortRouteValidator'
 import Database from '@ioc:Adonis/Lucid/Database'
 import { move } from 'App/Helpers/array.helper'
 import { recalculateRouteOrder } from 'App/Helpers/sort.helper'
+import Ws from 'App/Services/Ws'
 
 export default class RoutesController {
   public async create({ request, response, auth, params, bouncer }: HttpContextContract) {
@@ -18,6 +19,7 @@ export default class RoutesController {
     const route = await project
       .related('routes')
       .create({ ...data, order: (lastOrder?.order ?? 0) + 1 })
+    Ws.io.emit(`project:${project.id}`, `updated`)
     return response.created(route)
   }
 
@@ -29,6 +31,8 @@ export default class RoutesController {
     const data = await request.validate(EditRouteValidator)
     await bouncer.with('ProjectPolicy').authorize('isMember', project)
     const newRoute = await route.merge(data).save()
+    Ws.io.emit(`project:${project.id}`, `updated`)
+    Ws.io.emit(`route:${route.id}`, `updated`)
     return response.ok(newRoute)
   }
 
@@ -44,6 +48,8 @@ export default class RoutesController {
       await recalculateRouteOrder(routes, trx)
       await trx.commit()
     })
+    Ws.io.emit(`project:${project.id}`, `updated`)
+    Ws.io.emit(`route:${route.id}`, `deleted`)
     return response.ok({ message: 'Se ha eliminado la ruta correctamente' })
   }
 
@@ -91,6 +97,7 @@ export default class RoutesController {
       await recalculateRouteOrder(routes, trx)
       await trx.commit()
     })
+    Ws.io.emit(`project:${project.id}`, `updated`)
     return response.ok({ message: 'Se ha movido correctamente' })
   }
 }
