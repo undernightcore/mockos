@@ -1,14 +1,19 @@
 import { schema, CustomMessages, rules } from '@ioc:Adonis/Core/Validator'
-import { HttpContextContract } from '@ioc:Adonis/Core/HttpContext'
+import type { HttpContextContract } from '@ioc:Adonis/Core/HttpContext'
 
-export default class CreateResponseValidator {
+export default class EditResponseValidator {
   constructor(protected ctx: HttpContextContract) {}
   public schema = schema.create({
     enabled: schema.boolean(),
     status: schema.number([rules.range(100, 599)]),
     body: schema.string(),
     name: schema.string({}, [
-      rules.unique({ table: 'responses', column: 'name', where: { route_id: this.ctx.params.id } }),
+      rules.unique({
+        table: 'responses',
+        column: 'name',
+        where: { route_id: this.ctx.params.id },
+        whereNot: { id: this.ctx.params.id },
+      }),
     ]),
   })
 
