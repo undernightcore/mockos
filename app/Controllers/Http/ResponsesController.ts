@@ -4,6 +4,7 @@ import CreateResponseValidator from 'App/Validators/Response/CreateResponseValid
 import Database from '@ioc:Adonis/Lucid/Database'
 import Response from 'App/Models/Response'
 import EditResponseValidator from 'App/Validators/Response/EditResponseValidator'
+import Ws from 'App/Services/Ws'
 
 export default class ResponsesController {
   public async create({ request, response, auth, bouncer, params }: HttpContextContract) {
@@ -18,6 +19,7 @@ export default class ResponsesController {
       await route.related('responses').create(data)
       await trx.commit()
     })
+    Ws.io.emit(`route:${route.id}`, 'updated')
     return response.created({ message: 'Se ha creado la respuesta' })
   }
 
@@ -59,6 +61,8 @@ export default class ResponsesController {
       await routeResponse.merge(data)
       await trx.commit()
     })
+    Ws.io.emit(`route:${route.id}`, 'updated')
+    Ws.io.emit(`response:${routeResponse.id}`, 'updated')
     return response.ok({ message: 'Se ha actualizado la respuesta' })
   }
 
@@ -71,6 +75,8 @@ export default class ResponsesController {
     const project = route.project
     await bouncer.with('ProjectPolicy').authorize('isMember', project)
     await routeResponse.delete()
+    Ws.io.emit(`route:${routeResponse.id}`, 'updated')
+    Ws.io.emit(`response:${routeResponse.id}`, 'deleted')
     return response.ok({ message: 'Se ha eliminado la respuesta' })
   }
 }
