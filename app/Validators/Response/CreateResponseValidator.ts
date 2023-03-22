@@ -15,5 +15,7 @@ export default class CreateResponseValidator {
     'status.required': 'Es necesario un código HTTP para tu respuesta',
     'status.range': 'El código HTTP debe ser valido',
     'body.required': 'Es necesaria un cuerpo para tu respuesta',
+    'name.required': 'Es necesario un nombre para tu respuesta',
+    'name.unique': 'Este nombre de respuesta ya existe',
   }
 }
