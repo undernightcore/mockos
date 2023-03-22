@@ -12,7 +12,6 @@ export default class extends BaseSchema {
       table.boolean('enabled').defaultTo(false)
       table.integer('route_id').unsigned().notNullable().references('routes.id').onDelete('CASCADE')
       table.unique(['route_id', 'name'])
-      table.unique(['route_id', 'enabled'])
       table.timestamp('created_at', { useTz: true })
       table.timestamp('updated_at', { useTz: true })
     })
