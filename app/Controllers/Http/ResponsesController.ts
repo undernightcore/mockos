@@ -58,7 +58,7 @@ export default class ResponsesController {
       await routeResponse.useTransaction(trx)
       await route.useTransaction(trx)
       if (data.enabled) await route.related('responses').query().update('enabled', false)
-      await routeResponse.merge(data)
+      await routeResponse.merge(data).save()
       await trx.commit()
     })
     Ws.io.emit(`route:${route.id}`, 'updated')
