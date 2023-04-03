@@ -30,7 +30,12 @@ export default class ResponsesController {
     const page = request.input('page', 1)
     const perPage = request.input('perPage', 10)
     await bouncer.with('ProjectPolicy').authorize('isMember', route.project)
-    const responses = await route.related('responses').query().paginate(page, perPage)
+    const responses = await route
+      .related('responses')
+      .query()
+      .orderBy('enabled', 'desc')
+      .orderBy('created_at', 'desc')
+      .paginate(page, perPage)
     return response.ok(responses)
   }
 
@@ -55,8 +60,8 @@ export default class ResponsesController {
     const project = route.project
     await bouncer.with('ProjectPolicy').authorize('isMember', project)
     await Database.transaction(async (trx) => {
-      await routeResponse.useTransaction(trx)
       await route.useTransaction(trx)
+      await routeResponse.useTransaction(trx)
       if (data.enabled) await route.related('responses').query().update('enabled', false)
       await routeResponse.merge(data).save()
       await trx.commit()
