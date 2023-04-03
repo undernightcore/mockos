@@ -75,7 +75,7 @@ export default class ResponsesController {
     const project = route.project
     await bouncer.with('ProjectPolicy').authorize('isMember', project)
     await routeResponse.delete()
-    Ws.io.emit(`route:${routeResponse.id}`, 'updated')
+    Ws.io.emit(`route:${route.id}`, 'updated')
     Ws.io.emit(`response:${routeResponse.id}`, 'deleted')
     return response.ok({ message: 'Se ha eliminado la respuesta' })
   }
