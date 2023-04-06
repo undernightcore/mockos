@@ -1,5 +1,14 @@
 import { DateTime } from 'luxon'
-import { BaseModel, column, HasMany, hasMany, ManyToMany, manyToMany } from '@ioc:Adonis/Lucid/Orm'
+import {
+  BaseModel,
+  BelongsTo,
+  belongsTo,
+  column,
+  HasMany,
+  hasMany,
+  ManyToMany,
+  manyToMany,
+} from '@ioc:Adonis/Lucid/Orm'
 import User from 'App/Models/User'
 import Route from 'App/Models/Route'
 
@@ -12,6 +21,14 @@ export default class Project extends BaseModel {
 
   @column()
   public description: string | null
+
+  @belongsTo(() => Project, {
+    localKey: 'forked_project_id',
+  })
+  public forkedProject: BelongsTo<typeof Project>
+
+  @column()
+  public forkedProjectId: number | null
 
   @hasMany(() => Route)
   public routes: HasMany<typeof Route>

@@ -3,6 +3,7 @@ import Project from 'App/Models/Project'
 import EditProjectValidator from 'App/Validators/Project/EditProjectValidator'
 import CreateProjectValidator from 'App/Validators/Project/CreateProjectValidator'
 import Member from 'App/Models/Member'
+import Database from '@ioc:Adonis/Lucid/Database'
 
 export default class ProjectsController {
   public async create({ request, response, auth }: HttpContextContract) {
@@ -61,5 +62,41 @@ export default class ProjectsController {
       .preload('user')
       .paginate(page ?? 1, perPage ?? 10)
     return response.ok(memberList)
+  }
+
+  public async fork({ response, request, params, auth, bouncer }: HttpContextContract) {
+    const user = await auth.authenticate()
+    const data = await request.validate(CreateProjectValidator)
+    const project = await Project.findOrFail(params.id)
+    await bouncer.with('ProjectPolicy').authorize('isMember', project)
+    await Database.transaction(async (trx) => {
+      const newProject = await Project.create(
+        { ...data, forkedProjectId: project.id },
+        { client: trx }
+      )
+      const oldRoutes = await project
+        .related('routes')
+        .query()
+        .useTransaction(trx)
+        .preload('responses')
+      await Promise.all(
+        oldRoutes.map(async (oldRoute) => {
+          const { name, endpoint, method, enabled, order, responses } = oldRoute
+          const newRoute = await newProject
+            .related('routes')
+            .create({ name, endpoint, method, enabled, order }, { client: trx })
+          const newResponses = responses.map(({ name, body, status, enabled }) => ({
+            name,
+            body,
+            status,
+            enabled,
+          }))
+          await newRoute.related('responses').createMany(newResponses, { client: trx })
+        })
+      )
+      await newProject.related('members').attach({ [user.id]: { verified: true } }, trx)
+      await trx.commit()
+    })
+    return response.created({ message: 'Project forked successfully' })
   }
 }
