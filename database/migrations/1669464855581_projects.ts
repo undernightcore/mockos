@@ -8,6 +8,12 @@ export default class extends BaseSchema {
       table.increments('id')
       table.string('name').notNullable().unique()
       table.string('description').nullable()
+      table
+        .integer('forked_project_id')
+        .unsigned()
+        .references('projects.id')
+        .nullable()
+        .onDelete('CASCADE')
       table.timestamp('created_at', { useTz: true })
       table.timestamp('updated_at', { useTz: true })
     })

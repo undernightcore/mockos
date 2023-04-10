@@ -8,15 +8,14 @@ export async function recalculateRouteOrder(sortedRoutes: Route[], trx: Transact
   )
   await Promise.all(
     sortedRoutes.map(async (r, index) => {
-      r.useTransaction(trx)
       r.order = index + lastRouteOrder + 1
-      await r.save()
+      await r.useTransaction(trx).save()
     })
   )
   await Promise.all(
     sortedRoutes.map(async (r, index) => {
       r.order = index + 1
-      await r.save()
+      await r.useTransaction(trx).save()
     })
   )
 }

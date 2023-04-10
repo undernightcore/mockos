@@ -60,10 +60,9 @@ export default class ResponsesController {
     const project = route.project
     await bouncer.with('ProjectPolicy').authorize('isMember', project)
     await Database.transaction(async (trx) => {
-      await route.useTransaction(trx)
-      await routeResponse.useTransaction(trx)
-      if (data.enabled) await route.related('responses').query().update('enabled', false)
-      await routeResponse.merge(data).save()
+      if (data.enabled)
+        await route.related('responses').query().useTransaction(trx).update('enabled', false)
+      await routeResponse.merge(data).useTransaction(trx).save()
       await trx.commit()
     })
     Ws.io.emit(`route:${route.id}`, 'updated')
