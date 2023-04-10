@@ -45,6 +45,7 @@ export default class ProjectsController {
     const projectList = await user
       .related('projects')
       .query()
+      .preload('forkedProject')
       .wherePivot('verified', true)
       .orderBy('created_at')
       .paginate(page ?? 1, perPage ?? 10)
