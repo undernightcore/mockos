@@ -23,11 +23,11 @@ export default class Project extends BaseModel {
   public description: string | null
 
   @belongsTo(() => Project, {
-    localKey: 'forkedProjectId',
+    foreignKey: 'forkedProjectId',
   })
   public forkedProject: BelongsTo<typeof Project>
 
-  @column()
+  @column({ serializeAs: null })
   public forkedProjectId: number | null
 
   @hasMany(() => Route)
