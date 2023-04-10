@@ -27,6 +27,14 @@ export default class InvitationsController {
     return response.ok({ message: `Bienvenido a ${invitation.project.name}, ${user.name}!` })
   }
 
+  public async reject({ response, auth, params, bouncer }: HttpContextContract) {
+    await auth.authenticate()
+    const invitation = await Member.findOrFail(params.id)
+    await bouncer.with('InvitationPolicy').authorize('isInvited', invitation)
+    await invitation.delete()
+    return response.ok({ message: `Has rechazado la invitación` })
+  }
+
   public async invite({ response, params, auth, bouncer }: HttpContextContract) {
     await auth.authenticate()
     const project = await Project.findOrFail(params.projectId)
