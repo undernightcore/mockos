@@ -23,7 +23,7 @@ export default class Project extends BaseModel {
   public description: string | null
 
   @belongsTo(() => Project, {
-    localKey: 'forked_project_id',
+    localKey: 'forkedProjectId',
   })
   public forkedProject: BelongsTo<typeof Project>
 
