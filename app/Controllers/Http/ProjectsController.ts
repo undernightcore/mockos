@@ -98,6 +98,14 @@ export default class ProjectsController {
       await newProject.related('members').attach({ [user.id]: { verified: true } }, trx)
       await trx.commit()
     })
-    return response.created({ message: 'Project forked successfully' })
+    return response.created({ message: 'Rama creada correctamente' })
+  }
+
+  public async leave({ response, auth, params, bouncer }: HttpContextContract) {
+    const user = await auth.authenticate()
+    const project = await Project.findOrFail(params.id)
+    await bouncer.with('ProjectPolicy').authorize('isMember', project)
+    await project.related('members').detach([user.id])
+    return response.ok({ message: `Te has ido del projecto ${project.name}` })
   }
 }
