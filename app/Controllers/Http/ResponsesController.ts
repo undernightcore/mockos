@@ -17,7 +17,6 @@ export default class ResponsesController {
       route.useTransaction(trx)
       if (data.enabled) await route.related('responses').query().update('enabled', false)
       await route.related('responses').create(data)
-      await trx.commit()
     })
     Ws.io.emit(`route:${route.id}`, 'updated')
     return response.created({ message: 'Se ha creado la respuesta' })
@@ -60,10 +59,15 @@ export default class ResponsesController {
     const project = route.project
     await bouncer.with('ProjectPolicy').authorize('isMember', project)
     await Database.transaction(async (trx) => {
-      if (data.enabled)
-        await route.related('responses').query().useTransaction(trx).update('enabled', false)
+      if (data.enabled) {
+        await route
+          .related('responses')
+          .query()
+          .useTransaction(trx)
+          .whereNot('id', routeResponse.id)
+          .update('enabled', false)
+      }
       await routeResponse.merge(data).useTransaction(trx).save()
-      await trx.commit()
     })
     Ws.io.emit(`route:${route.id}`, 'updated')
     Ws.io.emit(`response:${routeResponse.id}`, 'updated')
