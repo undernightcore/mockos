@@ -104,7 +104,13 @@ export default class ProjectsController {
     const user = await auth.authenticate()
     const project = await Project.findOrFail(params.id)
     await bouncer.with('ProjectPolicy').authorize('isMember', project)
-    await project.related('members').detach([user.id])
+    const count =
+      (await project.related('members').query().count('* as total'))[0].$extras.total - 1
+    if (count) {
+      await project.related('members').detach([user.id])
+    } else {
+      await project.delete()
+    }
     return response.ok({ message: `Te has ido del projecto ${project.name}` })
   }
 }
