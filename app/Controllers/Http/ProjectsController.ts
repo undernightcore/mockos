@@ -96,7 +96,6 @@ export default class ProjectsController {
         })
       )
       await newProject.related('members').attach({ [user.id]: { verified: true } }, trx)
-      await trx.commit()
     })
     return response.created({ message: 'Rama creada correctamente' })
   }
