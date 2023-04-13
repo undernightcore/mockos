@@ -31,7 +31,14 @@ export default class InvitationsController {
     await auth.authenticate()
     const invitation = await Member.findOrFail(params.id)
     await bouncer.with('InvitationPolicy').authorize('isInvited', invitation)
-    await invitation.delete()
+    await invitation.load('project')
+    const count =
+      (await invitation.project.related('members').query().count('* as total'))[0].$extras.total - 1
+    if (count) {
+      await invitation.delete()
+    } else {
+      await invitation.project.delete()
+    }
     return response.ok({ message: `Has rechazado la invitación` })
   }
 
