@@ -17,17 +17,22 @@ export default class InvitationsController {
     return response.ok(invitations)
   }
 
-  public async accept({ response, auth, params, bouncer }: HttpContextContract) {
+  public async accept({ response, auth, params, bouncer, i18n }: HttpContextContract) {
     const user = await auth.authenticate()
     const invitation = await Member.findOrFail(params.id)
     await bouncer.with('InvitationPolicy').authorize('isInvited', invitation)
     await invitation.load('project')
     invitation.verified = true
     await invitation.save()
-    return response.ok({ message: `Bienvenido a ${invitation.project.name}, ${user.name}!` })
+    return response.ok({
+      message: i18n.formatMessage('responses.invitation.accept.welcome_user', {
+        project: invitation.project.name,
+        name: user.name,
+      }),
+    })
   }
 
-  public async reject({ response, auth, params, bouncer }: HttpContextContract) {
+  public async reject({ response, auth, params, bouncer, i18n }: HttpContextContract) {
     await auth.authenticate()
     const invitation = await Member.findOrFail(params.id)
     await bouncer.with('InvitationPolicy').authorize('isInvited', invitation)
@@ -39,10 +44,12 @@ export default class InvitationsController {
     } else {
       await invitation.project.delete()
     }
-    return response.ok({ message: `Has rechazado la invitación` })
+    return response.ok({
+      message: i18n.formatMessage('responses.invitation.reject.invitation_rejected'),
+    })
   }
 
-  public async invite({ response, params, auth, bouncer }: HttpContextContract) {
+  public async invite({ response, params, auth, bouncer, i18n }: HttpContextContract) {
     await auth.authenticate()
     const project = await Project.findOrFail(params.projectId)
     const user = await User.findByOrFail('email', params.email)
@@ -54,6 +61,10 @@ export default class InvitationsController {
         verified: false,
       },
     })
-    return response.ok({ message: `Se ha invitado a ${user.name}` })
+    return response.ok({
+      message: i18n.formatMessage('responses.invitation.invite.user_invited', {
+        name: user.name,
+      }),
+    })
   }
 }

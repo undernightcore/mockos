@@ -7,7 +7,7 @@ import EditResponseValidator from 'App/Validators/Response/EditResponseValidator
 import Ws from 'App/Services/Ws'
 
 export default class ResponsesController {
-  public async create({ request, response, auth, bouncer, params }: HttpContextContract) {
+  public async create({ request, response, auth, bouncer, params, i18n }: HttpContextContract) {
     await auth.authenticate()
     const data = await request.validate(CreateResponseValidator)
     const route = await Route.findOrFail(params.id)
@@ -19,7 +19,9 @@ export default class ResponsesController {
       await route.related('responses').create(data)
     })
     Ws.io.emit(`route:${route.id}`, 'updated')
-    return response.created({ message: 'Se ha creado la respuesta' })
+    return response.created({
+      message: i18n.formatMessage('responses.response.create.response_created'),
+    })
   }
 
   public async getList({ request, response, auth, bouncer, params }: HttpContextContract) {
@@ -49,7 +51,7 @@ export default class ResponsesController {
     return response.ok(routeResponse)
   }
 
-  public async edit({ request, response, auth, bouncer, params }: HttpContextContract) {
+  public async edit({ request, response, auth, bouncer, params, i18n }: HttpContextContract) {
     await auth.authenticate()
     const data = await request.validate(EditResponseValidator)
     const routeResponse = await Response.findOrFail(params.id)
@@ -71,10 +73,10 @@ export default class ResponsesController {
     })
     Ws.io.emit(`route:${route.id}`, 'updated')
     Ws.io.emit(`response:${routeResponse.id}`, 'updated')
-    return response.ok({ message: 'Se ha actualizado la respuesta' })
+    return response.ok({ message: i18n.formatMessage('responses.response.edit.response_edited') })
   }
 
-  public async delete({ response, auth, bouncer, params }: HttpContextContract) {
+  public async delete({ response, auth, bouncer, params, i18n }: HttpContextContract) {
     await auth.authenticate()
     const routeResponse = await Response.findOrFail(params.id)
     await routeResponse.load('route')
@@ -85,6 +87,8 @@ export default class ResponsesController {
     await routeResponse.delete()
     Ws.io.emit(`route:${route.id}`, 'updated')
     Ws.io.emit(`response:${routeResponse.id}`, 'deleted')
-    return response.ok({ message: 'Se ha eliminado la respuesta' })
+    return response.ok({
+      message: i18n.formatMessage('responses.response.delete.response_deleted'),
+    })
   }
 }

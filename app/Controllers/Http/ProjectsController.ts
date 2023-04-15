@@ -14,12 +14,16 @@ export default class ProjectsController {
     return response.created(project)
   }
 
-  public async delete({ response, params, bouncer, auth }: HttpContextContract) {
+  public async delete({ response, params, bouncer, auth, i18n }: HttpContextContract) {
     await auth.authenticate()
     const project = await Project.findOrFail(params.id)
     await bouncer.with('ProjectPolicy').authorize('isMember', project)
     await project.delete()
-    return response.ok({ message: `Se ha eliminado el projecto ${project.name} correctamente` })
+    return response.ok({
+      message: i18n.formatMessage('responses.project.delete.project_deleted', {
+        project: project.name,
+      }),
+    })
   }
 
   public async edit({ request, params, response, auth, bouncer }: HttpContextContract) {
@@ -65,7 +69,7 @@ export default class ProjectsController {
     return response.ok(memberList)
   }
 
-  public async fork({ response, request, params, auth, bouncer }: HttpContextContract) {
+  public async fork({ response, request, params, auth, bouncer, i18n }: HttpContextContract) {
     const user = await auth.authenticate()
     const data = await request.validate(CreateProjectValidator)
     const project = await Project.findOrFail(params.id)
@@ -97,10 +101,10 @@ export default class ProjectsController {
       )
       await newProject.related('members').attach({ [user.id]: { verified: true } }, trx)
     })
-    return response.created({ message: 'Rama creada correctamente' })
+    return response.created({ message: i18n.formatMessage('responses.project.fork.fork_created') })
   }
 
-  public async leave({ response, auth, params, bouncer }: HttpContextContract) {
+  public async leave({ response, auth, params, bouncer, i18n }: HttpContextContract) {
     const user = await auth.authenticate()
     const project = await Project.findOrFail(params.id)
     await bouncer.with('ProjectPolicy').authorize('isMember', project)
@@ -111,6 +115,10 @@ export default class ProjectsController {
     } else {
       await project.delete()
     }
-    return response.ok({ message: `Te has ido del projecto ${project.name}` })
+    return response.ok({
+      message: i18n.formatMessage('responses.project.leave.left_project', {
+        project: project.name,
+      }),
+    })
   }
 }

@@ -2,7 +2,7 @@ import { HttpContextContract } from '@ioc:Adonis/Core/HttpContext'
 import Project from 'App/Models/Project'
 
 export default class ApiController {
-  public async mock({ request, auth, params, response }: HttpContextContract) {
+  public async mock({ request, auth, params, response, i18n }: HttpContextContract) {
     await auth.authenticate()
     const projectId = request.headers().project
     const method = request.method().toLowerCase()
@@ -10,7 +10,7 @@ export default class ApiController {
     if (projectId === undefined)
       return response
         .status(500)
-        .json({ errors: ['Necesitamos que envíes el proyecto de la petición'] })
+        .json({ errors: [i18n.formatMessage('responses.api.mock.missing_project_header')] })
     const project = await Project.findOrFail(projectId)
     const routes = await project
       .related('routes')
@@ -28,7 +28,7 @@ export default class ApiController {
     if (routeIndex === -1)
       return response
         .status(400)
-        .json({ errors: ['No se ha encontrado ninguna ruta con ese endpoint y métodos'] })
+        .json({ errors: [i18n.formatMessage('responses.api.mock.missing_route')] })
     const enabledResponse = await routes[routeIndex]
       .related('responses')
       .query()
@@ -39,7 +39,7 @@ export default class ApiController {
       .json(
         enabledResponse
           ? enabledResponse.body
-          : { errors: ['No se ha encontrado ninguna respuesta disponible para esa ruta y método'] }
+          : { errors: [i18n.formatMessage('responses.api.mock.missing_response')] }
       )
   }
 }

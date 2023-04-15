@@ -36,7 +36,7 @@ export default class RoutesController {
     return response.ok(newRoute)
   }
 
-  public async delete({ response, auth, params, bouncer }: HttpContextContract) {
+  public async delete({ response, auth, params, bouncer, i18n }: HttpContextContract) {
     await auth.authenticate()
     const route = await Route.findOrFail(params.id)
     const project = await Project.findOrFail(route.projectId)
@@ -49,7 +49,7 @@ export default class RoutesController {
     })
     Ws.io.emit(`project:${project.id}`, `updated`)
     Ws.io.emit(`route:${route.id}`, `deleted`)
-    return response.ok({ message: 'Se ha eliminado la ruta correctamente' })
+    return response.ok({ message: i18n.formatMessage('responses.route.delete.route_deleted') })
   }
 
   public async get({ response, auth, params, bouncer }: HttpContextContract) {
@@ -77,7 +77,7 @@ export default class RoutesController {
     return response.ok(routes)
   }
 
-  public async sort({ auth, params, request, response }: HttpContextContract) {
+  public async sort({ auth, params, request, response, i18n }: HttpContextContract) {
     await auth.authenticate()
     const data = await request.validate(SortRouteValidator)
     const project = await Project.findOrFail(params.id)
@@ -87,7 +87,7 @@ export default class RoutesController {
     if (!sameProject)
       return response
         .status(400)
-        .json({ errors: ['Las rutas no corresponden al projecto correcto'] })
+        .json({ errors: [i18n.formatMessage('responses.route.sort.route_mismatch')] })
     await Database.transaction(async (trx) => {
       const routes = await project.related('routes').query().useTransaction(trx).orderBy('order')
       const fromIndex = routes.findIndex((route) => route.id === fromRoute.id)
@@ -96,6 +96,6 @@ export default class RoutesController {
       await recalculateRouteOrder(routes, trx)
     })
     Ws.io.emit(`project:${project.id}`, `updated`)
-    return response.ok({ message: 'Se ha movido correctamente' })
+    return response.ok({ message: i18n.formatMessage('responses.route.sort.route_sorted') })
   }
 }
