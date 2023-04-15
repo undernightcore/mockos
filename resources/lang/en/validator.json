@@ -1,0 +1,77 @@
+{
+  "auth": {
+    "login": {
+      "email.required": "We need an email so we know who you are",
+      "email.email": "This email does not look right...",
+      "password.required": "We need your password to verify that it's actually you"
+    },
+    "register": {
+      "email.required": "We need an email to register you",
+      "email.unique": "You already have an account with this email",
+      "email.email": "This email is not valid",
+      "name.required": "We need a name to know how to address you",
+      "password.required": "We need a password to give you access",
+      "password.minLength": "Please use a password of at least 8 characters"
+    }
+  },
+  "project": {
+    "create": {
+      "name.required": "I need a name for the project",
+      "name.unique": "A project with this name already exists",
+      "name.minLength": "The name must be at least 3 characters long",
+      "description.minLength": "The description must be at least 3 characters long",
+      "description.nullable": "A description is required, if you don't want to send one you can send null"
+    },
+    "edit": {
+      "name.required": "I need a name to modify",
+      "name.unique": "A project with this name already exists",
+      "name.minLength": "The name must be at least 3 characters long",
+      "description.minLength": "The description must be at least 3 characters long",
+      "description.nullable": "A description is required, if you don't want to send one you can send null"
+    }
+  },
+  "response": {
+    "create": {
+      "enabled.required": "You need to indicate if the response is enabled",
+      "status.required": "You need an HTTP code for your response",
+      "status.range": "The HTTP code must be valid",
+      "body.required": "A body is necessary for your response",
+      "name.required": "A name is necessary for your response",
+      "name.unique": "This response name already exists"
+    },
+    "edit": {
+      "enabled.required": "You need to indicate if the response is enabled",
+      "status.required": "You need an HTTP code for your response",
+      "status.range": "The HTTP code must be valid",
+      "body.required": "A body is necessary for your response",
+      "name.required": "A name is necessary for your response",
+      "name.unique": "This response name already exists"
+    }
+  },
+  "route": {
+    "create": {
+      "name.required": "A brief description for the route is needed",
+      "name.minLength": "The name must have at least 3 characters",
+      "method.required": "An HTTP verb must be specified",
+      "method.enum": "This is not a valid verb.",
+      "method.unique": "There is already a route with this method and endpoint in this project",
+      "endpoint.required": "The endpoint URL to create is required",
+      "endpoint.regex": "The endpoint must start with / and not end in /",
+      "enabled.required": "You have to indicate the state of the route"
+    },
+    "edit": {
+      "name.required": "A brief description for the route is needed",
+      "name.minLength": "The name must have at least 3 characters",
+      "method.required": "An HTTP verb must be specified",
+      "method.enum": "This is not a valid verb.",
+      "method.unique": "There is already a route with this method and endpoint in this project",
+      "endpoint.required": "The endpoint URL to create is required",
+      "endpoint.regex": "The endpoint must start with / and not end in /",
+      "enabled.required": "You have to indicate the state of the route"
+    },
+    "sort": {
+      "origin.required": "You need to indicate which route you are going to move",
+      "destination.required": "You need to indicate where you are going to move the route"
+    }
+  }
+}

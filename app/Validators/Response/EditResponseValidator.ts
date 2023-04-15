@@ -1,8 +1,8 @@
-import { schema, CustomMessages, rules } from '@ioc:Adonis/Core/Validator'
+import { schema, rules } from '@ioc:Adonis/Core/Validator'
 import type { HttpContextContract } from '@ioc:Adonis/Core/HttpContext'
 
 export default class EditResponseValidator {
-  constructor(protected ctx: HttpContextContract) {}
+  constructor(private ctx: HttpContextContract) {}
   public schema = schema.create({
     enabled: schema.boolean(),
     status: schema.number([rules.range(100, 599)]),
@@ -17,12 +17,5 @@ export default class EditResponseValidator {
     ]),
   })
 
-  public messages: CustomMessages = {
-    'enabled.required': 'Es necesario que indiques si la respuesta está activada',
-    'status.required': 'Es necesario un código HTTP para tu respuesta',
-    'status.range': 'El código HTTP debe ser valido',
-    'body.required': 'Es necesaria un cuerpo para tu respuesta',
-    'name.required': 'Es necesario un nombre para tu respuesta',
-    'name.unique': 'Este nombre de respuesta ya existe',
-  }
+  public messages = this.ctx.i18n.validatorMessages('validator.response.edit')
 }
