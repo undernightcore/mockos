@@ -17,7 +17,7 @@ export default class ProjectsController {
   public async delete({ response, params, bouncer, auth, i18n }: HttpContextContract) {
     await auth.authenticate()
     const project = await Project.findOrFail(params.id)
-    await bouncer.with('ProjectPolicy').authorize('isMember', project)
+    await bouncer.with('ProjectPolicy').authorize('isMember', project, i18n)
     await project.delete()
     return response.ok({
       message: i18n.formatMessage('responses.project.delete.project_deleted', {
@@ -26,19 +26,19 @@ export default class ProjectsController {
     })
   }
 
-  public async edit({ request, params, response, auth, bouncer }: HttpContextContract) {
+  public async edit({ request, params, response, auth, bouncer, i18n }: HttpContextContract) {
     await auth.authenticate()
     const data = await request.validate(EditProjectValidator)
     const project = await Project.findOrFail(params.id)
-    await bouncer.with('ProjectPolicy').authorize('isMember', project)
+    await bouncer.with('ProjectPolicy').authorize('isMember', project, i18n)
     const newProject = await project?.merge(data).save()
     return response.ok(newProject)
   }
 
-  public async get({ params, response, auth, bouncer }: HttpContextContract) {
+  public async get({ params, response, auth, bouncer, i18n }: HttpContextContract) {
     await auth.authenticate()
     const project = await Project.findOrFail(params.id)
-    await bouncer.with('ProjectPolicy').authorize('isMember', project)
+    await bouncer.with('ProjectPolicy').authorize('isMember', project, i18n)
     return response.ok(project)
   }
 
@@ -56,12 +56,19 @@ export default class ProjectsController {
     return response.ok(projectList)
   }
 
-  public async getMemberList({ response, request, params, auth, bouncer }: HttpContextContract) {
+  public async getMemberList({
+    response,
+    request,
+    params,
+    auth,
+    bouncer,
+    i18n,
+  }: HttpContextContract) {
     await auth.authenticate()
     const page = await request.input('page')
     const perPage = await request.input('perPage')
     const project = await Project.findOrFail(params.id)
-    await bouncer.with('ProjectPolicy').authorize('isMember', project)
+    await bouncer.with('ProjectPolicy').authorize('isMember', project, i18n)
     const memberList = await Member.query()
       .where('project_id', project.id)
       .preload('user')
@@ -73,7 +80,7 @@ export default class ProjectsController {
     const user = await auth.authenticate()
     const data = await request.validate(CreateProjectValidator)
     const project = await Project.findOrFail(params.id)
-    await bouncer.with('ProjectPolicy').authorize('isMember', project)
+    await bouncer.with('ProjectPolicy').authorize('isMember', project, i18n)
     await Database.transaction(async (trx) => {
       const newProject = await Project.create(
         { ...data, forkedProjectId: project.id },
@@ -107,7 +114,7 @@ export default class ProjectsController {
   public async leave({ response, auth, params, bouncer, i18n }: HttpContextContract) {
     const user = await auth.authenticate()
     const project = await Project.findOrFail(params.id)
-    await bouncer.with('ProjectPolicy').authorize('isMember', project)
+    await bouncer.with('ProjectPolicy').authorize('isMember', project, i18n)
     const count =
       (await project.related('members').query().count('* as total'))[0].$extras.total - 1
     if (count) {

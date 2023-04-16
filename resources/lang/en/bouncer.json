@@ -1,0 +1,15 @@
+{
+  "global": {
+    "is_verified": "The user must verify their email first"
+  },
+  "invitation": {
+    "is_invited": "You haven't been invited to this party!"
+  },
+  "project": {
+    "is_already_member": {
+      "is_verified": "This member already exists",
+      "is_not_verified": "This member is pending to accept the invitation"
+    },
+    "is_member": "You are not a member of this project"
+  }
+}

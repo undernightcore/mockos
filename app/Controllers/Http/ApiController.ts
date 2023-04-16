@@ -2,7 +2,7 @@ import { HttpContextContract } from '@ioc:Adonis/Core/HttpContext'
 import Project from 'App/Models/Project'
 
 export default class ApiController {
-  public async mock({ request, auth, params, response, i18n }: HttpContextContract) {
+  public async mock({ request, auth, params, response, bouncer, i18n }: HttpContextContract) {
     await auth.authenticate()
     const projectId = request.headers().project
     const method = request.method().toLowerCase()
@@ -12,6 +12,7 @@ export default class ApiController {
         .status(500)
         .json({ errors: [i18n.formatMessage('responses.api.mock.missing_project_header')] })
     const project = await Project.findOrFail(projectId)
+    await bouncer.with('ProjectPolicy').authorize('isMember', project, i18n)
     const routes = await project
       .related('routes')
       .query()

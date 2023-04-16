@@ -12,7 +12,7 @@ export default class ResponsesController {
     const data = await request.validate(CreateResponseValidator)
     const route = await Route.findOrFail(params.id)
     await route.load('project')
-    await bouncer.with('ProjectPolicy').authorize('isMember', route.project)
+    await bouncer.with('ProjectPolicy').authorize('isMember', route.project, i18n)
     await Database.transaction(async (trx) => {
       route.useTransaction(trx)
       if (data.enabled) await route.related('responses').query().update('enabled', false)
@@ -24,13 +24,13 @@ export default class ResponsesController {
     })
   }
 
-  public async getList({ request, response, auth, bouncer, params }: HttpContextContract) {
+  public async getList({ request, response, auth, bouncer, params, i18n }: HttpContextContract) {
     await auth.authenticate()
     const route = await Route.findOrFail(params.id)
     await route.load('project')
     const page = request.input('page', 1)
     const perPage = request.input('perPage', 10)
-    await bouncer.with('ProjectPolicy').authorize('isMember', route.project)
+    await bouncer.with('ProjectPolicy').authorize('isMember', route.project, i18n)
     const responses = await route
       .related('responses')
       .query()
@@ -40,14 +40,14 @@ export default class ResponsesController {
     return response.ok(responses)
   }
 
-  public async get({ response, auth, bouncer, params }: HttpContextContract) {
+  public async get({ response, auth, bouncer, params, i18n }: HttpContextContract) {
     await auth.authenticate()
     const routeResponse = await Response.findOrFail(params.id)
     await routeResponse.load('route')
     const route = routeResponse.route
     await route.load('project')
     const project = route.project
-    await bouncer.with('ProjectPolicy').authorize('isMember', project)
+    await bouncer.with('ProjectPolicy').authorize('isMember', project, i18n)
     return response.ok(routeResponse)
   }
 
@@ -59,7 +59,7 @@ export default class ResponsesController {
     const route = routeResponse.route
     await route.load('project')
     const project = route.project
-    await bouncer.with('ProjectPolicy').authorize('isMember', project)
+    await bouncer.with('ProjectPolicy').authorize('isMember', project, i18n)
     await Database.transaction(async (trx) => {
       if (data.enabled) {
         await route
@@ -83,7 +83,7 @@ export default class ResponsesController {
     const route = routeResponse.route
     await route.load('project')
     const project = route.project
-    await bouncer.with('ProjectPolicy').authorize('isMember', project)
+    await bouncer.with('ProjectPolicy').authorize('isMember', project, i18n)
     await routeResponse.delete()
     Ws.io.emit(`route:${route.id}`, 'updated')
     Ws.io.emit(`response:${routeResponse.id}`, 'deleted')

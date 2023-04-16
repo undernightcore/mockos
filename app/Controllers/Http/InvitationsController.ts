@@ -20,7 +20,7 @@ export default class InvitationsController {
   public async accept({ response, auth, params, bouncer, i18n }: HttpContextContract) {
     const user = await auth.authenticate()
     const invitation = await Member.findOrFail(params.id)
-    await bouncer.with('InvitationPolicy').authorize('isInvited', invitation)
+    await bouncer.with('InvitationPolicy').authorize('isInvited', invitation, i18n)
     await invitation.load('project')
     invitation.verified = true
     await invitation.save()
@@ -35,7 +35,7 @@ export default class InvitationsController {
   public async reject({ response, auth, params, bouncer, i18n }: HttpContextContract) {
     await auth.authenticate()
     const invitation = await Member.findOrFail(params.id)
-    await bouncer.with('InvitationPolicy').authorize('isInvited', invitation)
+    await bouncer.with('InvitationPolicy').authorize('isInvited', invitation, i18n)
     await invitation.load('project')
     const count =
       (await invitation.project.related('members').query().count('* as total'))[0].$extras.total - 1
@@ -53,9 +53,9 @@ export default class InvitationsController {
     await auth.authenticate()
     const project = await Project.findOrFail(params.projectId)
     const user = await User.findByOrFail('email', params.email)
-    await bouncer.with('ProjectPolicy').authorize('isMember', project)
-    await bouncer.forUser(user).with('ProjectPolicy').authorize('isAlreadyMember', project)
-    await bouncer.forUser(user).with('GlobalPolicy').authorize('isVerified')
+    await bouncer.with('ProjectPolicy').authorize('isMember', project, i18n)
+    await bouncer.forUser(user).with('ProjectPolicy').authorize('isAlreadyMember', project, i18n)
+    await bouncer.forUser(user).with('GlobalPolicy').authorize('isVerified', i18n)
     await project.related('members').attach({
       [user.id]: {
         verified: false,
