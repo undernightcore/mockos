@@ -1,13 +1,13 @@
-import { schema, CustomMessages } from '@ioc:Adonis/Core/Validator'
+import { schema } from '@ioc:Adonis/Core/Validator'
+import { HttpContextContract } from '@ioc:Adonis/Core/HttpContext'
 
 export default class SortRouteValidator {
+  constructor(private ctx: HttpContextContract) {}
+
   public schema = schema.create({
     origin: schema.number(),
     destination: schema.number(),
   })
 
-  public messages: CustomMessages = {
-    'origin.required': 'Es necesario que indiques que ruta vas a mover',
-    'destination.required': 'Es necesario que indiques donde vas a mover la ruta',
-  }
+  public messages = this.ctx.i18n.validatorMessages('validator.route.sort')
 }

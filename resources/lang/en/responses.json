@@ -1,0 +1,62 @@
+{
+  "api": {
+    "mock": {
+      "missing_project_header": "We need you to submit the project of the request",
+      "missing_route": "No route found with that endpoint and methods",
+      "missing_response": "No response available for that route and method"
+    }
+  },
+  "auth": {
+    "register": {
+      "verify_subject": "Welcome to Mockos!",
+      "verify_message": "Please verify your email here {url}",
+      "verify_email": "Hi {name}, please verify your email address"
+    },
+    "login": {
+      "verify_first": "You need to verify your email address first",
+      "wrong_credentials": "Sorry, these credentials are incorrect"
+    }
+  },
+  "invitation": {
+    "accept": {
+      "welcome_user": "Welcome to {project}, {name}!"
+    },
+    "reject": {
+      "invitation_rejected": "You have rejected the invitation"
+    },
+    "invite": {
+      "user_invited": "{name} has been invited"
+    }
+  },
+  "project": {
+    "delete": {
+      "project_deleted": "The {project} project has been successfully deleted"
+    },
+    "fork": {
+      "fork_created": "Branch created successfully"
+    },
+    "leave": {
+      "left_project": "You have left the {project} project"
+    }
+  },
+  "response": {
+    "create": {
+      "response_created": "The response has been created"
+    },
+    "edit": {
+      "response_edited": "The response has been updated"
+    },
+    "delete": {
+      "response_deleted": "The response has been deleted"
+    }
+  },
+  "route": {
+    "delete": {
+      "route_deleted": "The route has been deleted"
+    },
+    "sort": {
+      "route_mismatch": "The routes don't correspond to the correct project",
+      "route_sorted": "Moved successfully"
+    }
+  }
+}

@@ -1,8 +1,8 @@
-import { schema, CustomMessages, rules } from '@ioc:Adonis/Core/Validator'
+import { schema, rules } from '@ioc:Adonis/Core/Validator'
 import type { HttpContextContract } from '@ioc:Adonis/Core/HttpContext'
 
 export default class EditProjectValidator {
-  constructor(protected ctx: HttpContextContract) {}
+  constructor(private ctx: HttpContextContract) {}
 
   public schema = schema.create({
     name: schema.string({}, [
@@ -11,12 +11,5 @@ export default class EditProjectValidator {
     ]),
     description: schema.string.nullable({}, [rules.minLength(3)]),
   })
-  public messages: CustomMessages = {
-    'name.required': 'Necesito un nombre a modificar',
-    'name.unique': 'Ya existe un proyecto con este nombre',
-    'name.minLength': 'El nombre debe tener como mínimo 3 carácteres',
-    'description.minLength': 'La descripción debe tener como mínimo 3 caracteres',
-    'description.nullable':
-      'Es necesaria una descripción, si no quieres enviar una puede pasar null',
-  }
+  public messages = this.ctx.i18n.validatorMessages('validator.project.edit')
 }

@@ -1,14 +1,13 @@
-import { schema, CustomMessages, rules } from '@ioc:Adonis/Core/Validator'
+import { schema, rules } from '@ioc:Adonis/Core/Validator'
+import { HttpContextContract } from '@ioc:Adonis/Core/HttpContext'
 
 export default class LoginValidator {
+  constructor(private ctx: HttpContextContract) {}
+
   public schema = schema.create({
     email: schema.string({}, [rules.email()]),
     password: schema.string(),
   })
 
-  public messages: CustomMessages = {
-    'email.required': 'Necesito tu correo para poder logearte.',
-    'email.email': 'Este correo no es valido.',
-    'password.required': 'Necesito tu contraseña (o tu intento de contreseña).',
-  }
+  public messages = this.ctx.i18n.validatorMessages('validator.auth.login')
 }

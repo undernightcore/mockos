@@ -1,0 +1,62 @@
+{
+  "api": {
+    "mock": {
+      "missing_project_header": "Necesitamos que envíes el proyecto de la petición",
+      "missing_route": "No se ha encontrado ninguna ruta con ese endpoint y métodos",
+      "missing_response": "No se ha encontrado ninguna respuesta disponible para esa ruta y método"
+    }
+  },
+  "auth": {
+    "register": {
+      "verify_subject": "¡Bienvenido a Mockos!",
+      "verify_message": "Porfi, verifica tu correo aquí {url}",
+      "verify_email": "Holi {name}, verifica tu correo electrónico porfa"
+    },
+    "login": {
+      "verify_first": "Tienes que verificar tu correo electrónico primero",
+      "wrong_credentials": "Bro estas credenciales no están bien"
+    }
+  },
+  "invitation": {
+    "accept": {
+      "welcome_user": "¡Bienvenido a {project}, {name}!"
+    },
+    "reject": {
+      "invitation_rejected": "Has rechazado la invitación"
+    },
+    "invite": {
+      "user_invited": "Se ha invitado a {name}"
+    }
+  },
+  "project": {
+    "delete": {
+      "project_deleted": "Se ha eliminado el projecto {project} correctamente"
+    },
+    "fork": {
+      "fork_created": "Rama creada correctamente"
+    },
+    "leave": {
+      "left_project": "Te has ido del projecto {project}"
+    }
+  },
+  "response": {
+    "create": {
+      "response_created": "Se ha creado la respuesta"
+    },
+    "edit": {
+      "response_edited": "Se ha actualizado la respuesta"
+    },
+    "delete": {
+      "response_deleted": "Se ha eliminado la respuesta"
+    }
+  },
+  "route": {
+    "delete": {
+      "route_deleted": "Se ha eliminado la ruta"
+    },
+    "sort": {
+      "route_mismatch": "Las rutas no corresponden al projecto correcto",
+      "route_sorted": "Se ha movido correctamente"
+    }
+  }
+}
