@@ -27,7 +27,8 @@
     "@adonisjs/auth",
     "@adonisjs/mail",
     "@adonisjs/bouncer",
-    "@adonisjs/i18n"
+    "@adonisjs/i18n",
+    "@adonisjs/drive-s3"
   ],
   "aceProviders": [
     "@adonisjs/repl"

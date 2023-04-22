@@ -42,7 +42,7 @@ export default driveConfig({
     */
     local: {
       driver: 'local',
-      visibility: 'public',
+      visibility: 'private',
 
       /*
       |--------------------------------------------------------------------------
@@ -65,7 +65,7 @@ export default driveConfig({
       | storage services that has inbuilt capabilities to serve files.
       |
       */
-      serveFiles: true,
+      serveFiles: false,
 
       /*
       |--------------------------------------------------------------------------
@@ -93,18 +93,16 @@ export default driveConfig({
     |**************************************************************************
     |
     */
-    // s3: {
-    //   driver: 's3',
-    //   visibility: 'public',
-    //   key: Env.get('S3_KEY'),
-    //   secret: Env.get('S3_SECRET'),
-    //   region: Env.get('S3_REGION'),
-    //   bucket: Env.get('S3_BUCKET'),
-    //   endpoint: Env.get('S3_ENDPOINT'),
-    //
-    //  // For minio to work
-    //  // forcePathStyle: true,
-    // },
+    s3: {
+      driver: 's3',
+      visibility: 'private',
+      key: Env.get('S3_KEY'),
+      secret: Env.get('S3_SECRET'),
+      region: Env.get('S3_REGION'),
+      bucket: Env.get('S3_BUCKET'),
+      endpoint: Env.get('S3_ENDPOINT'),
+      forcePathStyle: true,
+    },
 
     /*
     |--------------------------------------------------------------------------

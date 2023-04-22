@@ -97,11 +97,12 @@ export default class ProjectsController {
           const newRoute = await newProject
             .related('routes')
             .create({ name, endpoint, method, enabled, order }, { client: trx })
-          const newResponses = responses.map(({ name, body, status, enabled }) => ({
+          const newResponses = responses.map(({ name, body, status, enabled, isFile }) => ({
             name,
             body,
             status,
             enabled,
+            isFile,
           }))
           await newRoute.related('responses').createMany(newResponses, { client: trx })
         })

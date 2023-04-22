@@ -57,6 +57,7 @@
     "@adonisjs/auth": "^8.2.3",
     "@adonisjs/bouncer": "^2.3.0",
     "@adonisjs/core": "^5.9.0",
+    "@adonisjs/drive-s3": "^1.3.2",
     "@adonisjs/i18n": "^1.5.6",
     "@adonisjs/lucid": "^18.3.0",
     "@adonisjs/mail": "^8.1.2",
