@@ -44,6 +44,7 @@ export default class DetectUserLocale {
      * Share i18n with view
      */
     if ('view' in ctx) {
+      // @ts-ignore
       ctx.view.share({ i18n: ctx.i18n })
     }
 
