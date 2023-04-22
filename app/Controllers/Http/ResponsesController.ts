@@ -5,10 +5,13 @@ import Database from '@ioc:Adonis/Lucid/Database'
 import Response from 'App/Models/Response'
 import EditResponseValidator from 'App/Validators/Response/EditResponseValidator'
 import Ws from 'App/Services/Ws'
+import { MultipartFileContract } from '@ioc:Adonis/Core/BodyParser'
+import Drive from '@ioc:Adonis/Core/Drive'
 
 export default class ResponsesController {
   public async create({ request, response, auth, bouncer, params, i18n }: HttpContextContract) {
     await auth.authenticate()
+    const isFile = Boolean(await request.input('isFile', false))
     const data = await request.validate(CreateResponseValidator)
     const route = await Route.findOrFail(params.id)
     await route.load('project')
@@ -16,7 +19,12 @@ export default class ResponsesController {
     await Database.transaction(async (trx) => {
       route.useTransaction(trx)
       if (data.enabled) await route.related('responses').query().update('enabled', false)
-      await route.related('responses').create(data)
+      if (isFile) {
+        const file = data.body as MultipartFileContract
+        await file.moveToDisk('responses')
+        data.body = file.fileName ?? ''
+      }
+      await route.related('responses').create({ ...data, body: data.body as string })
     })
     Ws.io.emit(`route:${route.id}`, 'updated')
     return response.created({
@@ -53,6 +61,7 @@ export default class ResponsesController {
 
   public async edit({ request, response, auth, bouncer, params, i18n }: HttpContextContract) {
     await auth.authenticate()
+    const isFile = Boolean(await request.input('isFile', false))
     const data = await request.validate(EditResponseValidator)
     const routeResponse = await Response.findOrFail(params.id)
     await routeResponse.load('route')
@@ -69,7 +78,15 @@ export default class ResponsesController {
           .whereNot('id', routeResponse.id)
           .update('enabled', false)
       }
-      await routeResponse.merge(data).useTransaction(trx).save()
+      if (isFile) {
+        const file = data.body as MultipartFileContract
+        await file.moveToDisk('responses')
+        data.body = file.fileName ?? ''
+      }
+      await routeResponse
+        .merge({ ...data, body: data.body as string })
+        .useTransaction(trx)
+        .save()
     })
     Ws.io.emit(`route:${route.id}`, 'updated')
     Ws.io.emit(`response:${routeResponse.id}`, 'updated')
@@ -85,6 +102,7 @@ export default class ResponsesController {
     const project = route.project
     await bouncer.with('ProjectPolicy').authorize('isMember', project, i18n)
     await routeResponse.delete()
+    if (routeResponse.isFile) await Drive.delete(`responses/${routeResponse.body}`)
     Ws.io.emit(`route:${route.id}`, 'updated')
     Ws.io.emit(`response:${routeResponse.id}`, 'deleted')
     return response.ok({

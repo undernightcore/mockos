@@ -9,6 +9,7 @@ export default class extends BaseSchema {
       table.string('name').notNullable()
       table.integer('status').notNullable()
       table.string('body').notNullable()
+      table.boolean('is_file').notNullable()
       table.boolean('enabled').defaultTo(false)
       table.integer('route_id').unsigned().notNullable().references('routes.id').onDelete('CASCADE')
       table.unique(['route_id', 'name'])
