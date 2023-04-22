@@ -6,7 +6,7 @@ import Response from 'App/Models/Response'
 import EditResponseValidator from 'App/Validators/Response/EditResponseValidator'
 import Ws from 'App/Services/Ws'
 import { MultipartFileContract } from '@ioc:Adonis/Core/BodyParser'
-import Drive from '@ioc:Adonis/Core/Drive'
+import { deleteIfOnceUsed } from 'App/Helpers/file.helper'
 
 export default class ResponsesController {
   public async create({ request, response, auth, bouncer, params, i18n }: HttpContextContract) {
@@ -24,7 +24,7 @@ export default class ResponsesController {
         await file.moveToDisk('responses')
         data.body = file.fileName ?? ''
       }
-      await route.related('responses').create({ ...data, body: data.body as string })
+      await route.related('responses').create({ ...data, isFile, body: data.body as string })
     })
     Ws.io.emit(`route:${route.id}`, 'updated')
     return response.created({
@@ -78,13 +78,16 @@ export default class ResponsesController {
           .whereNot('id', routeResponse.id)
           .update('enabled', false)
       }
-      if (isFile) {
+      if (isFile && data.body) {
         const file = data.body as MultipartFileContract
         await file.moveToDisk('responses')
         data.body = file.fileName ?? ''
+        await deleteIfOnceUsed('responses', routeResponse.body)
+      } else if (!isFile && routeResponse.isFile) {
+        await deleteIfOnceUsed('responses', routeResponse.body)
       }
       await routeResponse
-        .merge({ ...data, body: data.body as string })
+        .merge({ ...data, isFile, body: (data.body as string | undefined) ?? routeResponse.body })
         .useTransaction(trx)
         .save()
     })
@@ -101,8 +104,8 @@ export default class ResponsesController {
     await route.load('project')
     const project = route.project
     await bouncer.with('ProjectPolicy').authorize('isMember', project, i18n)
+    if (routeResponse.isFile) await deleteIfOnceUsed('responses', routeResponse.body)
     await routeResponse.delete()
-    if (routeResponse.isFile) await Drive.delete(`responses/${routeResponse.body}`)
     Ws.io.emit(`route:${route.id}`, 'updated')
     Ws.io.emit(`response:${routeResponse.id}`, 'deleted')
     return response.ok({

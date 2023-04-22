@@ -9,7 +9,7 @@ export default class EditResponseValidator {
   public schema = schema.create({
     enabled: schema.boolean(),
     status: schema.number([rules.range(100, 599)]),
-    body: this.#isFile ? schema.file({ size: '8MB' }) : schema.string(),
+    body: this.#isFile ? schema.file.optional({ size: '8MB' }) : schema.string(),
     name: schema.string({}, [
       rules.unique({
         table: 'responses',
