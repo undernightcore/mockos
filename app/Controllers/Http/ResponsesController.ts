@@ -6,7 +6,7 @@ import Response from 'App/Models/Response'
 import EditResponseValidator from 'App/Validators/Response/EditResponseValidator'
 import Ws from 'App/Services/Ws'
 import { MultipartFileContract } from '@ioc:Adonis/Core/BodyParser'
-import { deleteIfOnceUsed } from 'App/Helpers/file.helper'
+import { deleteIfOnceUsed, getFileName } from 'App/Helpers/file.helper'
 
 export default class ResponsesController {
   public async create({ request, response, auth, bouncer, params, i18n }: HttpContextContract) {
@@ -22,7 +22,7 @@ export default class ResponsesController {
       if (isFile) {
         const file = data.body as MultipartFileContract
         await file.moveToDisk('responses')
-        data.body = file.fileName ?? ''
+        data.body = getFileName(file.fileName ?? '')
       }
       await route.related('responses').create({ ...data, isFile, body: data.body as string })
     })
@@ -85,7 +85,7 @@ export default class ResponsesController {
       } else if (isFile && data.body) {
         const file = data.body as MultipartFileContract
         await file.moveToDisk('responses')
-        data.body = file.fileName ?? ''
+        data.body = getFileName(file.fileName ?? '')
         if (routeResponse.isFile) await deleteIfOnceUsed('responses', routeResponse.body)
       } else if (!isFile && routeResponse.isFile) {
         await deleteIfOnceUsed('responses', routeResponse.body)
