@@ -78,11 +78,15 @@ export default class ResponsesController {
           .whereNot('id', routeResponse.id)
           .update('enabled', false)
       }
-      if (isFile && data.body) {
+      if (!routeResponse.isFile && isFile && !data.body) {
+        return response
+          .status(400)
+          .send({ errors: [i18n.formatMessage('responses.response.edit.response_edited')] })
+      } else if (isFile && data.body) {
         const file = data.body as MultipartFileContract
         await file.moveToDisk('responses')
         data.body = file.fileName ?? ''
-        await deleteIfOnceUsed('responses', routeResponse.body)
+        if (routeResponse.isFile) await deleteIfOnceUsed('responses', routeResponse.body)
       } else if (!isFile && routeResponse.isFile) {
         await deleteIfOnceUsed('responses', routeResponse.body)
       }

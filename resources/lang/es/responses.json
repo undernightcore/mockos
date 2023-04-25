@@ -44,7 +44,8 @@
       "response_created": "Se ha creado la respuesta"
     },
     "edit": {
-      "response_edited": "Se ha actualizado la respuesta"
+      "response_edited": "Se ha actualizado la respuesta",
+      "missing_file_body": "Tienes que subir un archivo"
     },
     "delete": {
       "response_deleted": "Se ha eliminado la respuesta"

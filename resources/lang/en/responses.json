@@ -44,7 +44,8 @@
       "response_created": "The response has been created"
     },
     "edit": {
-      "response_edited": "The response has been updated"
+      "response_edited": "The response has been updated",
+      "missing_file_body": "You have to upload a file"
     },
     "delete": {
       "response_deleted": "The response has been deleted"
