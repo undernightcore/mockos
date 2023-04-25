@@ -8,3 +8,7 @@ export async function deleteIfOnceUsed(location: string, fileName: string) {
     )[0].$extras.total - 1
   if (!amountUsed) await Drive.delete(`${location}/${fileName}`)
 }
+
+export function getFileName(path: string) {
+  return path.split('/').at(-1)!
+}
