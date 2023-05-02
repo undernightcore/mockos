@@ -1,5 +1,6 @@
 import { HttpContextContract } from '@ioc:Adonis/Core/HttpContext'
 import Project from 'App/Models/Project'
+import Drive from '@ioc:Adonis/Core/Drive'
 
 export default class ApiController {
   public async mock({ request, auth, params, response, bouncer, i18n }: HttpContextContract) {
@@ -35,12 +36,13 @@ export default class ApiController {
       .query()
       .where('enabled', '=', true)
       .first()
-    return response
-      .status(enabledResponse ? 200 : 404)
-      .json(
-        enabledResponse
-          ? enabledResponse.body
-          : { errors: [i18n.formatMessage('responses.api.mock.missing_response')] }
-      )
+    if (!enabledResponse)
+      return response.status(404).json({
+        errors: [i18n.formatMessage('responses.api.mock.missing_response')],
+      })
+    const file = enabledResponse.isFile
+      ? await Drive.get(`responses/${enabledResponse.body}`)
+      : undefined
+    return response.status(enabledResponse.status).send(file ?? enabledResponse.body)
   }
 }
