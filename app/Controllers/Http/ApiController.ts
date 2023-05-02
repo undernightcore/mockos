@@ -43,6 +43,9 @@ export default class ApiController {
     const file = enabledResponse.isFile
       ? await Drive.get(`responses/${enabledResponse.body}`)
       : undefined
-    return response.status(enabledResponse.status).send(file ?? enabledResponse.body)
+    return response
+      .status(enabledResponse.status)
+      .type(file ? 'file' : 'json')
+      .send(file ?? enabledResponse.body)
   }
 }
