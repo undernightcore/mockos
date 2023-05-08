@@ -37,6 +37,7 @@
       "status.range": "The HTTP code must be valid",
       "body.required": "A body is necessary for your response",
       "body.size": "Your file can't be bigger than 8MB",
+      "body.json": "This JSON body is invalid",
       "name.required": "A name is necessary for your response",
       "name.unique": "This response name already exists"
     },
@@ -45,6 +46,7 @@
       "status.required": "You need an HTTP code for your response",
       "status.range": "The HTTP code must be valid",
       "body.required": "A body is necessary for your response",
+      "body.json": "This JSON body is invalid",
       "name.required": "A name is necessary for your response",
       "name.unique": "This response name already exists"
     }
