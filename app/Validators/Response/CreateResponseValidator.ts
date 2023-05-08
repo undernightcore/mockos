@@ -9,7 +9,7 @@ export default class CreateResponseValidator {
   public schema = schema.create({
     enabled: schema.boolean(),
     status: schema.number([rules.range(100, 599)]),
-    body: this.#isFile ? schema.file({ size: '8MB' }) : schema.string(),
+    body: this.#isFile ? schema.file({ size: '8MB' }) : schema.string({}, [rules.json()]),
     name: schema.string({}, [
       rules.unique({ table: 'responses', column: 'name', where: { route_id: this.ctx.params.id } }),
     ]),
