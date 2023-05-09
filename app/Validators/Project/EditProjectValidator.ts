@@ -7,9 +7,10 @@ export default class EditProjectValidator {
   public schema = schema.create({
     name: schema.string({}, [
       rules.minLength(3),
+      rules.maxLength(200),
       rules.unique({ table: 'projects', column: 'name', whereNot: { id: this.ctx.params.id } }),
     ]),
-    description: schema.string.nullable({}, [rules.minLength(3)]),
+    description: schema.string.nullable({}, [rules.minLength(3), rules.maxLength(2000)]),
   })
   public messages = this.ctx.i18n.validatorMessages('validator.project.edit')
 }
