@@ -6,9 +6,9 @@ export default class extends BaseSchema {
   public async up() {
     this.schema.createTable(this.tableName, (table) => {
       table.increments('id')
-      table.string('name').notNullable()
+      table.text('name').notNullable()
       table.integer('status').notNullable()
-      table.string('body').notNullable()
+      table.text('body').notNullable()
       table.boolean('is_file').notNullable()
       table.boolean('enabled').defaultTo(false)
       table.integer('route_id').unsigned().notNullable().references('routes.id').onDelete('CASCADE')

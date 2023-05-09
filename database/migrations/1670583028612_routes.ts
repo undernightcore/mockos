@@ -6,9 +6,9 @@ export default class extends BaseSchema {
   public async up() {
     this.schema.createTable(this.tableName, (table) => {
       table.increments('id')
-      table.string('name').notNullable()
+      table.text('name').notNullable()
       table.enum('method', ['get', 'post', 'put', 'delete', 'patch']).notNullable()
-      table.string('endpoint').notNullable()
+      table.text('endpoint').notNullable()
       table.boolean('enabled').defaultTo(false)
       table.unique(['project_id', 'endpoint', 'method'])
       table.unique(['project_id', 'order'])
