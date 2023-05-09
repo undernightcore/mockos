@@ -19,14 +19,18 @@
       "name.required": "I need a name for the project",
       "name.unique": "A project with this name already exists",
       "name.minLength": "The name must be at least 3 characters long",
+      "name.maxLength": "The name can't be more than 200 characters long",
       "description.minLength": "The description must be at least 3 characters long",
+      "description.maxLength": "The description can't be more than 2000 characters long",
       "description.nullable": "A description is required, if you don't want to send one you can send null"
     },
     "edit": {
       "name.required": "I need a name to modify",
       "name.unique": "A project with this name already exists",
       "name.minLength": "The name must be at least 3 characters long",
+      "name.maxLength": "The name can't be more than 200 characters long",
       "description.minLength": "The description must be at least 3 characters long",
+      "description.maxLength": "The description can't be more than 2000 characters long",
       "description.nullable": "A description is required, if you don't want to send one you can send null"
     }
   },
@@ -38,7 +42,9 @@
       "body.required": "A body is necessary for your response",
       "body.size": "Your file can't be bigger than 8MB",
       "body.json": "This JSON body is invalid",
+      "body.maxLength": "The body can't be more than 20000 characters long",
       "name.required": "A name is necessary for your response",
+      "name.maxLength": "The name can't be more than 200 characters long",
       "name.unique": "This response name already exists"
     },
     "edit": {
@@ -47,7 +53,9 @@
       "status.range": "The HTTP code must be valid",
       "body.required": "A body is necessary for your response",
       "body.json": "This JSON body is invalid",
+      "body.maxLength": "The body can't be more than 20000 characters long",
       "name.required": "A name is necessary for your response",
+      "name.maxLength": "The name can't be more than 200 characters long",
       "name.unique": "This response name already exists"
     }
   },
@@ -55,21 +63,25 @@
     "create": {
       "name.required": "A brief description for the route is needed",
       "name.minLength": "The name must have at least 3 characters",
+      "name.maxLength": "The name can't be more than 200 characters long",
       "method.required": "An HTTP verb must be specified",
       "method.enum": "This is not a valid verb.",
       "method.unique": "There is already a route with this method and endpoint in this project",
       "endpoint.required": "The endpoint URL to create is required",
       "endpoint.regex": "The endpoint must start with / and not end in /",
+      "endpoint.maxLength": "The endpoint can't be more than 2000 characters long",
       "enabled.required": "You have to indicate the state of the route"
     },
     "edit": {
       "name.required": "A brief description for the route is needed",
       "name.minLength": "The name must have at least 3 characters",
+      "name.maxLength": "The name can't be more than 200 characters long",
       "method.required": "An HTTP verb must be specified",
       "method.enum": "This is not a valid verb.",
       "method.unique": "There is already a route with this method and endpoint in this project",
       "endpoint.required": "The endpoint URL to create is required",
       "endpoint.regex": "The endpoint must start with / and not end in /",
+      "endpoint.maxLength": "The endpoint can't be more than 2000 characters long",
       "enabled.required": "You have to indicate the state of the route"
     },
     "sort": {

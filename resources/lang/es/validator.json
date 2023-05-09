@@ -19,14 +19,18 @@
       "name.required": "Necesito un nombre para el proyecto",
       "name.unique": "Ya existe un proyecto con este nombre",
       "name.minLength": "El nombre debe tener como mínimo 3 carácteres",
+      "name.maxLength": "El nombre no puede tener más de 200 carácteres",
       "description.minLength": "La descripción debe tener como mínimo 3 caracteres",
+      "description.maxLength": "La descripción no puede tener más de 2000 carácteres",
       "description.nullable": "Es necesaria una descripción, si no quieres enviar una puede pasar null"
     },
     "edit": {
       "name.required": "Necesito un nombre a modificar",
       "name.unique": "Ya existe un proyecto con este nombre",
       "name.minLength": "El nombre debe tener como mínimo 3 carácteres",
+      "name.maxLength": "El nombre no puede tener más de 200 carácteres",
       "description.minLength": "La descripción debe tener como mínimo 3 caracteres",
+      "description.maxLength": "La descripción no puede tener más de 2000 carácteres",
       "description.nullable": "Es necesaria una descripción, si no quieres enviar una puede pasar null"
     }
   },
@@ -38,7 +42,9 @@
       "body.required": "Es necesaria un cuerpo para tu respuesta",
       "body.size": "Tu fichero no debe pesar más de 8MB",
       "body.json": "Este JSON es invalido",
+      "body.maxLength": "El cuerpo no puede tener más de 20000 carácteres",
       "name.required": "Es necesario un nombre para tu respuesta",
+      "name.maxLength": "El nombre no puede tener más de 200 carácteres",
       "name.unique": "Este nombre de respuesta ya existe"
     },
     "edit": {
@@ -47,7 +53,9 @@
       "status.range": "El código HTTP debe ser valido",
       "body.required": "Es necesaria un cuerpo para tu respuesta",
       "body.json": "Este JSON es invalido",
+      "body.maxLength": "El cuerpo no puede tener más de 20000 carácteres",
       "name.required": "Es necesario un nombre para tu respuesta",
+      "name.maxLength": "El nombre no puede tener más de 200 carácteres",
       "name.unique": "Este nombre de respuesta ya existe"
     }
   },
@@ -55,21 +63,25 @@
     "create": {
       "name.required": "Se necesita una pequeña descripción para la ruta",
       "name.minLength": "Es necesario que el nombre tenga como mínimo 3 carácteres",
+      "name.maxLength": "El nombre no puede tener más de 200 carácteres",
       "method.required": "Es necesario especificar un verbo HTTP",
       "method.enum": "No es un verbo válido.",
       "method.unique": "Ya existe una ruta con este método y endpoint en este proyecto",
       "endpoint.required": "Es necesaria la URL del endpoint a crear",
       "endpoint.regex": "El endpoint debe comenzar con / y no terminar en /",
+      "endpoint.maxLength": "El endpoint no puede tener más de 2000 carácteres",
       "enabled.required": "Tienes que indicar el estado de la ruta"
     },
     "edit": {
       "name.required": "Se necesita una pequeña descripción para la ruta",
       "name.minLength": "Es necesario que el nombre tenga como mínimo 3 carácteres",
+      "name.maxLength": "El nombre no puede tener más de 200 carácteres",
       "method.required": "Es necesario especificar un verbo HTTP",
       "method.enum": "No es un verbo válido.",
       "method.unique": "Ya existe una ruta con este método y endpoint en este proyecto",
       "endpoint.required": "Es necesaria la URL del endpoint a crear",
       "endpoint.regex": "El endpoint debe comenzar con / y no terminar en /",
+      "endpoint.maxLength": "El endpoint no puede tener más de 2000 carácteres",
       "enabled.required": "Tienes que indicar el estado de la ruta"
     },
     "sort": {
