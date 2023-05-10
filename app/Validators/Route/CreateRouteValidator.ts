@@ -20,7 +20,7 @@ export default class CreateRouteValidator {
       ]
     ),
     endpoint: schema.string({}, [
-      rules.regex(new RegExp('^/([a-zA-Z0-9{}]+)*(/[a-zA-Z0-9{}]+)*$')),
+      rules.regex(new RegExp('^/([a-zA-Z0-9{}-]+)*(/[a-zA-Z0-9{}-]+)*$')),
       rules.maxLength(2000),
     ]),
     enabled: schema.boolean(),
