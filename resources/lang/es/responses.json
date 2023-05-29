@@ -3,7 +3,8 @@
     "mock": {
       "missing_project_header": "Necesitamos que envíes el proyecto de la petición",
       "missing_route": "No se ha encontrado ninguna ruta con ese endpoint y métodos",
-      "missing_response": "No se ha encontrado ninguna respuesta disponible para esa ruta y método"
+      "missing_response": "No se ha encontrado ninguna respuesta disponible para esa ruta y método",
+      "invalid_json": "La respuesta JSON tiene una estructura inválida, por favor corrige el cuerpo de la respuesta"
     }
   },
   "auth": {

@@ -3,7 +3,8 @@
     "mock": {
       "missing_project_header": "We need you to submit the project of the request",
       "missing_route": "No route found with that endpoint and methods",
-      "missing_response": "No response available for that route and method"
+      "missing_response": "No response available for that route and method",
+      "invalid_json": "JSON response has invalid structure, please fix response body"
     }
   },
   "auth": {
