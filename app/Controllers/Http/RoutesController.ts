@@ -5,9 +5,10 @@ import CreateRouteValidator from 'App/Validators/Route/CreateRouteValidator'
 import EditRouteValidator from 'App/Validators/Route/EditRouteValidator'
 import SortRouteValidator from 'App/Validators/Route/SortRouteValidator'
 import Database from '@ioc:Adonis/Lucid/Database'
-import { move } from 'App/Helpers/array.helper'
-import { recalculateRouteOrder } from 'App/Helpers/sort.helper'
 import Ws from 'App/Services/Ws'
+import { recalculateRouteOrder } from 'App/Helpers/Shared/sort.helper'
+import { move } from 'App/Helpers/Shared/array.helper'
+import { HttpError } from 'App/Models/HttpError'
 
 export default class RoutesController {
   public async create({ request, response, auth, params, bouncer, i18n }: HttpContextContract) {
@@ -86,9 +87,7 @@ export default class RoutesController {
     const toRoute = await Route.findOrFail(data.destination)
     const sameProject = fromRoute.projectId === project.id && toRoute.projectId === project.id
     if (!sameProject)
-      return response
-        .status(400)
-        .json({ errors: [i18n.formatMessage('responses.route.sort.route_mismatch')] })
+      throw new HttpError(400, i18n.formatMessage('responses.route.sort.route_mismatch'))
     await Database.transaction(async (trx) => {
       const routes = await project.related('routes').query().useTransaction(trx).orderBy('order')
       const fromIndex = routes.findIndex((route) => route.id === fromRoute.id)

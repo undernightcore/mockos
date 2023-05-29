@@ -6,8 +6,8 @@ import Response from 'App/Models/Response'
 import EditResponseValidator from 'App/Validators/Response/EditResponseValidator'
 import Ws from 'App/Services/Ws'
 import { MultipartFileContract } from '@ioc:Adonis/Core/BodyParser'
-import { deleteIfOnceUsed, getFileName } from 'App/Helpers/file.helper'
-import { prettifyJson } from 'App/Helpers/string.helper'
+import { deleteIfOnceUsed, getFileName } from 'App/Helpers/Shared/file.helper'
+import { prettifyJson } from 'App/Helpers/Shared/string.helper'
 
 export default class ResponsesController {
   public async create({ request, response, auth, bouncer, params, i18n }: HttpContextContract) {
