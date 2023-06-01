@@ -7,7 +7,7 @@
 Mockos is a **useful and practical tool for developers** looking to test their applications with **custom API mocks**, in a **collaborative way and without the need to install anything** on their computer.
 ## Live demo
 
-https://mockos.puntaserver.com (Proudly hosted using Coolify.io)
+https://mockos.io (Proudly hosted using Coolify.io)
 
 If you find any bugs/vulnerabilities feel free to open a new issue or/and contact me at undernightcore@gmail.com.
 ## Features
@@ -56,11 +56,11 @@ SMTP_PASSWORD=<change me>
 # Leave these blank if verified manually
 
 # Frontend URL for successful verification. 
-# Example: https://mockos.puntaserver.com/verify/sucess
+# Example: https://mockos.io/verify/sucess
 VERIFY_SUCCESS_URL=<change me> 
 
 # Frontend URL for successful verification. 
-# Example: https://mockos.puntaserver.com/verify/failure
+# Example: https://mockos.io/verify/failure
 VERIFY_FAILURE_URL=<change me> # Frontend URL for failed verification
 ```
 
