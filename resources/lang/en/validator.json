@@ -42,7 +42,7 @@
       "body.required": "A body is necessary for your response",
       "body.size": "Your file can't be bigger than 8MB",
       "body.json": "This JSON body is invalid",
-      "body.maxLength": "The body can't be more than 20000 characters long",
+      "body.maxLength": "The body can't be more than 500000 characters long",
       "name.required": "A name is necessary for your response",
       "name.maxLength": "The name can't be more than 200 characters long",
       "name.unique": "This response name already exists"

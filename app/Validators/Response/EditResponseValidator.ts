@@ -11,7 +11,7 @@ export default class EditResponseValidator {
     status: schema.number([rules.range(100, 599)]),
     body: this.#isFile
       ? schema.file.optional({ size: '8MB' })
-      : schema.string({}, [rules.maxLength(200000)]),
+      : schema.string({}, [rules.maxLength(500000)]),
     name: schema.string({}, [
       rules.unique({
         table: 'responses',
