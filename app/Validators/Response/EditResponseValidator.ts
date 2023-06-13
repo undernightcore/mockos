@@ -16,7 +16,7 @@ export default class EditResponseValidator {
       rules.unique({
         table: 'responses',
         column: 'name',
-        where: { route_id: this.ctx.params.id },
+        where: { route_id: this.ctx.params.routeId },
         whereNot: { id: this.ctx.params.id },
       }),
       rules.maxLength(200),

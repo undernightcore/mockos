@@ -65,10 +65,11 @@ export default class ResponsesController {
   public async edit({ request, response, auth, bouncer, params, i18n }: HttpContextContract) {
     await auth.authenticate()
     const isFile = Boolean(await request.input('isFile', false))
-    const data = await request.validate(EditResponseValidator)
     const routeResponse = await Response.findOrFail(params.id)
     await routeResponse.load('route')
     const route = routeResponse.route
+    params['routeId'] = route.id
+    const data = await request.validate(EditResponseValidator)
     await route.load('project')
     const project = route.project
     await bouncer.with('ProjectPolicy').authorize('isMember', project, i18n)
