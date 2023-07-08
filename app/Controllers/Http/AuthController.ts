@@ -32,10 +32,10 @@ export default class AuthController {
   public async verify({ request, response, params }: HttpContextContract) {
     if (!request.hasValidSignature()) return response.redirect(Env.get('VERIFY_FAILURE_URL'))
     const user = await User.findBy('email', params.email)
-    if (!user) return response.redirect(Env.get('VERIFY_FAILURE_URL'))
+    if (!user) return response.redirect(`${Env.get('FRONT_URL')}/verify/failure`)
     user.verified = true
     await user.save()
-    return response.redirect(Env.get('VERIFY_SUCCESS_URL'))
+    return response.redirect(`${Env.get('FRONT_URL')}/verify/success`)
   }
 
   public async login({ request, response, auth, i18n }: HttpContextContract) {
