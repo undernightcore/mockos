@@ -15,7 +15,7 @@ export default class AuthController {
     })
     await Mail.send((message) => {
       message
-        .from(Env.get('SMTP_USERNAME'))
+        .from(Env.get('SMTP_EMAIL'))
         .to(user.email)
         .subject(i18n.formatMessage('responses.auth.register.verify_subject'))
         .text(
