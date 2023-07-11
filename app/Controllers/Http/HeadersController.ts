@@ -4,6 +4,7 @@ import Route from 'App/Models/Route'
 import Project from 'App/Models/Project'
 import CreateHeaderValidator from 'App/Validators/Header/CreateHeaderValidator'
 import Header from 'App/Models/Header'
+import Ws from 'App/Services/Ws'
 
 export default class HeadersController {
   public async getList({ params, request, response, auth, bouncer, i18n }: HttpContextContract) {
@@ -22,6 +23,7 @@ export default class HeadersController {
     await bouncer.with('ProjectPolicy').authorize('isMember', project, i18n)
     const data = await request.validate(CreateHeaderValidator)
     await res.related('headers').create(data)
+    Ws.io.emit(`response:${res.id}`, `headers`)
     return response.created({
       message: i18n.formatMessage('responses.header.create.header_created'),
     })
@@ -29,10 +31,11 @@ export default class HeadersController {
 
   public async edit({ params, request, response, auth, bouncer, i18n }: HttpContextContract) {
     await auth.authenticate()
-    const { header, project } = await this.#getProjectByHeader(params.id)
+    const { header, project, res } = await this.#getProjectByHeader(params.id)
     await bouncer.with('ProjectPolicy').authorize('isMember', project, i18n)
     const data = await request.validate(CreateHeaderValidator)
     await header.merge(data).save()
+    Ws.io.emit(`response:${res.id}`, `headers`)
     return response.created({
       message: i18n.formatMessage('responses.header.update.header_updated'),
     })
@@ -40,9 +43,10 @@ export default class HeadersController {
 
   public async delete({ params, response, auth, bouncer, i18n }: HttpContextContract) {
     await auth.authenticate()
-    const { header, project } = await this.#getProjectByHeader(params.id)
+    const { header, res, project } = await this.#getProjectByHeader(params.id)
     await bouncer.with('ProjectPolicy').authorize('isMember', project, i18n)
     await header.delete()
+    Ws.io.emit(`response:${res.id}`, `headers`)
     return response.created({
       message: i18n.formatMessage('responses.header.delete.header_deleted'),
     })
@@ -53,13 +57,13 @@ export default class HeadersController {
     const res = await Response.findOrFail(header.id)
     const route = await Route.findOrFail(res.id)
     const project = await Project.findOrFail(route.id)
-    return { header, project }
+    return { header, res, route, project }
   }
 
   async #getProjectByResponse(id: string) {
     const res = await Response.findOrFail(id)
     const route = await Route.findOrFail(res.id)
     const project = await Project.findOrFail(route.id)
-    return { res, project }
+    return { res, route, project }
   }
 }
