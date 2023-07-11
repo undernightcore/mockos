@@ -52,6 +52,8 @@ export default class HeadersController {
     })
   }
 
+  // Helper functions
+
   async #getProjectByHeader(id: string) {
     const header = await Header.findOrFail(id)
     const res = await Response.findOrFail(header.id)
