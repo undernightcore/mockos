@@ -64,6 +64,9 @@
   "header": {
     "create": {
       "header_created": "Cabecera creada correctamente"
+    },
+    "update": {
+      "header_updated": "Cabecera actualizada correctamente"
     }
   }
 }

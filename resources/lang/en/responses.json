@@ -64,6 +64,9 @@
   "header": {
     "create": {
       "header_created": "Header created successfully"
+    },
+    "update": {
+      "header_updated": "Header updated successfully"
     }
   }
 }
