@@ -65,8 +65,8 @@
     "create": {
       "header_created": "Cabecera creada correctamente"
     },
-    "update": {
-      "header_updated": "Cabecera actualizada correctamente"
+    "delete": {
+      "header_deleted": "Cabecera eliminada correctamente"
     }
   }
 }

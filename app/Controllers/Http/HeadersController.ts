@@ -6,11 +6,9 @@ import CreateHeaderValidator from 'App/Validators/Header/CreateHeaderValidator'
 import Header from 'App/Models/Header'
 
 export default class HeadersController {
-  public async getList({ request, response, auth, bouncer, i18n }: HttpContextContract) {
+  public async getList({ params, request, response, auth, bouncer, i18n }: HttpContextContract) {
     await auth.authenticate()
-    const res = await Response.findOrFail(request.param('id'))
-    const route = await Route.findOrFail(res.id)
-    const project = await Project.findOrFail(route.id)
+    const { res, project } = await this.#getProjectByResponse(params.id)
     await bouncer.with('ProjectPolicy').authorize('isMember', project, i18n)
     const page = request.input('page', 1)
     const perPage = request.input('perPage', 10)
@@ -18,11 +16,9 @@ export default class HeadersController {
     return response.ok(headers)
   }
 
-  public async create({ request, response, auth, bouncer, i18n }: HttpContextContract) {
+  public async create({ params, request, response, auth, bouncer, i18n }: HttpContextContract) {
     await auth.authenticate()
-    const res = await Response.findOrFail(request.param('id'))
-    const route = await Route.findOrFail(res.id)
-    const project = await Project.findOrFail(route.id)
+    const { res, project } = await this.#getProjectByResponse(params.id)
     await bouncer.with('ProjectPolicy').authorize('isMember', project, i18n)
     const data = await request.validate(CreateHeaderValidator)
     await res.related('headers').create(data)
@@ -31,17 +27,39 @@ export default class HeadersController {
     })
   }
 
-  public async edit({ request, response, auth, bouncer, i18n }: HttpContextContract) {
+  public async edit({ params, request, response, auth, bouncer, i18n }: HttpContextContract) {
     await auth.authenticate()
-    const header = await Header.findOrFail(request.param('id'))
-    const res = await Response.findOrFail(header.id)
-    const route = await Route.findOrFail(res.id)
-    const project = await Project.findOrFail(route.id)
+    const { header, project } = await this.#getProjectByHeader(params.id)
     await bouncer.with('ProjectPolicy').authorize('isMember', project, i18n)
     const data = await request.validate(CreateHeaderValidator)
     await header.merge(data).save()
     return response.created({
       message: i18n.formatMessage('responses.header.update.header_updated'),
     })
+  }
+
+  public async delete({ params, response, auth, bouncer, i18n }: HttpContextContract) {
+    await auth.authenticate()
+    const { header, project } = await this.#getProjectByHeader(params.id)
+    await bouncer.with('ProjectPolicy').authorize('isMember', project, i18n)
+    await header.delete()
+    return response.created({
+      message: i18n.formatMessage('responses.header.delete.header_deleted'),
+    })
+  }
+
+  async #getProjectByHeader(id: string) {
+    const header = await Header.findOrFail(id)
+    const res = await Response.findOrFail(header.id)
+    const route = await Route.findOrFail(res.id)
+    const project = await Project.findOrFail(route.id)
+    return { header, project }
+  }
+
+  async #getProjectByResponse(id: string) {
+    const res = await Response.findOrFail(id)
+    const route = await Route.findOrFail(res.id)
+    const project = await Project.findOrFail(route.id)
+    return { res, project }
   }
 }

@@ -67,6 +67,9 @@
     },
     "update": {
       "header_updated": "Header updated successfully"
+    },
+    "delete": {
+      "header_deleted": "Header deleted successfully"
     }
   }
 }
