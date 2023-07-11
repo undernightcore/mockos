@@ -60,5 +60,10 @@
       "route_mismatch": "The routes don't correspond to the correct project",
       "route_sorted": "Moved successfully"
     }
+  },
+  "header": {
+    "create": {
+      "header_created": "Header created successfully"
+    }
   }
 }

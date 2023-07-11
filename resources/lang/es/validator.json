@@ -88,5 +88,13 @@
       "origin.required": "Es necesario que indiques que ruta vas a mover",
       "destination.required": "Es necesario que indiques donde vas a mover la ruta"
     }
+  },
+  "header": {
+    "create": {
+      "key.required": "Es necesario que indiques que clave necesitas",
+      "key.maxLength": "La clave no puede tener más de 255 carácteres",
+      "value.required": "Es necesario que indiques que valor tiene esa clave",
+      "value.maxLength": "El valor no puede tener más de 255 carácteres"
+    }
   }
 }
