@@ -7,6 +7,7 @@ import { ResponseContract } from '@ioc:Adonis/Core/Response'
 import { I18nContract } from '@ioc:Adonis/Addons/I18n'
 import Route from 'App/Models/Route'
 import Response from 'App/Models/Response'
+import { Buffer } from 'buffer'
 
 export default class ApiController {
   public async mock({ request, auth, params, response, bouncer, i18n }: HttpContextContract) {
@@ -29,8 +30,7 @@ export default class ApiController {
       ? await Drive.get(`responses/${enabledResponse.body}`)
       : undefined
     const headers = await this.#getHeadersOrDefault(enabledResponse, Boolean(file))
-
-    return this.#prepareResponse(headers, enabledResponse, Boolean(file), response)
+    return this.#prepareResponse(headers, enabledResponse, file, response)
   }
 
   // Helper functions
@@ -74,7 +74,7 @@ export default class ApiController {
   #prepareResponse(
     headers: { key: string; value: string }[],
     enabledResponse: Response,
-    isFile: boolean,
+    file: Buffer | undefined,
     response: ResponseContract
   ) {
     return headers
@@ -82,6 +82,6 @@ export default class ApiController {
         (acc, { key, value }) => acc.safeHeader(key, value),
         response.status(enabledResponse.status)
       )
-      .send(isFile ?? enabledResponse.body)
+      .send(file ?? enabledResponse.body)
   }
 }
