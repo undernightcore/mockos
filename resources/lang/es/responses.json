@@ -60,5 +60,13 @@
       "route_mismatch": "Las rutas no corresponden al projecto correcto",
       "route_sorted": "Se ha movido correctamente"
     }
+  },
+  "header": {
+    "create": {
+      "header_created": "Cabecera creada correctamente"
+    },
+    "delete": {
+      "header_deleted": "Cabecera eliminada correctamente"
+    }
   }
 }

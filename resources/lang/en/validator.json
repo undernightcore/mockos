@@ -88,5 +88,13 @@
       "origin.required": "You need to indicate which route you are going to move",
       "destination.required": "You need to indicate where you are going to move the route"
     }
+  },
+  "header": {
+    "create": {
+      "key.required": "A key is required",
+      "key.maxLength": "The key can't be more than 255 characters long",
+      "value.required": "A value is required",
+      "value.maxLength": "The value can't be more than 255 characters long"
+    }
   }
 }
