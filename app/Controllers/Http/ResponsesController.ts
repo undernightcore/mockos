@@ -64,10 +64,10 @@ export default class ResponsesController {
 
   public async edit({ request, response, auth, bouncer, params, i18n }: HttpContextContract) {
     await auth.authenticate()
-    const isFile = Boolean(await request.input('isFile', false))
+    const isFileNow = Boolean(await request.input('isFile', false))
     const routeResponse = await Response.findOrFail(params.id)
     const route = await Route.findOrFail(routeResponse.routeId)
-    params['routeId'] = route.id
+    params['routeId'] = route.id // Send context to validator
     const data = await request.validate(EditResponseValidator)
     const project = await Project.findOrFail(route.projectId)
     await bouncer.with('ProjectPolicy').authorize('isMember', project, i18n)
@@ -80,31 +80,32 @@ export default class ResponsesController {
           .whereNot('id', routeResponse.id)
           .update('enabled', false)
       }
-      const changedToFileTypeWithoutBody = !routeResponse.isFile && isFile && !data.body
-      const changedToJsonType = !isFile && routeResponse.isFile
-      const hasNewFileToUpload = isFile && data.body
-      if (changedToFileTypeWithoutBody) {
+      const wasFileBefore = routeResponse.isFile
+      if (!wasFileBefore && isFileNow && !data.body) {
         return response
           .status(400)
           .send({ errors: [i18n.formatMessage('responses.response.edit.missing_file_body')] })
-      } else if (hasNewFileToUpload) {
-        const file = data.body as MultipartFileContract
-        await file.moveToDisk('responses')
-        data.body = getFileName(file.fileName ?? '')
-        if (routeResponse.isFile) await deleteIfOnceUsed('responses', routeResponse.body)
-      } else if (changedToJsonType) {
+      } else if (isFileNow && data.body) {
+        data.body = await this.#uploadFile(data.body as MultipartFileContract)
+        if (wasFileBefore) {
+          await deleteIfOnceUsed('responses', routeResponse.body)
+        } else if (!wasFileBefore) {
+          await this.#flushResponseContentType(routeResponse)
+        }
+      } else if (!isFileNow && wasFileBefore) {
+        await this.#flushResponseContentType(routeResponse)
         await deleteIfOnceUsed('responses', routeResponse.body)
       }
       const newBodyValue =
         data.body === undefined
           ? routeResponse.body
-          : isFile
+          : isFileNow
           ? (data.body as string)
           : prettifyJson(data.body as string)
       await routeResponse
         .merge({
           ...data,
-          isFile,
+          isFile: isFileNow,
           body: newBodyValue,
         })
         .useTransaction(trx)
@@ -128,5 +129,22 @@ export default class ResponsesController {
     return response.ok({
       message: i18n.formatMessage('responses.response.delete.response_deleted'),
     })
+  }
+
+  // Helper functions
+
+  async #uploadFile(file: MultipartFileContract) {
+    await file.moveToDisk('responses')
+    return getFileName(file.fileName ?? '')
+  }
+
+  async #flushResponseContentType(response: Response) {
+    const contentType = await response
+      .related('headers')
+      .query()
+      .where('key', 'content-type')
+      .first()
+    if (!contentType) return
+    await contentType.delete()
   }
 }

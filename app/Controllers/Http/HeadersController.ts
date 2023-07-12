@@ -21,8 +21,8 @@ export default class HeadersController {
     await auth.authenticate()
     const { res, project } = await this.#getProjectByResponse(params.id)
     await bouncer.with('ProjectPolicy').authorize('isMember', project, i18n)
-    const data = await request.validate(CreateHeaderValidator)
-    await res.related('headers').create(data)
+    const { key, value } = await request.validate(CreateHeaderValidator)
+    await res.related('headers').create({ key: key.toLowerCase(), value: value })
     Ws.io.emit(`response:${res.id}`, `headers`)
     return response.created({
       message: i18n.formatMessage('responses.header.create.header_created'),
@@ -33,8 +33,8 @@ export default class HeadersController {
     await auth.authenticate()
     const { header, project, res } = await this.#getProjectByHeader(params.id)
     await bouncer.with('ProjectPolicy').authorize('isMember', project, i18n)
-    const data = await request.validate(CreateHeaderValidator)
-    await header.merge(data).save()
+    const { key, value } = await request.validate(CreateHeaderValidator)
+    await header.merge({ key: key.toLowerCase(), value: value }).save()
     Ws.io.emit(`response:${res.id}`, `headers`)
     return response.created({
       message: i18n.formatMessage('responses.header.update.header_updated'),
