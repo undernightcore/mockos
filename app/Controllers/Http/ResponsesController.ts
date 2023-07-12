@@ -8,6 +8,7 @@ import Ws from 'App/Services/Ws'
 import { MultipartFileContract } from '@ioc:Adonis/Core/BodyParser'
 import { deleteIfOnceUsed, getFileName } from 'App/Helpers/Shared/file.helper'
 import { prettifyJson } from 'App/Helpers/Shared/string.helper'
+import Project from 'App/Models/Project'
 
 export default class ResponsesController {
   public async create({ request, response, auth, bouncer, params, i18n }: HttpContextContract) {
@@ -38,10 +39,10 @@ export default class ResponsesController {
   public async getList({ request, response, auth, bouncer, params, i18n }: HttpContextContract) {
     await auth.authenticate()
     const route = await Route.findOrFail(params.id)
-    await route.load('project')
+    const project = await Project.findOrFail(route.projectId)
     const page = request.input('page', 1)
     const perPage = request.input('perPage', 10)
-    await bouncer.with('ProjectPolicy').authorize('isMember', route.project, i18n)
+    await bouncer.with('ProjectPolicy').authorize('isMember', project, i18n)
     const responses = await route
       .related('responses')
       .query()
@@ -54,11 +55,10 @@ export default class ResponsesController {
   public async get({ response, auth, bouncer, params, i18n }: HttpContextContract) {
     await auth.authenticate()
     const routeResponse = await Response.findOrFail(params.id)
-    await routeResponse.load('route')
-    const route = routeResponse.route
-    await route.load('project')
-    const project = route.project
+    const route = await Route.findOrFail(routeResponse.routeId)
+    const project = await Project.findOrFail(route.projectId)
     await bouncer.with('ProjectPolicy').authorize('isMember', project, i18n)
+    await routeResponse.load('headers')
     return response.ok(routeResponse)
   }
 
@@ -66,12 +66,10 @@ export default class ResponsesController {
     await auth.authenticate()
     const isFile = Boolean(await request.input('isFile', false))
     const routeResponse = await Response.findOrFail(params.id)
-    await routeResponse.load('route')
-    const route = routeResponse.route
+    const route = await Route.findOrFail(routeResponse.routeId)
     params['routeId'] = route.id
     const data = await request.validate(EditResponseValidator)
-    await route.load('project')
-    const project = route.project
+    const project = await Project.findOrFail(route.projectId)
     await bouncer.with('ProjectPolicy').authorize('isMember', project, i18n)
     await Database.transaction(async (trx) => {
       if (data.enabled) {
@@ -120,10 +118,8 @@ export default class ResponsesController {
   public async delete({ response, auth, bouncer, params, i18n }: HttpContextContract) {
     await auth.authenticate()
     const routeResponse = await Response.findOrFail(params.id)
-    await routeResponse.load('route')
-    const route = routeResponse.route
-    await route.load('project')
-    const project = route.project
+    const route = await Route.findOrFail(routeResponse.routeId)
+    const project = await Project.findOrFail(route.projectId)
     await bouncer.with('ProjectPolicy').authorize('isMember', project, i18n)
     if (routeResponse.isFile) await deleteIfOnceUsed('responses', routeResponse.body)
     await routeResponse.delete()

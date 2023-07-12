@@ -47,7 +47,7 @@ export default class HeadersController {
     await bouncer.with('ProjectPolicy').authorize('isMember', project, i18n)
     await header.delete()
     Ws.io.emit(`response:${res.id}`, `headers`)
-    return response.created({
+    return response.ok({
       message: i18n.formatMessage('responses.header.delete.header_deleted'),
     })
   }

@@ -12,7 +12,7 @@ export default class Header extends BaseModel {
   @column()
   public value: string
 
-  @column()
+  @column({ serializeAs: null })
   public responseId: number
 
   @belongsTo(() => Response, {
