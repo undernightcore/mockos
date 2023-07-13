@@ -46,6 +46,7 @@ export default class ResponsesController {
     const responses = await route
       .related('responses')
       .query()
+      .preload('headers')
       .orderBy('enabled', 'desc')
       .orderBy('created_at', 'desc')
       .paginate(page, perPage)
