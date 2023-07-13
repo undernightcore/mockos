@@ -56,16 +56,16 @@ export default class HeadersController {
 
   async #getProjectByHeader(id: string) {
     const header = await Header.findOrFail(id)
-    const res = await Response.findOrFail(header.id)
-    const route = await Route.findOrFail(res.id)
-    const project = await Project.findOrFail(route.id)
+    const res = await Response.findOrFail(header.responseId)
+    const route = await Route.findOrFail(res.routeId)
+    const project = await Project.findOrFail(route.projectId)
     return { header, res, route, project }
   }
 
   async #getProjectByResponse(id: string) {
     const res = await Response.findOrFail(id)
-    const route = await Route.findOrFail(res.id)
-    const project = await Project.findOrFail(route.id)
+    const route = await Route.findOrFail(res.routeId)
+    const project = await Project.findOrFail(route.projectId)
     return { res, route, project }
   }
 }
