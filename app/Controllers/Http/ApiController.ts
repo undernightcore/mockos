@@ -63,7 +63,7 @@ export default class ApiController {
   async #getHeadersOrDefault(response: Response, isFile: boolean) {
     const dbHeaders = await response.related('headers').query()
     const headers = dbHeaders.map(({ key, value }) => ({ key, value }))
-    const foundContentType = headers.find((header) => header.key.toLowerCase() === 'content-type')
+    const foundContentType = headers.find((header) => header.key === 'content-type')
     const defaultContentType = {
       key: 'content-type',
       value: isFile ? 'application/octet-stream' : 'application/json',

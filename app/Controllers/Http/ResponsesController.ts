@@ -46,7 +46,7 @@ export default class ResponsesController {
     const responses = await route
       .related('responses')
       .query()
-      .preload('headers')
+      .select(['id', 'name', 'enabled', 'status'])
       .orderBy('enabled', 'desc')
       .orderBy('created_at', 'desc')
       .paginate(page, perPage)
@@ -115,6 +115,30 @@ export default class ResponsesController {
     Ws.io.emit(`route:${route.id}`, 'updated')
     Ws.io.emit(`response:${routeResponse.id}`, 'updated')
     return response.ok({ message: i18n.formatMessage('responses.response.edit.response_edited') })
+  }
+
+  public async enable({ response, auth, bouncer, params, i18n }: HttpContextContract) {
+    await auth.authenticate()
+    const routeResponse = await Response.findOrFail(params.id)
+    const route = await Route.findOrFail(routeResponse.routeId)
+    const project = await Project.findOrFail(route.projectId)
+    await bouncer.with('ProjectPolicy').authorize('isMember', project, i18n)
+    await Database.transaction(async (trx) => {
+      await route
+        .related('responses')
+        .query()
+        .useTransaction(trx)
+        .whereNot('id', routeResponse.id)
+        .update('enabled', false)
+      await routeResponse
+        .useTransaction(trx)
+        .merge({ ...routeResponse, enabled: true })
+        .save()
+    })
+    Ws.io.emit(`route:${route.id}`, 'updated')
+    return response.ok({
+      message: i18n.formatMessage('responses.response.enable.response_enabled'),
+    })
   }
 
   public async delete({ response, auth, bouncer, params, i18n }: HttpContextContract) {

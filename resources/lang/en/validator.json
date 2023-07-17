@@ -95,6 +95,13 @@
       "key.maxLength": "The key can't be more than 255 characters long",
       "value.required": "A value is required",
       "value.maxLength": "The value can't be more than 255 characters long"
+    },
+    "update": {
+      "key.required": "A key is required",
+      "key.maxLength": "The key can't be more than 255 characters long",
+      "value.required": "A value is required",
+      "value.maxLength": "The value can't be more than 255 characters long",
+      "key.unique": "There is already a header with that key"
     }
   }
 }
