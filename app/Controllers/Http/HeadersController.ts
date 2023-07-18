@@ -5,6 +5,7 @@ import Project from 'App/Models/Project'
 import CreateHeaderValidator from 'App/Validators/Header/CreateHeaderValidator'
 import Header from 'App/Models/Header'
 import Ws from 'App/Services/Ws'
+import UpdateHeaderValidator from 'App/Validators/Header/UpdateHeaderValidator'
 
 export default class HeadersController {
   public async getList({ params, request, response, auth, bouncer, i18n }: HttpContextContract) {
@@ -32,8 +33,9 @@ export default class HeadersController {
   public async edit({ params, request, response, auth, bouncer, i18n }: HttpContextContract) {
     await auth.authenticate()
     const { header, project, res } = await this.#getProjectByHeader(params.id)
+    params['responseId'] = res.id // Pass context to validator
     await bouncer.with('ProjectPolicy').authorize('isMember', project, i18n)
-    const { key, value } = await request.validate(CreateHeaderValidator)
+    const { key, value } = await request.validate(UpdateHeaderValidator)
     await header.merge({ key: key.toLowerCase(), value: value }).save()
     Ws.io.emit(`response:${res.id}`, `headers`)
     return response.created({

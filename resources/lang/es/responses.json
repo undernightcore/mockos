@@ -50,6 +50,9 @@
     },
     "delete": {
       "response_deleted": "Se ha eliminado la respuesta"
+    },
+    "enable": {
+      "response_enabled": "Se ha activado la respuesta"
     }
   },
   "route": {
