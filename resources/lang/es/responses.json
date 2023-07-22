@@ -53,6 +53,9 @@
     },
     "enable": {
       "response_enabled": "Se ha activado la respuesta"
+    },
+    "duplicate": {
+      "response_duplicated": "Se ha duplicado la respuesta"
     }
   },
   "route": {

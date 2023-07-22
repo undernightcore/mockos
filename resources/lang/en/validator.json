@@ -57,6 +57,11 @@
       "name.required": "A name is necessary for your response",
       "name.maxLength": "The name can't be more than 200 characters long",
       "name.unique": "This response name already exists"
+    },
+    "duplicate": {
+      "name.required": "A name is necessary for your response",
+      "name.maxLength": "The name can't be more than 200 characters long",
+      "name.unique": "This response name already exists"
     }
   },
   "route": {

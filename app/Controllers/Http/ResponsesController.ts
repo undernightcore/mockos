@@ -9,6 +9,7 @@ import { MultipartFileContract } from '@ioc:Adonis/Core/BodyParser'
 import { deleteIfOnceUsed, getFileName } from 'App/Helpers/Shared/file.helper'
 import { prettifyJson } from 'App/Helpers/Shared/string.helper'
 import Project from 'App/Models/Project'
+import DuplicateResponseValidator from 'App/Validators/Response/DuplicateResponseValidator'
 
 export default class ResponsesController {
   public async create({ request, response, auth, bouncer, params, i18n }: HttpContextContract) {
@@ -138,6 +139,20 @@ export default class ResponsesController {
     Ws.io.emit(`route:${route.id}`, 'updated')
     return response.ok({
       message: i18n.formatMessage('responses.response.enable.response_enabled'),
+    })
+  }
+
+  public async duplicate({ response, request, auth, bouncer, params, i18n }: HttpContextContract) {
+    await auth.authenticate()
+    const routeResponse = await Response.findOrFail(params.id)
+    const route = await Route.findOrFail(routeResponse.routeId)
+    const project = await Project.findOrFail(route.projectId)
+    await bouncer.with('ProjectPolicy').authorize('isMember', project, i18n)
+    params['routeId'] = route.id // Send context to validator
+    const data = await request.validate(DuplicateResponseValidator)
+    await Response.create({ ...routeResponse, ...data, id: undefined })
+    return response.created({
+      message: i18n.formatMessage('responses.response.duplicate.response_duplicated'),
     })
   }
 

@@ -53,6 +53,9 @@
     },
     "enable": {
       "response_enabled": "The response is now enabled"
+    },
+    "duplicate": {
+      "response_duplicated": "The response has been duplicated"
     }
   },
   "route": {

@@ -57,6 +57,11 @@
       "name.required": "Es necesario un nombre para tu respuesta",
       "name.maxLength": "El nombre no puede tener más de 200 carácteres",
       "name.unique": "Este nombre de respuesta ya existe"
+    },
+    "duplicate": {
+      "name.required": "Es necesario un nombre para tu respuesta",
+      "name.maxLength": "El nombre no puede tener más de 200 carácteres",
+      "name.unique": "Este nombre de respuesta ya existe"
     }
   },
   "route": {
