@@ -5,6 +5,7 @@ Route.group(() => {
   Route.put(':id', 'ResponsesController.edit')
   Route.delete(':id', 'ResponsesController.delete')
   Route.post(':id/enable', 'ResponsesController.enable')
+  Route.post(':id/duplicate', 'ResponsesController.duplicate')
   Route.get(':id/headers', 'HeadersController.getList')
   Route.post(':id/headers', 'HeadersController.create')
 }).prefix('responses')

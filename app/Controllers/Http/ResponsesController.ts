@@ -148,9 +148,20 @@ export default class ResponsesController {
     const route = await Route.findOrFail(routeResponse.routeId)
     const project = await Project.findOrFail(route.projectId)
     await bouncer.with('ProjectPolicy').authorize('isMember', project, i18n)
+    const headers = await routeResponse.related('headers').query()
     params['routeId'] = route.id // Send context to validator
     const data = await request.validate(DuplicateResponseValidator)
-    await Response.create({ ...routeResponse, ...data, id: undefined })
+    const newResponse = await Response.create({
+      name: data.name,
+      body: routeResponse.body,
+      isFile: routeResponse.isFile,
+      routeId: routeResponse.routeId,
+      status: routeResponse.status,
+      enabled: false,
+    })
+    const newHeaders = headers.map(({ key, value }) => ({ key, value }))
+    await newResponse.related('headers').createMany(newHeaders)
+    Ws.io.emit(`route:${route.id}`, 'updated')
     return response.created({
       message: i18n.formatMessage('responses.response.duplicate.response_duplicated'),
     })
