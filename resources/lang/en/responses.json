@@ -7,7 +7,7 @@
       "invalid_json": "JSON response has invalid structure, please fix response body"
     }
   },
-  "auth": {
+  "user": {
     "register": {
       "verify_subject": "Welcome to Mockos!",
       "verify_message": "Please verify your email here {url}",

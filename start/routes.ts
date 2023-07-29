@@ -21,7 +21,7 @@
 import './routes/api'
 import './routes/routes'
 import './routes/invitations'
-import './routes/auth'
+import './routes/user'
 import './routes/projects'
 import './routes/responses'
 import './routes/headers'

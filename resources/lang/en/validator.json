@@ -1,5 +1,5 @@
 {
-  "auth": {
+  "user": {
     "login": {
       "email.required": "We need an email so we know who you are",
       "email.email": "This email does not look right...",

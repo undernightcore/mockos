@@ -1,5 +1,5 @@
 {
-  "auth": {
+  "user": {
     "login": {
       "email.required": "Necesitamos un correo para saber quien eres",
       "email.email": "El correo electrónico no tiene un formato correcto",

@@ -2,11 +2,11 @@ import { HttpContextContract } from '@ioc:Adonis/Core/HttpContext'
 import User from 'App/Models/User'
 import Mail from '@ioc:Adonis/Addons/Mail'
 import Route from '@ioc:Adonis/Core/Route'
-import RegisterValidator from 'App/Validators/Auth/RegisterValidator'
-import LoginValidator from 'App/Validators/Auth/LoginValidator'
+import RegisterValidator from 'App/Validators/User/RegisterValidator'
+import LoginValidator from 'App/Validators/User/LoginValidator'
 import Env from '@ioc:Adonis/Core/Env'
 
-export default class AuthController {
+export default class UserController {
   public async register({ request, response, i18n }: HttpContextContract) {
     const data = await request.validate(RegisterValidator)
     const user = await User.create(data)
@@ -17,15 +17,15 @@ export default class AuthController {
       message
         .from(Env.get('SMTP_EMAIL'))
         .to(user.email)
-        .subject(i18n.formatMessage('responses.auth.register.verify_subject'))
+        .subject(i18n.formatMessage('responses.user.register.verify_subject'))
         .text(
-          i18n.formatMessage('responses.auth.register.verify_message', {
+          i18n.formatMessage('responses.user.register.verify_message', {
             url: `${Env.get('BACK_URL')}${verificationUrl}}`,
           })
         )
     })
     return response.created({
-      message: i18n.formatMessage('responses.auth.register.verify_email', { name: user.name }),
+      message: i18n.formatMessage('responses.user.register.verify_email', { name: user.name }),
     })
   }
 
@@ -45,10 +45,10 @@ export default class AuthController {
       const user = await User.findBy('email', data.email)
       return user?.verified
         ? response.ok(token)
-        : response.forbidden({ errors: [i18n.formatMessage('responses.auth.login.verify_first')] })
+        : response.forbidden({ errors: [i18n.formatMessage('responses.user.login.verify_first')] })
     } catch {
       return response.unauthorized({
-        errors: [i18n.formatMessage('responses.auth.login.wrong_credentials')],
+        errors: [i18n.formatMessage('responses.user.login.wrong_credentials')],
       })
     }
   }

@@ -7,7 +7,7 @@
       "invalid_json": "La respuesta JSON tiene una estructura inválida, por favor corrige el cuerpo de la respuesta"
     }
   },
-  "auth": {
+  "user": {
     "register": {
       "verify_subject": "¡Bienvenido a Mockos!",
       "verify_message": "Porfi, verifica tu correo aquí {url}",
