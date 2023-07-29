@@ -16,6 +16,9 @@
     "login": {
       "verify_first": "You need to verify your email address first",
       "wrong_credentials": "Sorry, these credentials are incorrect"
+    },
+    "edit": {
+      "user_edited": "Your user info has been edited"
     }
   },
   "invitation": {

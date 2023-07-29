@@ -10,8 +10,13 @@
       "email.unique": "You already have an account with this email",
       "email.email": "This email is not valid",
       "name.required": "We need a name to know how to address you",
+      "name.minLength": "We need a name that is at least 3 characters, you can also use your surname",
       "password.required": "We need a password to give you access",
       "password.minLength": "Please use a password of at least 8 characters"
+    },
+    "edit": {
+      "name.required": "We need a name to know how to address you",
+      "name.minLength": "We need a name that is at least 3 characters, you can also use your surname"
     }
   },
   "project": {

@@ -16,6 +16,9 @@
     "login": {
       "verify_first": "Tienes que verificar tu correo electrónico primero",
       "wrong_credentials": "Bro estas credenciales no están bien"
+    },
+    "edit": {
+      "user_edited": "Tus datos de usuario han sido editados"
     }
   },
   "invitation": {

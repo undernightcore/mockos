@@ -5,6 +5,7 @@ import Route from '@ioc:Adonis/Core/Route'
 import RegisterValidator from 'App/Validators/User/RegisterValidator'
 import LoginValidator from 'App/Validators/User/LoginValidator'
 import Env from '@ioc:Adonis/Core/Env'
+import EditUserValidator from 'App/Validators/User/EditUserValidator'
 
 export default class UserController {
   public async register({ request, response, i18n }: HttpContextContract) {
@@ -51,5 +52,14 @@ export default class UserController {
         errors: [i18n.formatMessage('responses.user.login.wrong_credentials')],
       })
     }
+  }
+
+  public async edit({ request, response, auth, i18n }: HttpContextContract) {
+    const user = await auth.authenticate()
+    const data = await request.validate(EditUserValidator)
+    await user.merge(data).save()
+    return response.ok({
+      message: i18n.formatMessage('responses.user.edit.user_edited'),
+    })
   }
 }
