@@ -7,7 +7,7 @@
       "invalid_json": "JSON response has invalid structure, please fix response body"
     }
   },
-  "auth": {
+  "user": {
     "register": {
       "verify_subject": "Welcome to Mockos!",
       "verify_message": "Please verify your email here {url}",
@@ -16,6 +16,14 @@
     "login": {
       "verify_first": "You need to verify your email address first",
       "wrong_credentials": "Sorry, these credentials are incorrect"
+    },
+    "edit": {
+      "user_edited": "Your user info has been edited"
+    },
+    "email": {
+      "verify_subject": "Please validate your new Mockos email here",
+      "verify_message": "You just requested an email change, the change will take effect if you click here {url}",
+      "verify_email": "Please, verify this change in the inbox of the email you just sent us"
     }
   },
   "invitation": {

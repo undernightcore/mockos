@@ -1,13 +1,12 @@
 import { schema, rules } from '@ioc:Adonis/Core/Validator'
 import { HttpContextContract } from '@ioc:Adonis/Core/HttpContext'
 
-export default class LoginValidator {
+export default class EditUserEmailValidator {
   constructor(private ctx: HttpContextContract) {}
 
   public schema = schema.create({
-    email: schema.string({}, [rules.email()]),
-    password: schema.string(),
+    email: schema.string({}, [rules.email(), rules.unique({ table: 'users', column: 'email' })]),
   })
 
-  public messages = this.ctx.i18n.validatorMessages('validator.auth.login')
+  public messages = this.ctx.i18n.validatorMessages('validator.user.email')
 }

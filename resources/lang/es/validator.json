@@ -1,5 +1,5 @@
 {
-  "auth": {
+  "user": {
     "login": {
       "email.required": "Necesitamos un correo para saber quien eres",
       "email.email": "El correo electrónico no tiene un formato correcto",
@@ -10,8 +10,18 @@
       "email.unique": "Ya tienes una cuenta con este correo",
       "email.email": "Este correo no es valido",
       "name.required": "Necesitamos un nombre para saber como dirigirnos a ti",
+      "name.minLength": "Tu nombre tiene que tener al menos 3 caracteres, podrías usar tu apellido",
       "password.required": "Necesitamos una contraseña para poderte dar acceso",
       "password.minLength": "Porfa, usa una contraseña de al menos 8 caracteres"
+    },
+    "edit": {
+      "name.required": "Necesitamos un nombre para saber como dirigirnos a ti",
+      "name.minLength": "Tu nombre tiene que tener al menos 3 caracteres, podrías usar tu apellido"
+    },
+    "email": {
+      "email.required": "Necesitamos conocer tu nuevo email",
+      "email.email": "Este email no es valido",
+      "email.unique": "Este email ya está en uso"
     }
   },
   "project": {
