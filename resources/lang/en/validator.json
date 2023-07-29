@@ -17,6 +17,11 @@
     "edit": {
       "name.required": "We need a name to know how to address you",
       "name.minLength": "We need a name that is at least 3 characters, you can also use your surname"
+    },
+    "email": {
+      "email.required": "We need to know your new email",
+      "email.email": "This email is not valid",
+      "email.unique": "This email is already in use"
     }
   },
   "project": {

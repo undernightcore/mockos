@@ -5,4 +5,5 @@ Route.group(() => {
   Route.post('register', 'UserController.register')
   Route.get('verify/:email', 'UserController.verify').as('verifyEmail')
   Route.put('edit', 'UserController.edit')
+  Route.put('email', 'UserController.editEmail')
 }).prefix('user')

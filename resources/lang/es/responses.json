@@ -19,6 +19,11 @@
     },
     "edit": {
       "user_edited": "Tus datos de usuario han sido editados"
+    },
+    "email": {
+      "verify_subject": "Por favor, valida tu nuevo correo electrónico de Mockos aquí",
+      "verify_message": "Acabas de solicitar un cambio de correo electrónico, el cambio surtirá efecto si haces clic aquí {url}",
+      "verify_email": "Por favor, verifica este cambio en la bandeja de entrada del correo electrónico que nos acabas de enviar"
     }
   },
   "invitation": {
