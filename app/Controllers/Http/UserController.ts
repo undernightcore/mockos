@@ -11,35 +11,35 @@ import EditUserEmailValidator from 'App/Validators/User/EditUserEmailValidator'
 export default class UserController {
   public async register({ request, response, i18n }: HttpContextContract) {
     const data = await request.validate(RegisterValidator)
-    const user = await User.create(data)
-    const verificationUrl = Route.makeSignedUrl('verifyEmail', {
-      email: user.email,
-    })
-    await Mail.send((message) => {
-      message
-        .from(Env.get('SMTP_EMAIL'))
-        .to(user.email)
-        .subject(i18n.formatMessage('responses.user.register.verify_subject'))
-        .text(
-          i18n.formatMessage('responses.user.register.verify_message', {
-            url: `${Env.get('BACK_URL')}${verificationUrl}}`,
-          })
-        )
-    })
+    const { id, verifyLock, email, name } = await User.create(data)
+    const verificationUrl = this.#createVerificationUrl(id, verifyLock)
+    await this.#sendEmail(
+      email,
+      i18n.formatMessage('responses.user.register.verify_subject'),
+      i18n.formatMessage('responses.user.register.verify_message', {
+        url: `${Env.get('BACK_URL')}${verificationUrl}`,
+      })
+    )
     return response.created({
-      message: i18n.formatMessage('responses.user.register.verify_email', { name: user.name }),
+      message: i18n.formatMessage('responses.user.register.verify_email', { name }),
     })
   }
 
   public async verify({ request, response, params }: HttpContextContract) {
     if (!request.hasValidSignature()) return response.redirect(Env.get('VERIFY_FAILURE_URL'))
-    const user = await User.findBy('email', params.email)
-    if (!user) return response.redirect(`${Env.get('FRONT_URL')}/verify/failure`)
-    if (user.verified) {
-      user.email = params.email
-    } else {
-      user.verified = true
+    const id = Number(params.id)
+    const verifyLock = Number(request.qs().verifyLock)
+    const email = request.qs().email
+    const user = await User.find(id)
+    if (!user || user.verifyLock !== verifyLock) {
+      return response.redirect(`${Env.get('FRONT_URL')}/verify/failure`)
     }
+    if (email && (await User.findBy('email', email))) {
+      return response.redirect(`${Env.get('FRONT_URL')}/verify/failure`)
+    }
+    user.email = email ?? user.email
+    user.verified = true
+    user.verifyLock = user.verifyLock + 1
     await user.save()
     return response.redirect(`${Env.get('FRONT_URL')}/verify/success`)
   }
@@ -68,21 +68,30 @@ export default class UserController {
     })
   }
 
-  public async editEmail({ request, response, auth, i18n }: HttpContextContract) {
-    await auth.authenticate()
+  public async editEmail({ request, response, auth, i18n, bouncer }: HttpContextContract) {
+    const { id, verifyLock } = await auth.authenticate()
+    await bouncer.with('GlobalPolicy').authorize('isVerified', i18n)
     const { email } = await request.validate(EditUserEmailValidator)
-    const verificationUrl = Route.makeSignedUrl('verifyEmail', { email })
+    const verificationUrl = this.#createVerificationUrl(id, verifyLock, email)
+    await this.#sendEmail(
+      email,
+      i18n.formatMessage('responses.user.email.verify_subject'),
+      i18n.formatMessage('responses.user.email.verify_message', {
+        url: `${Env.get('BACK_URL')}${verificationUrl}`,
+      })
+    )
+    return response.ok({ message: i18n.formatMessage('responses.user.email.verify_email') })
+  }
+
+  // Helper functions
+
+  async #sendEmail(email: string, subject: string, body: string) {
     await Mail.send((message) => {
-      message
-        .from(Env.get('SMTP_EMAIL'))
-        .to(email)
-        .subject(i18n.formatMessage('responses.user.email.verify_subject'))
-        .text(
-          i18n.formatMessage('responses.user.email.verify_message', {
-            url: `${Env.get('BACK_URL')}${verificationUrl}}`,
-          })
-        )
+      message.from(Env.get('SMTP_EMAIL')).to(email).subject(subject).text(body)
     })
-    return response.ok({ message: 'responses.user.email.verify_email' })
+  }
+
+  #createVerificationUrl(id: number, verifyLock: number, email?: string) {
+    return Route.makeSignedUrl('verifyEmail', { id }, { qs: { email, verifyLock } })
   }
 }
