@@ -10,5 +10,5 @@ export default class RegisterValidator {
     password: schema.string({}, [rules.minLength(8)]),
   })
 
-  public messages = this.ctx.i18n.validatorMessages('validator.auth.register')
+  public messages = this.ctx.i18n.validatorMessages('validator.user.register')
 }

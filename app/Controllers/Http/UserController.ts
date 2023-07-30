@@ -11,8 +11,8 @@ import EditUserEmailValidator from 'App/Validators/User/EditUserEmailValidator'
 export default class UserController {
   public async register({ request, response, i18n }: HttpContextContract) {
     const data = await request.validate(RegisterValidator)
-    const { id, verifyLock, email, name } = await User.create(data)
-    const verificationUrl = this.#createVerificationUrl(id, verifyLock)
+    const { id, email, name } = await User.create(data)
+    const verificationUrl = this.#createVerificationUrl(id, 0)
     await this.#sendEmail(
       email,
       i18n.formatMessage('responses.user.register.verify_subject'),
