@@ -39,6 +39,9 @@ export default class User extends BaseModel {
   @column({ serializeAs: null })
   public rememberMeToken: string | null
 
+  @column({ serializeAs: null })
+  public verifyLock: number
+
   @column.dateTime({ autoCreate: true })
   public createdAt: DateTime
 
