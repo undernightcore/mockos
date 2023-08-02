@@ -49,7 +49,7 @@ export default class ApiController {
       (route) =>
         // Replace {} dynamic values in path to regex dynamic value
         new RegExp(
-          `^${route.endpoint.replace('/', '\\/').replace(new RegExp('{(.+?)}', 'g'), '(.+)')}$`
+          `^${route.endpoint.replace('/', '\\/').replace(new RegExp('{(.+?)}', 'g'), '([^/]+)')}$`
         )
     )
     const routeIndex = regexList.findIndex((regex) => regex.test(endpoint))
