@@ -85,5 +85,10 @@
     "delete": {
       "header_deleted": "Header deleted successfully"
     }
+  },
+  "token": {
+    "delete": {
+      "token_deleted": "Token deleted successfully"
+    }
   }
 }

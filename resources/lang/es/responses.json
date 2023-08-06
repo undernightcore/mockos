@@ -82,5 +82,10 @@
     "delete": {
       "header_deleted": "Cabecera eliminada correctamente"
     }
+  },
+  "token": {
+    "delete": {
+      "token_deleted": "Token eliminado correctamente"
+    }
   }
 }

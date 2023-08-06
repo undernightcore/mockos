@@ -118,5 +118,12 @@
       "value.maxLength": "El valor no puede tener más de 255 carácteres",
       "key.unique": "Ya hay una cabecera con esa clave"
     }
+  },
+  "token": {
+    "create": {
+      "name.required": "Se require un nombre para este token",
+      "name.minLength": "El nombre tiene que tener al menos 3 carácteres",
+      "name.maxLength": "El nombre no puede tener más de 30 carácteres"
+    }
   }
 }
