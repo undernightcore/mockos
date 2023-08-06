@@ -10,12 +10,10 @@ import Response from 'App/Models/Response'
 import { Buffer } from 'buffer'
 
 export default class ApiController {
-  public async mock({ request, auth, params, response, bouncer, i18n }: HttpContextContract) {
-    await auth.authenticate()
+  public async mock({ request, params, response, i18n }: HttpContextContract) {
+    const project = await this.#authenticateProject(request, i18n)
     const method = request.method().toLowerCase()
     const endpoint = '/' + (params['*']?.join('/') ?? '')
-    const project = await Project.findOrFail(this.#getProjectHeaderOrFail(request, i18n))
-    await bouncer.with('ProjectPolicy').authorize('isMember', project, i18n)
     const routes = await project
       .related('routes')
       .query()
@@ -35,13 +33,23 @@ export default class ApiController {
 
   // Helper functions
 
-  #getProjectHeaderOrFail(request: RequestContract, i18n: I18nContract) {
-    const projectId = request.headers().project
+  async #authenticateProject(request: RequestContract, i18n: I18nContract) {
+    const token = request.header('token')
+    const projectId = request.header('project')
     if (projectId === undefined) {
       throw new HttpError(400, i18n.formatMessage('responses.api.mock.missing_project_header'))
-    } else {
-      return projectId
     }
+    if (token === undefined) {
+      throw new HttpError(400, i18n.formatMessage('responses.api.mock.missing_token_header'))
+    }
+    const project = await Project.findOrFail(projectId)
+    const isTokenValid = Boolean(
+      await project.related('tokens').query().where('token', token).first()
+    )
+    if (!isTokenValid) {
+      throw new HttpError(400, i18n.formatMessage('responses.api.mock.wrong_token'))
+    }
+    return project
   }
 
   #getFirstMatchingRouteOrFail(routes: Route[], endpoint: string, i18n: I18nContract) {
