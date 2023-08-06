@@ -47,8 +47,11 @@ export default class UserController {
   public async login({ request, response, auth, i18n }: HttpContextContract) {
     const data = await request.validate(LoginValidator)
     try {
-      const token = await auth.attempt(data.email, data.password)
-      const user = await User.findBy('email', data.email)
+      const token = await auth.attempt(data.email, data.password, {
+        expiresIn: '7 days',
+      })
+      const user = await User.findByOrFail('email', data.email)
+      await this.#flushExpiredTokens(user)
       return user?.verified
         ? response.ok(token)
         : response.forbidden({ errors: [i18n.formatMessage('responses.user.login.verify_first')] })
@@ -89,6 +92,10 @@ export default class UserController {
     await Mail.send((message) => {
       message.from(Env.get('SMTP_EMAIL')).to(email).subject(subject).text(body)
     })
+  }
+
+  async #flushExpiredTokens(user: User) {
+    await user.related('tokens').query().delete().where('expires_at', '<', new Date())
   }
 
   #createVerificationUrl(id: number, verifyLock: number, email?: string) {
