@@ -10,9 +10,9 @@ export default class TokensController {
     const data = await request.validate(CreateTokenValidator)
     const project = await Project.findOrFail(params.id)
     await bouncer.with('ProjectPolicy').authorize('isMember', project, i18n)
-    let token = randomString(20)
+    let token = randomString(40)
     while (await Token.findBy('token', token)) {
-      token = randomString(20)
+      token = randomString(40)
     }
     const newToken = await project.related('tokens').create({ token, ...data })
     return response.created(newToken)
