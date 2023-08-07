@@ -5,7 +5,8 @@ import Token from 'App/Models/Token'
 import CreateTokenValidator from 'App/Validators/Token/CreateTokenValidator'
 
 export default class TokensController {
-  public async create({ request, response, params, bouncer, i18n }: HttpContextContract) {
+  public async create({ request, response, params, bouncer, i18n, auth }: HttpContextContract) {
+    await auth.authenticate()
     const data = await request.validate(CreateTokenValidator)
     const project = await Project.findOrFail(params.id)
     await bouncer.with('ProjectPolicy').authorize('isMember', project, i18n)
@@ -17,7 +18,8 @@ export default class TokensController {
     return response.created(newToken)
   }
 
-  public async delete({ response, params, bouncer, i18n }: HttpContextContract) {
+  public async delete({ response, params, bouncer, i18n, auth }: HttpContextContract) {
+    await auth.authenticate()
     const token = await Token.findOrFail(params.id)
     const project = await Project.findOrFail(token.projectId)
     await bouncer.with('ProjectPolicy').authorize('isMember', project, i18n)
@@ -25,7 +27,8 @@ export default class TokensController {
     return response.ok({ message: i18n.formatMessage('responses.token.delete.token_deleted') })
   }
 
-  public async getList({ response, request, params, bouncer, i18n }: HttpContextContract) {
+  public async getList({ response, request, params, bouncer, i18n, auth }: HttpContextContract) {
+    await auth.authenticate()
     const project = await Project.findOrFail(params.id)
     const page = request.input('page', 1)
     const perPage = request.input('perPage', 10)
