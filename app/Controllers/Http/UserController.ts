@@ -9,6 +9,11 @@ import EditUserValidator from 'App/Validators/User/EditUserValidator'
 import EditUserEmailValidator from 'App/Validators/User/EditUserEmailValidator'
 
 export default class UserController {
+  public async get({ response, auth }: HttpContextContract) {
+    const user = await auth.authenticate()
+    return response.ok(user)
+  }
+
   public async register({ request, response, i18n }: HttpContextContract) {
     const data = await request.validate(RegisterValidator)
     const { id, email, name } = await User.create(data)
