@@ -13,4 +13,6 @@ Route.group(() => {
   Route.post(':id/routes', 'RoutesController.create')
   Route.get(':id/routes', 'RoutesController.getList')
   Route.post(':id/sort', 'RoutesController.sort')
+  Route.post(':id/tokens', 'TokensController.create')
+  Route.get(':id/tokens', 'TokensController.getList')
 }).prefix('projects')

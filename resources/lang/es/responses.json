@@ -2,6 +2,8 @@
   "api": {
     "mock": {
       "missing_project_header": "Necesitamos que envíes el proyecto de la petición",
+      "missing_token_header": "Necesitamos que te autentiques usando la cabecera 'token'",
+      "wrong_token": "Este token no es válido para este proyecto",
       "missing_route": "No se ha encontrado ninguna ruta con ese endpoint y métodos",
       "missing_response": "No se ha encontrado ninguna respuesta disponible para esa ruta y método",
       "invalid_json": "La respuesta JSON tiene una estructura inválida, por favor corrige el cuerpo de la respuesta"
@@ -81,6 +83,11 @@
     },
     "delete": {
       "header_deleted": "Cabecera eliminada correctamente"
+    }
+  },
+  "token": {
+    "delete": {
+      "token_deleted": "Token eliminado correctamente"
     }
   }
 }

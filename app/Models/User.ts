@@ -11,6 +11,7 @@ import {
 } from '@ioc:Adonis/Lucid/Orm'
 import Project from 'App/Models/Project'
 import Member from 'App/Models/Member'
+import ApiToken from 'App/Models/ApiToken'
 
 export default class User extends BaseModel {
   @column({ isPrimary: true })
@@ -27,6 +28,9 @@ export default class User extends BaseModel {
 
   @hasMany(() => Member)
   public invitations: HasMany<typeof Member>
+
+  @hasMany(() => ApiToken)
+  public tokens: HasMany<typeof ApiToken>
 
   @manyToMany(() => Project, {
     pivotTable: 'members',

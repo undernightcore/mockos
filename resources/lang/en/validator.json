@@ -118,5 +118,12 @@
       "value.maxLength": "The value can't be more than 255 characters long",
       "key.unique": "There is already a header with that key"
     }
+  },
+  "token": {
+    "create": {
+      "name.required": "A name is required for this token",
+      "name.minLength": "The name must be at least 3 characters long",
+      "name.maxLength": "The name can't be more than 30 characters long"
+    }
   }
 }

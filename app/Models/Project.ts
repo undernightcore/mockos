@@ -11,6 +11,7 @@ import {
 } from '@ioc:Adonis/Lucid/Orm'
 import User from 'App/Models/User'
 import Route from 'App/Models/Route'
+import Token from 'App/Models/Token'
 
 export default class Project extends BaseModel {
   @column({ isPrimary: true })
@@ -26,6 +27,9 @@ export default class Project extends BaseModel {
     foreignKey: 'forkedProjectId',
   })
   public forkedProject: BelongsTo<typeof Project>
+
+  @hasMany(() => Token)
+  public tokens: HasMany<typeof Token>
 
   @column({ serializeAs: null })
   public forkedProjectId: number | null
