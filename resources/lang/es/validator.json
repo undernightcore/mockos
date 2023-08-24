@@ -22,6 +22,11 @@
       "email.required": "Necesitamos conocer tu nuevo email",
       "email.email": "Este email no es valido",
       "email.unique": "Este email ya está en uso"
+    },
+    "resend_email": {
+      "email.required": "Necesitamos saber cuál es tu correo electrónico",
+      "email.email": "Este correo electrónico no es válido",
+      "email.exists": "No hay ningún usuario con este correo electrónico"
     }
   },
   "project": {
