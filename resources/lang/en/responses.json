@@ -26,6 +26,10 @@
       "verify_subject": "Please validate your new Mockos email here",
       "verify_message": "You just requested an email change, the change will take effect if you click here {url}",
       "verify_email": "Please, verify this change in the inbox of the email you just sent us"
+    },
+    "resend_email": {
+      "already_verified": "No need to verify your account, you're already verified",
+      "verify_email": "We sent you a new email with a verification link"
     }
   },
   "invitation": {

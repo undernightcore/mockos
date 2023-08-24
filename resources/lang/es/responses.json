@@ -26,6 +26,10 @@
       "verify_subject": "Por favor, valida tu nuevo correo electrónico de Mockos aquí",
       "verify_message": "Acabas de solicitar un cambio de correo electrónico, el cambio surtirá efecto si haces clic aquí {url}",
       "verify_email": "Por favor, verifica este cambio en la bandeja de entrada del correo electrónico que nos acabas de enviar"
+    },
+    "resend_email": {
+      "already_verified": "No hace falta que verifiques tu cuenta, ya estás verificado",
+      "verify_email": "Te hemos enviado un nuevo correo electrónico con un enlace de verificación"
     }
   },
   "invitation": {

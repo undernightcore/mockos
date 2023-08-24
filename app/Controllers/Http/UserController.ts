@@ -7,6 +7,7 @@ import LoginValidator from 'App/Validators/User/LoginValidator'
 import Env from '@ioc:Adonis/Core/Env'
 import EditUserValidator from 'App/Validators/User/EditUserValidator'
 import EditUserEmailValidator from 'App/Validators/User/EditUserEmailValidator'
+import ResendEmailValidator from 'App/Validators/User/ResendEmailValidator'
 
 export default class UserController {
   public async get({ response, auth }: HttpContextContract) {
@@ -89,6 +90,26 @@ export default class UserController {
       })
     )
     return response.ok({ message: i18n.formatMessage('responses.user.email.verify_email') })
+  }
+
+  public async resendEmail({ request, response, i18n }: HttpContextContract) {
+    const { email } = await request.validate(ResendEmailValidator)
+    const user = await User.findByOrFail('email', email)
+    if (user.verified)
+      return response
+        .status(400)
+        .send({ errors: [i18n.formatMessage('responses.user.resend_email.already_verified')] })
+    const verificationUrl = this.#createVerificationUrl(user.id, user.verifyLock)
+    await this.#sendEmail(
+      email,
+      i18n.formatMessage('responses.user.register.verify_subject'),
+      i18n.formatMessage('responses.user.register.verify_message', {
+        url: `${Env.get('BACK_URL')}${verificationUrl}`,
+      })
+    )
+    return response.ok({
+      message: i18n.formatMessage('responses.user.resend_email.verify_email'),
+    })
   }
 
   // Helper functions
