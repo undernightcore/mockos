@@ -1,4 +1,4 @@
-FROM node:latest as build
+FROM node:lts as build
 
 WORKDIR /usr/local/app
 COPY ./ /usr/local/app/
@@ -6,7 +6,7 @@ ENV NODE_ENV=development
 RUN npm install
 RUN node ace build --production
 
-FROM node:latest
+FROM node:lts
 WORKDIR /usr/local/app
 COPY --from=build /usr/local/app/build/ /usr/local/app/
 ENV NODE_ENV=production
