@@ -13,7 +13,8 @@
     "register": {
       "verify_subject": "Welcome to Mockos!",
       "verify_message": "Please verify your email here {url}",
-      "verify_email": "Hi {name}, please verify your email address"
+      "verify_email": "Hi {name}, please verify your email address",
+      "login": "Welcome {name}! Please log in!"
     },
     "login": {
       "verify_first": "You need to verify your email address first",

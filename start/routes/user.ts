@@ -6,6 +6,6 @@ Route.group(() => {
   Route.post('register', 'UserController.register')
   Route.get(':id/verify', 'UserController.verify').as('verifyEmail')
   Route.put('', 'UserController.edit')
-  Route.put('email', 'UserController.editEmail')
-  Route.post('resend', 'UserController.resendEmail')
+  Route.put('email', 'UserController.editEmail').middleware('verificationDisabled')
+  Route.post('resend', 'UserController.resendEmail').middleware('verificationDisabled')
 }).prefix('user')
