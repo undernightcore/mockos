@@ -16,18 +16,24 @@ export default class UserController {
   }
 
   public async register({ request, response, i18n }: HttpContextContract) {
+    const isVerifyDisabled = Env.get('DISABLE_VERIFICATION')
     const data = await request.validate(RegisterValidator)
-    const { id, email, name } = await User.create(data)
-    const verificationUrl = this.#createVerificationUrl(id, 0)
-    await this.#sendEmail(
-      email,
-      i18n.formatMessage('responses.user.register.verify_subject'),
-      i18n.formatMessage('responses.user.register.verify_message', {
-        url: `${Env.get('BACK_URL')}${verificationUrl}`,
-      })
-    )
+    const { id, email, name } = await User.create({ ...data, verified: isVerifyDisabled })
+    if (!isVerifyDisabled) {
+      const verificationUrl = this.#createVerificationUrl(id, 0)
+      await this.#sendEmail(
+        email,
+        i18n.formatMessage('responses.user.register.verify_subject'),
+        i18n.formatMessage('responses.user.register.verify_message', {
+          url: `${Env.get('BACK_URL')}${verificationUrl}`,
+        })
+      )
+    }
     return response.created({
-      message: i18n.formatMessage('responses.user.register.verify_email', { name }),
+      message: i18n.formatMessage(
+        `responses.user.register.${isVerifyDisabled ? 'login' : 'verify_email'}`,
+        { name }
+      ),
     })
   }
 
