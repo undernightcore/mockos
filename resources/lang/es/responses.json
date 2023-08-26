@@ -13,7 +13,8 @@
     "register": {
       "verify_subject": "¡Bienvenido a Mockos!",
       "verify_message": "Porfi, verifica tu correo aquí {url}",
-      "verify_email": "Holi {name}, verifica tu correo electrónico porfa"
+      "verify_email": "Holi {name}, verifica tu correo electrónico porfa",
+      "login": "¡Bienvenido {name}! Por favor inicia sesión"
     },
     "login": {
       "verify_first": "Tienes que verificar tu correo electrónico primero",
@@ -25,8 +26,7 @@
     "email": {
       "verify_subject": "Por favor, valida tu nuevo correo electrónico de Mockos aquí",
       "verify_message": "Acabas de solicitar un cambio de correo electrónico, el cambio surtirá efecto si haces clic aquí {url}",
-      "verify_email": "Por favor, verifica este cambio en la bandeja de entrada del correo electrónico que nos acabas de enviar",
-      "login": "¡Bienvenido {name}! Por favor inicia sesión"
+      "verify_email": "Por favor, verifica este cambio en la bandeja de entrada del correo electrónico que nos acabas de enviar"
     },
     "resend_email": {
       "already_verified": "No hace falta que verifiques tu cuenta, ya estás verificado",

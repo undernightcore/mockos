@@ -1,0 +1,34 @@
+version: '3.8'
+services:
+  frontend:
+    image: 'ghcr.io/undernightcore/mockos-front:latest'
+    restart: unless-stopped
+    env_file:
+      - .env
+    ports:
+      - '8090:80'
+  api:
+    image: 'ghcr.io/undernightcore/mockos-back:latest'
+    restart: unless-stopped
+    env_file:
+      - .env
+    ports:
+      - '8091:3333'
+  s3:
+    image: 'minio/minio'
+    restart: unless-stopped
+    volumes:
+      - ./storage:/data
+    environment:
+      MINIO_ROOT_USER: ${S3_KEY}
+      MINIO_ROOT_PASSWORD: ${S3_SECRET}
+    entrypoint: sh
+    command: -c 'mkdir -p /data/mockos && minio server /data'
+  db:
+    image: 'postgres'
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: ${PG_USER}
+      POSTGRES_PASSWORD: ${PG_PASSWORD}
+    volumes:
+      - ./database:/var/lib/postgresql/data
