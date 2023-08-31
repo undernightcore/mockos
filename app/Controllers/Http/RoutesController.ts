@@ -9,17 +9,19 @@ import Ws from 'App/Services/Ws'
 import { recalculateRouteOrder } from 'App/Helpers/Shared/sort.helper'
 import { move } from 'App/Helpers/Shared/array.helper'
 import { HttpError } from 'App/Models/HttpError'
+import CreateFolderValidator from 'App/Validators/Route/CreateFolderValidator'
 
 export default class RoutesController {
   public async create({ request, response, auth, params, bouncer, i18n }: HttpContextContract) {
     await auth.authenticate()
     const project = await Project.findOrFail(params.id)
+    const isFolder = Boolean(request.input('isFolder', false))
     await bouncer.with('ProjectPolicy').authorize('isMember', project, i18n)
-    const data = await request.validate(CreateRouteValidator)
+    const data = await request.validate(isFolder ? CreateFolderValidator : CreateRouteValidator)
     const lastOrder = await project.related('routes').query().orderBy('order', 'desc').first()
     const route = await project
       .related('routes')
-      .create({ ...data, order: (lastOrder?.order ?? 0) + 1 })
+      .create({ ...data, isFolder, order: (lastOrder?.order ?? 0) + 1 })
     Ws.io.emit(`project:${project.id}`, `updated`)
     return response.created(route)
   }

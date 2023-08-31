@@ -23,6 +23,9 @@ export default class CreateRouteValidator {
       rules.regex(new RegExp('^/([a-zA-Z0-9{}-]+)*(/[a-zA-Z0-9{}-]+)*$')),
       rules.maxLength(2000),
     ]),
+    parentFolderId: schema.number.nullable([
+      rules.exists({ table: 'routes', column: 'id', where: { is_folder: true } }),
+    ]),
     enabled: schema.boolean(),
   })
 
