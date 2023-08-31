@@ -79,6 +79,7 @@
     },
     "sort": {
       "route_mismatch": "Las rutas no corresponden al projecto correcto",
+      "context_mismatch": "Solo puedes ordenar rutas dentro de una misma profundidad",
       "route_sorted": "Se ha movido correctamente"
     }
   },

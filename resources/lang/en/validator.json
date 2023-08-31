@@ -110,6 +110,11 @@
       "endpoint.maxLength": "The endpoint can't be more than 2000 characters long",
       "enabled.required": "You have to indicate the state of the route"
     },
+    "edit_folder": {
+      "name.required": "A brief description for the folder is needed",
+      "name.minLength": "The name must have at least 3 characters",
+      "name.maxLength": "The name can't be more than 200 characters long"
+    },
     "sort": {
       "origin.required": "You need to indicate which route you are going to move",
       "destination.required": "You need to indicate where you are going to move the route"

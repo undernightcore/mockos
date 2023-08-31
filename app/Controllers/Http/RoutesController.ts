@@ -7,9 +7,9 @@ import SortRouteValidator from 'App/Validators/Route/SortRouteValidator'
 import Database from '@ioc:Adonis/Lucid/Database'
 import Ws from 'App/Services/Ws'
 import { recalculateRouteOrder } from 'App/Helpers/Shared/sort.helper'
-import { move } from 'App/Helpers/Shared/array.helper'
+import { getLastIndex, move } from 'App/Helpers/Shared/array.helper'
 import { HttpError } from 'App/Models/HttpError'
-import CreateFolderValidator from 'App/Validators/Route/CreateFolderValidator'
+import EditFolderValidator from 'App/Validators/Route/EditFolderValidator'
 
 export default class RoutesController {
   public async create({ request, response, auth, params, bouncer, i18n }: HttpContextContract) {
@@ -17,11 +17,12 @@ export default class RoutesController {
     const project = await Project.findOrFail(params.id)
     const isFolder = Boolean(request.input('isFolder', false))
     await bouncer.with('ProjectPolicy').authorize('isMember', project, i18n)
-    const data = await request.validate(isFolder ? CreateFolderValidator : CreateRouteValidator)
-    const lastOrder = await project.related('routes').query().orderBy('order', 'desc').first()
-    const route = await project
-      .related('routes')
-      .create({ ...data, isFolder, order: (lastOrder?.order ?? 0) + 1 })
+    const data = await request.validate(CreateRouteValidator)
+
+    const route = await (data.parentFolderId
+      ? this.createNewRouteInRoot(project, isFolder, data)
+      : this.createNewRouteInFolder(project, data.parentFolderId, data))
+
     Ws.io.emit(`project:${project.id}`, `updated`)
     return response.created(route)
   }
@@ -31,7 +32,7 @@ export default class RoutesController {
     const route = await Route.findOrFail(params.id)
     const project = await Project.findOrFail(route.projectId)
     params.projectId = route.projectId
-    const data = await request.validate(EditRouteValidator)
+    const data = await request.validate(route.isFolder ? EditFolderValidator : EditRouteValidator)
     await bouncer.with('ProjectPolicy').authorize('isMember', project, i18n)
     const newRoute = await route.merge(data).save()
     Ws.io.emit(`project:${project.id}`, `updated`)
@@ -87,9 +88,14 @@ export default class RoutesController {
     await bouncer.with('ProjectPolicy').authorize('isMember', project, i18n)
     const fromRoute = await Route.findOrFail(data.origin)
     const toRoute = await Route.findOrFail(data.destination)
+
     const sameProject = fromRoute.projectId === project.id && toRoute.projectId === project.id
+    const sameDepth = fromRoute.parentFolderId === toRoute.parentFolderId
     if (!sameProject)
       throw new HttpError(400, i18n.formatMessage('responses.route.sort.route_mismatch'))
+    if (!sameDepth)
+      throw new HttpError(400, i18n.formatMessage('responses.route.sort.context_mismatch'))
+
     await Database.transaction(async (trx) => {
       const routes = await project.related('routes').query().useTransaction(trx).orderBy('order')
       const fromIndex = routes.findIndex((route) => route.id === fromRoute.id)
@@ -97,7 +103,56 @@ export default class RoutesController {
       move(routes, fromIndex, toIndex)
       await recalculateRouteOrder(routes, trx)
     })
+
     Ws.io.emit(`project:${project.id}`, `updated`)
     return response.ok({ message: i18n.formatMessage('responses.route.sort.route_sorted') })
+  }
+
+  // Helper functions
+
+  private async createNewRouteInRoot(
+    project: Project,
+    isFolder: boolean,
+    data: { [p: string]: any }
+  ) {
+    const lastOrder = await project.related('routes').query().orderBy('order', 'desc').first()
+    return project
+      .related('routes')
+      .create({ ...data, isFolder, order: (lastOrder?.order ?? 0) + 1 })
+  }
+
+  private async createNewRouteInFolder(
+    project: Project,
+    parentFolderId: number,
+    data: { [p: string]: any }
+  ) {
+    return Database.transaction(async (trx) => {
+      const newRoute = new Route().fill({
+        ...data,
+        isFolder: false,
+        projectId: project.id,
+        parentFolderId: parentFolderId,
+      })
+      const allRoutes = await project.related('routes').query().useTransaction(trx).orderBy('order')
+      const lastFolderChildIndex = getLastIndex(
+        allRoutes,
+        (route: Route) => route.parentFolderId === parentFolderId || route.id === parentFolderId
+      )
+      allRoutes.splice(lastFolderChildIndex + 1, 0, newRoute)
+      await recalculateRouteOrder(allRoutes, trx)
+      return newRoute
+    })
+  }
+
+  private sortRoutes(allRoutes: Route[], fromRoute: Route, toRoute: Route) {
+    const fromIndex = allRoutes.findIndex((route) => route.id === fromRoute.id)
+    const fromRelatedRoutesAmount = allRoutes.reduce(
+      (acc, route) => (route.parentFolderId === fromRoute.id ? acc + 1 : acc),
+      1
+    )
+    const movingRoutes = allRoutes.splice(fromIndex, fromRelatedRoutesAmount)
+    const toIndex = allRoutes.findIndex((route) => route.id === toRoute.id)
+    const placeAfter = fromRoute.order < toRoute.order
+    allRoutes.splice(toIndex)
   }
 }

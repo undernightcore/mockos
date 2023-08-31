@@ -110,6 +110,11 @@
       "endpoint.maxLength": "El endpoint no puede tener más de 500000 carácteres",
       "enabled.required": "Tienes que indicar el estado de la ruta"
     },
+    "edit_folder": {
+      "name.required": "Se necesita una pequeña descripción para la carpeta",
+      "name.minLength": "Es necesario que el nombre tenga como mínimo 3 carácteres",
+      "name.maxLength": "El nombre no puede tener más de 200 carácteres"
+    },
     "sort": {
       "origin.required": "Es necesario que indiques que ruta vas a mover",
       "destination.required": "Es necesario que indiques donde vas a mover la ruta"
