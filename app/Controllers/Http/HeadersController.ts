@@ -10,7 +10,8 @@ import UpdateHeaderValidator from 'App/Validators/Header/UpdateHeaderValidator'
 export default class HeadersController {
   public async getList({ params, request, response, auth, bouncer, i18n }: HttpContextContract) {
     await auth.authenticate()
-    const { res, project } = await this.#getProjectByResponse(params.id)
+    const { res, route, project } = await this.#getProjectByResponse(params.id)
+    await bouncer.with('RoutePolicy').authorize('isNotFolder', route, i18n)
     await bouncer.with('ProjectPolicy').authorize('isMember', project, i18n)
     const page = request.input('page', 1)
     const perPage = request.input('perPage', 10)
@@ -20,7 +21,8 @@ export default class HeadersController {
 
   public async create({ params, request, response, auth, bouncer, i18n }: HttpContextContract) {
     await auth.authenticate()
-    const { res, project } = await this.#getProjectByResponse(params.id)
+    const { res, project, route } = await this.#getProjectByResponse(params.id)
+    await bouncer.with('RoutePolicy').authorize('isNotFolder', route, i18n)
     await bouncer.with('ProjectPolicy').authorize('isMember', project, i18n)
     const { key, value } = await request.validate(CreateHeaderValidator)
     await res.related('headers').create({ key: key.toLowerCase(), value: value })
@@ -32,8 +34,9 @@ export default class HeadersController {
 
   public async edit({ params, request, response, auth, bouncer, i18n }: HttpContextContract) {
     await auth.authenticate()
-    const { header, project, res } = await this.#getProjectByHeader(params.id)
+    const { header, project, res, route } = await this.#getProjectByHeader(params.id)
     params['responseId'] = res.id // Pass context to validator
+    await bouncer.with('RoutePolicy').authorize('isNotFolder', route, i18n)
     await bouncer.with('ProjectPolicy').authorize('isMember', project, i18n)
     const { key, value } = await request.validate(UpdateHeaderValidator)
     await header.merge({ key: key.toLowerCase(), value: value }).save()
@@ -45,7 +48,8 @@ export default class HeadersController {
 
   public async delete({ params, response, auth, bouncer, i18n }: HttpContextContract) {
     await auth.authenticate()
-    const { header, res, project } = await this.#getProjectByHeader(params.id)
+    const { header, res, project, route } = await this.#getProjectByHeader(params.id)
+    await bouncer.with('RoutePolicy').authorize('isNotFolder', route, i18n)
     await bouncer.with('ProjectPolicy').authorize('isMember', project, i18n)
     await header.delete()
     Ws.io.emit(`response:${res.id}`, `headers`)

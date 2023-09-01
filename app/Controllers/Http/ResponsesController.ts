@@ -18,6 +18,7 @@ export default class ResponsesController {
     const data = await request.validate(CreateResponseValidator)
     const route = await Route.findOrFail(params.id)
     await route.load('project')
+    await bouncer.with('RoutePolicy').authorize('isNotFolder', route, i18n)
     await bouncer.with('ProjectPolicy').authorize('isMember', route.project, i18n)
     await Database.transaction(async (trx) => {
       route.useTransaction(trx)
@@ -43,6 +44,7 @@ export default class ResponsesController {
     const project = await Project.findOrFail(route.projectId)
     const page = request.input('page', 1)
     const perPage = request.input('perPage', 10)
+    await bouncer.with('RoutePolicy').authorize('isNotFolder', route, i18n)
     await bouncer.with('ProjectPolicy').authorize('isMember', project, i18n)
     const responses = await route
       .related('responses')
@@ -59,6 +61,7 @@ export default class ResponsesController {
     const routeResponse = await Response.findOrFail(params.id)
     const route = await Route.findOrFail(routeResponse.routeId)
     const project = await Project.findOrFail(route.projectId)
+    await bouncer.with('RoutePolicy').authorize('isNotFolder', route, i18n)
     await bouncer.with('ProjectPolicy').authorize('isMember', project, i18n)
     await routeResponse.load('headers')
     return response.ok(routeResponse)
@@ -72,6 +75,7 @@ export default class ResponsesController {
     params['routeId'] = route.id // Send context to validator
     const data = await request.validate(EditResponseValidator)
     const project = await Project.findOrFail(route.projectId)
+    await bouncer.with('RoutePolicy').authorize('isNotFolder', route, i18n)
     await bouncer.with('ProjectPolicy').authorize('isMember', project, i18n)
     await Database.transaction(async (trx) => {
       if (data.enabled) {
@@ -123,6 +127,7 @@ export default class ResponsesController {
     const routeResponse = await Response.findOrFail(params.id)
     const route = await Route.findOrFail(routeResponse.routeId)
     const project = await Project.findOrFail(route.projectId)
+    await bouncer.with('RoutePolicy').authorize('isNotFolder', route, i18n)
     await bouncer.with('ProjectPolicy').authorize('isMember', project, i18n)
     await Database.transaction(async (trx) => {
       await route
@@ -147,6 +152,7 @@ export default class ResponsesController {
     const routeResponse = await Response.findOrFail(params.id)
     const route = await Route.findOrFail(routeResponse.routeId)
     const project = await Project.findOrFail(route.projectId)
+    await bouncer.with('RoutePolicy').authorize('isNotFolder', route, i18n)
     await bouncer.with('ProjectPolicy').authorize('isMember', project, i18n)
     const headers = await routeResponse.related('headers').query()
     params['routeId'] = route.id // Send context to validator
@@ -172,6 +178,7 @@ export default class ResponsesController {
     const routeResponse = await Response.findOrFail(params.id)
     const route = await Route.findOrFail(routeResponse.routeId)
     const project = await Project.findOrFail(route.projectId)
+    await bouncer.with('RoutePolicy').authorize('isNotFolder', route, i18n)
     await bouncer.with('ProjectPolicy').authorize('isMember', project, i18n)
     if (routeResponse.isFile) await deleteIfOnceUsed('responses', routeResponse.body)
     await routeResponse.delete()
