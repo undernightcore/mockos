@@ -118,6 +118,12 @@
     "sort": {
       "origin.required": "Es necesario que indiques que ruta vas a mover",
       "destination.required": "Es necesario que indiques donde vas a mover la ruta"
+    },
+    "move": {
+      "origin.required": "Debes indicar qué ruta deseas mover",
+      "origin.exists": "La ruta que estás intentando mover no existe",
+      "destination.required": "Debes indicar a dónde deseas mover la ruta",
+      "destination.exists": "Debes moverla a una carpeta o raíz existente"
     }
   },
   "header": {

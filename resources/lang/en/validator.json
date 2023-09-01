@@ -118,6 +118,12 @@
     "sort": {
       "origin.required": "You need to indicate which route you are going to move",
       "destination.required": "You need to indicate where you are going to move the route"
+    },
+    "move": {
+      "origin.required": "You need to indicate which route you are going to move",
+      "origin.exists": "The route you are trying to move does not exist",
+      "destination.required": "You need to indicate where you are going to move the route",
+      "destination.exists": "You need to move to an existing folder or root"
     }
   },
   "header": {

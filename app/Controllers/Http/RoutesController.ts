@@ -7,9 +7,10 @@ import SortRouteValidator from 'App/Validators/Route/SortRouteValidator'
 import Database from '@ioc:Adonis/Lucid/Database'
 import Ws from 'App/Services/Ws'
 import { recalculateRouteOrder } from 'App/Helpers/Shared/sort.helper'
-import { getLastIndex, move } from 'App/Helpers/Shared/array.helper'
+import { getLastIndex } from 'App/Helpers/Shared/array.helper'
 import { HttpError } from 'App/Models/HttpError'
 import EditFolderValidator from 'App/Validators/Route/EditFolderValidator'
+import MoveRouteValidator from 'App/Validators/Route/MoveRouteValidator'
 
 export default class RoutesController {
   public async create({ request, response, auth, params, bouncer, i18n }: HttpContextContract) {
@@ -98,14 +99,41 @@ export default class RoutesController {
 
     await Database.transaction(async (trx) => {
       const routes = await project.related('routes').query().useTransaction(trx).orderBy('order')
-      const fromIndex = routes.findIndex((route) => route.id === fromRoute.id)
-      const toIndex = routes.findIndex((route) => route.id === toRoute.id)
-      move(routes, fromIndex, toIndex)
+      this.sortRoutes(routes, fromRoute, toRoute)
       await recalculateRouteOrder(routes, trx)
     })
 
     Ws.io.emit(`project:${project.id}`, `updated`)
     return response.ok({ message: i18n.formatMessage('responses.route.sort.route_sorted') })
+  }
+
+  public async moveDepth({ auth, params, request, response, bouncer, i18n }: HttpContextContract) {
+    await auth.authenticate()
+    const data = await request.validate(MoveRouteValidator)
+    const project = await Project.findOrFail(params.id)
+    await bouncer.with('ProjectPolicy').authorize('isMember', project, i18n)
+
+    await Database.transaction(async (trx) => {
+      const routes = await project.related('routes').query().useTransaction(trx).orderBy('order')
+      const fromIndex = routes.findIndex((route) => route.id === data.origin)
+      const movingRoute = routes.splice(fromIndex, 1)[0]
+      movingRoute.parentFolderId = data.destination
+
+      if (data.destination !== null) {
+        const toIndex = getLastIndex(
+          routes,
+          (route: Route) =>
+            route.parentFolderId === data.destination || route.id === data.destination
+        )
+        routes.splice(toIndex + 1, 0, movingRoute)
+      } else {
+        routes.push(movingRoute)
+      }
+
+      await recalculateRouteOrder(routes, trx)
+    })
+
+    return response.ok({ message: i18n.formatMessage('responses.route.move.route_moved') })
   }
 
   // Helper functions
@@ -150,9 +178,16 @@ export default class RoutesController {
       (acc, route) => (route.parentFolderId === fromRoute.id ? acc + 1 : acc),
       1
     )
+
     const movingRoutes = allRoutes.splice(fromIndex, fromRelatedRoutesAmount)
+
     const toIndex = allRoutes.findIndex((route) => route.id === toRoute.id)
+    const toRelatedRoutesAmount = allRoutes.reduce(
+      (acc, route) => (route.parentFolderId === fromRoute.id ? acc + 1 : acc),
+      1
+    )
+
     const placeAfter = fromRoute.order < toRoute.order
-    allRoutes.splice(toIndex)
+    allRoutes.splice(toIndex + (placeAfter ? toRelatedRoutesAmount : -1), 0, ...movingRoutes)
   }
 }
