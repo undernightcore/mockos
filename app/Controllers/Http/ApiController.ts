@@ -19,6 +19,7 @@ export default class ApiController {
       .query()
       .where('method', '=', method)
       .andWhere('enabled', '=', true)
+      .andWhere('is_folder', '=', false)
       .orderBy('order')
     const enabledResponse = await this.#getFirstMatchingRouteOrFail(routes, endpoint, i18n)
     if (!enabledResponse)
