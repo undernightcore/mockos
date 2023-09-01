@@ -7,7 +7,7 @@ export default class extends BaseSchema {
     this.schema.alterTable(this.tableName, (table) => {
       table.dropUnique(['project_id', 'endpoint', 'method'])
 
-      table.enum('method', ['get', 'post', 'put', 'delete', 'patch']).nullable().alter()
+      table.enum('method', ['get', 'post', 'put', 'delete', 'patch']).alter({ alterType: false })
       table.text('endpoint').nullable().alter()
 
       table.boolean('is_folder').notNullable().defaultTo(false)
@@ -26,7 +26,10 @@ export default class extends BaseSchema {
     })
 
     this.schema.alterTable(this.tableName, (table) => {
-      table.enum('method', ['get', 'post', 'put', 'delete', 'patch']).notNullable().alter()
+      table
+        .enum('method', ['get', 'post', 'put', 'delete', 'patch'])
+        .notNullable()
+        .alter({ alterType: false })
       table.text('endpoint').notNullable().alter()
 
       table.dropColumn('is_folder')
