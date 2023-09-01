@@ -191,11 +191,11 @@ export default class RoutesController {
 
     const toIndex = allRoutes.findIndex((route) => route.id === toRoute.id)
     const toRelatedRoutesAmount = allRoutes.reduce(
-      (acc, route) => (route.parentFolderId === fromRoute.id ? acc + 1 : acc),
+      (acc, route) => (route.parentFolderId === toRoute.id ? acc + 1 : acc),
       1
     )
 
     const placeAfter = fromRoute.order < toRoute.order
-    allRoutes.splice(toIndex + (placeAfter ? toRelatedRoutesAmount : -1), 0, ...movingRoutes)
+    allRoutes.splice(toIndex + (placeAfter ? toRelatedRoutesAmount : 0), 0, ...movingRoutes)
   }
 }
