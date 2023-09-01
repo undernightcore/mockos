@@ -115,7 +115,7 @@ export default class RoutesController {
     return response.ok({ message: i18n.formatMessage('responses.route.sort.route_sorted') })
   }
 
-  public async moveDepth({ auth, params, request, response, bouncer, i18n }: HttpContextContract) {
+  public async move({ auth, params, request, response, bouncer, i18n }: HttpContextContract) {
     await auth.authenticate()
     const data = await request.validate(MoveRouteValidator)
     const project = await Project.findOrFail(params.id)
@@ -141,6 +141,7 @@ export default class RoutesController {
       await recalculateRouteOrder(routes, trx)
     })
 
+    Ws.io.emit(`project:${project.id}`, `updated`)
     return response.ok({ message: i18n.formatMessage('responses.route.move.route_moved') })
   }
 
