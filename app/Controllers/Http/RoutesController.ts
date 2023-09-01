@@ -71,13 +71,21 @@ export default class RoutesController {
     const page = await request.input('page')
     const perPage = await request.input('perPage')
     const search = await request.input('search')
+    const folderParam = await request.input('folderId', null)
+    const folderId = folderParam !== null ? Number(folderParam) : null
     await bouncer.with('ProjectPolicy').authorize('isMember', project, i18n)
     const routes = await project
       .related('routes')
       .query()
       .orderBy('order')
-      .whereILike('name', `%${search ?? ''}%`)
-      .orWhereILike('endpoint', `%${search ?? ''}%`)
+      .where((query) => {
+        query.whereILike('name', `%${search ?? ''}%`).orWhereILike('endpoint', `%${search ?? ''}%`)
+      })
+      .andWhere((query) => {
+        folderId === null || isNaN(folderId)
+          ? query.whereNull('parentFolderId')
+          : query.where('parentFolderId', folderId)
+      })
       .paginate(page ?? 1, perPage ?? 10)
     return response.ok(routes)
   }
