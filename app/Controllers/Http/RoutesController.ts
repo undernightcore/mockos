@@ -21,8 +21,8 @@ export default class RoutesController {
     const data = await request.validate(CreateRouteValidator)
 
     const route = await (data.parentFolderId
-      ? this.createNewRouteInRoot(project, isFolder, data)
-      : this.createNewRouteInFolder(project, data.parentFolderId, data))
+      ? this.createNewRouteInFolder(project, data.parentFolderId, data)
+      : this.createNewRouteInRoot(project, isFolder, data))
 
     Ws.io.emit(`project:${project.id}`, `updated`)
     return response.created(route)
