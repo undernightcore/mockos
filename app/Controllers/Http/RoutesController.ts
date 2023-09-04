@@ -95,23 +95,27 @@ export default class RoutesController {
     const data = await request.validate(SortRouteValidator)
     const project = await Project.findOrFail(params.id)
     await bouncer.with('ProjectPolicy').authorize('isMember', project, i18n)
-    const fromRoute = await Route.findOrFail(data.origin)
-    const toRoute = await Route.findOrFail(data.destination)
 
-    const sameProject = fromRoute.projectId === project.id && toRoute.projectId === project.id
-    const sameDepth = fromRoute.parentFolderId === toRoute.parentFolderId
-    if (!sameProject)
-      throw new HttpError(400, i18n.formatMessage('responses.route.sort.route_mismatch'))
-    if (!sameDepth)
-      throw new HttpError(400, i18n.formatMessage('responses.route.sort.context_mismatch'))
+    if (data.origin !== data.destination) {
+      const fromRoute = await Route.findOrFail(data.origin)
+      const toRoute = await Route.findOrFail(data.destination)
 
-    await Database.transaction(async (trx) => {
-      const routes = await project.related('routes').query().useTransaction(trx).orderBy('order')
-      this.sortRoutes(routes, fromRoute, toRoute)
-      await recalculateRouteOrder(routes, trx)
-    })
+      const sameProject = fromRoute.projectId === project.id && toRoute.projectId === project.id
+      const sameDepth = fromRoute.parentFolderId === toRoute.parentFolderId
+      if (!sameProject)
+        throw new HttpError(400, i18n.formatMessage('responses.route.sort.route_mismatch'))
+      if (!sameDepth)
+        throw new HttpError(400, i18n.formatMessage('responses.route.sort.context_mismatch'))
 
-    Ws.io.emit(`project:${project.id}`, `updated`)
+      await Database.transaction(async (trx) => {
+        const routes = await project.related('routes').query().useTransaction(trx).orderBy('order')
+        this.sortRoutes(routes, fromRoute, toRoute)
+        await recalculateRouteOrder(routes, trx)
+      })
+
+      Ws.io.emit(`project:${project.id}`, `updated`)
+    }
+
     return response.ok({ message: i18n.formatMessage('responses.route.sort.route_sorted') })
   }
 
