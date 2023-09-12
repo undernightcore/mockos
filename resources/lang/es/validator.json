@@ -90,7 +90,13 @@
       "endpoint.required": "Es necesaria la URL del endpoint a crear",
       "endpoint.regex": "El endpoint debe comenzar con / y no terminar en /",
       "endpoint.maxLength": "El endpoint no puede tener más de 2000 carácteres",
-      "enabled.required": "Tienes que indicar el estado de la ruta"
+      "enabled.required": "Tienes que indicar el estado de la ruta",
+      "parentFolderId.exists": "No existe la carpeta donde intentas crear la ruta"
+    },
+    "create_folder": {
+      "name.required": "Se necesita una pequeña descripción para la carpeta",
+      "name.minLength": "Es necesario que el nombre tenga como mínimo 3 carácteres",
+      "name.maxLength": "El nombre no puede tener más de 200 carácteres"
     },
     "edit": {
       "name.required": "Se necesita una pequeña descripción para la ruta",
@@ -104,9 +110,20 @@
       "endpoint.maxLength": "El endpoint no puede tener más de 500000 carácteres",
       "enabled.required": "Tienes que indicar el estado de la ruta"
     },
+    "edit_folder": {
+      "name.required": "Se necesita una pequeña descripción para la carpeta",
+      "name.minLength": "Es necesario que el nombre tenga como mínimo 3 carácteres",
+      "name.maxLength": "El nombre no puede tener más de 200 carácteres"
+    },
     "sort": {
       "origin.required": "Es necesario que indiques que ruta vas a mover",
       "destination.required": "Es necesario que indiques donde vas a mover la ruta"
+    },
+    "move": {
+      "origin.required": "Debes indicar qué ruta deseas mover",
+      "origin.exists": "La ruta que estás intentando mover no existe",
+      "destination.required": "Debes indicar a dónde deseas mover la ruta",
+      "destination.exists": "Debes moverla a una carpeta o raíz existente"
     }
   },
   "header": {

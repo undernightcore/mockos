@@ -11,5 +11,8 @@
       "is_not_verified": "Este miembro está pendiente de aceptar la invitación"
     },
     "is_member": "No eres miembro de este proyecto"
+  },
+  "route": {
+    "is_folder": "¡No puedes agregar respuestas/cabeceras a una carpeta!"
   }
 }

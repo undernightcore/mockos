@@ -11,5 +11,8 @@
       "is_not_verified": "This member is pending to accept the invitation"
     },
     "is_member": "You are not a member of this project"
+  },
+  "route": {
+    "is_folder": "You can't add responses/headers to a folder!"
   }
 }

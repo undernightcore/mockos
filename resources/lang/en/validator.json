@@ -90,7 +90,13 @@
       "endpoint.required": "The endpoint URL to create is required",
       "endpoint.regex": "The endpoint must start with / and not end in /",
       "endpoint.maxLength": "The endpoint can't be more than 2000 characters long",
-      "enabled.required": "You have to indicate the state of the route"
+      "enabled.required": "You have to indicate the state of the route",
+      "parentFolderId.exists": "The folder you are trying to create the route in does not exist"
+    },
+    "create_folder": {
+      "name.required": "A brief description for the folder is needed",
+      "name.minLength": "The name must have at least 3 characters",
+      "name.maxLength": "The name can't be more than 200 characters long"
     },
     "edit": {
       "name.required": "A brief description for the route is needed",
@@ -104,9 +110,20 @@
       "endpoint.maxLength": "The endpoint can't be more than 2000 characters long",
       "enabled.required": "You have to indicate the state of the route"
     },
+    "edit_folder": {
+      "name.required": "A brief description for the folder is needed",
+      "name.minLength": "The name must have at least 3 characters",
+      "name.maxLength": "The name can't be more than 200 characters long"
+    },
     "sort": {
       "origin.required": "You need to indicate which route you are going to move",
       "destination.required": "You need to indicate where you are going to move the route"
+    },
+    "move": {
+      "origin.required": "You need to indicate which route you are going to move",
+      "origin.exists": "The route you are trying to move does not exist",
+      "destination.required": "You need to indicate where you are going to move the route",
+      "destination.exists": "You need to move to an existing folder or root"
     }
   },
   "header": {
