@@ -19,10 +19,13 @@ export function isVersionGreater(currentVersion: string, newVersion: string) {
 
 export function isVersionValid(version: string) {
   const numbers = version.split('.')
-  return numbers.map(Number).every((number) => !isNaN(number) && number >= 0)
+  return numbers.length <= 3 && numbers.map(Number).every((number) => !isNaN(number) && number >= 0)
 }
 
 export function beautifyVersion(version: string) {
   const numbers = version.split('.').map(Number)
+  while (numbers.length < 3) {
+    numbers.push(0)
+  }
   return numbers.join('.')
 }
