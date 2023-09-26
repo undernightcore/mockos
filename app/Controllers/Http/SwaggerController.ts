@@ -40,4 +40,12 @@ export default class SwaggerController {
 
     return response.ok({ message: i18n.formatMessage('responses.swagger.edit.swagger_saved') })
   }
+
+  public async get({ response, params, auth, i18n, bouncer }: HttpContextContract) {
+    await auth.authenticate()
+    const project = await Project.findOrFail(params.id)
+    await bouncer.with('ProjectPolicy').authorize('isMember', project, i18n)
+
+    return response.ok({ swagger: project.swagger })
+  }
 }
