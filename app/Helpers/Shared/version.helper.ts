@@ -1,6 +1,4 @@
 export function isVersionGreater(currentVersion: string, newVersion: string) {
-  if (!isVersionValid(currentVersion) || !isVersionValid(newVersion)) return false
-
   const currentNumbers = currentVersion.split('.').map(Number)
   const newNumbers = newVersion.split('.').map(Number)
 
@@ -21,5 +19,10 @@ export function isVersionGreater(currentVersion: string, newVersion: string) {
 
 export function isVersionValid(version: string) {
   const numbers = version.split('.')
-  return numbers.every((number) => !isNaN(Number(number)))
+  return numbers.map(Number).every((number) => !isNaN(number) && number >= 0)
+}
+
+export function beautifyVersion(version: string) {
+  const numbers = version.split('.').map(Number)
+  return numbers.join('.')
 }
