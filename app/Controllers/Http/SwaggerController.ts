@@ -1,8 +1,9 @@
 import { HttpContextContract } from '@ioc:Adonis/Core/HttpContext'
 import Project from 'App/Models/Project'
 import UpdateSwaggerValidator from 'App/Validators/Swagger/UpdateSwaggerValidator'
-import { parseSwagger } from 'App/Helpers/Shared/swagger.helper'
+import { parseSwagger, stringifySwagger } from 'App/Helpers/Shared/swagger.helper'
 import { isVersionGreater, isVersionValid } from 'App/Helpers/Shared/version.helper'
+import Ws from 'App/Services/Ws'
 
 export default class SwaggerController {
   public async edit({ request, response, auth, params, bouncer, i18n }: HttpContextContract) {
@@ -13,18 +14,30 @@ export default class SwaggerController {
     const data = await request.validate(UpdateSwaggerValidator)
 
     const swagger = await parseSwagger(data.swagger).catch(() => {
-      throw { status: 400, message: '' }
+      throw { status: 400, message: i18n.formatMessage('responses.swagger.edit.invalid_swagger') }
     })
     const currentVersion = project.swagger
       ? await parseSwagger(project.swagger).then(({ data }) => data.info.version)
       : null
     const newVersion = swagger.data.info.version
 
+    if (data.originalVersion !== currentVersion) {
+      throw { status: 409, message: i18n.formatMessage('responses.swagger.edit.outdated_version') }
+    }
+
     if (!isVersionValid(newVersion)) {
-      return response.status(400).send({})
+      throw { status: 400, message: i18n.formatMessage('responses.swagger.edit.invalid_version') }
     }
 
     if (currentVersion !== null && !isVersionGreater(currentVersion, newVersion)) {
+      throw { status: 400, message: i18n.formatMessage('responses.swagger.edit.greater_version') }
     }
+
+    project.swagger = stringifySwagger(swagger.data, swagger.wasJSON)
+    await project.save()
+
+    Ws.io.emit(`swagger:${project.id}`, `updated`)
+
+    return response.ok({ message: i18n.formatMessage('responses.swagger.edit.swagger_saved') })
   }
 }
