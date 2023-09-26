@@ -42,6 +42,9 @@ export default class Project extends BaseModel {
   })
   public members: ManyToMany<typeof User>
 
+  @column({ serializeAs: null })
+  public swagger: string | null
+
   @column.dateTime({ autoCreate: true })
   public createdAt: DateTime
 
