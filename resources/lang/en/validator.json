@@ -147,5 +147,11 @@
       "name.minLength": "The name must be at least 3 characters long",
       "name.maxLength": "The name can't be more than 30 characters long"
     }
+  },
+  "swagger": {
+    "update": {
+      "originalVersion.required": "You need to specify what your previous version was",
+      "swagger.required": "You need to send your edited swagger"
+    }
   }
 }

@@ -9,5 +9,5 @@ export default class UpdateSwaggerValidator {
     swagger: schema.string({}),
   })
 
-  public messages: CustomMessages = {}
+  public messages: CustomMessages = this.ctx.i18n.validatorMessages('validator.swagger.update')
 }

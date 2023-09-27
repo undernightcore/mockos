@@ -112,6 +112,9 @@
     },
     "rollback": {
       "rollback_successful": "Your swagger has been downgraded to {version}. Thank you!"
+    },
+    "get": {
+      "version_not_found": "This specific version does not exist"
     }
   }
 }

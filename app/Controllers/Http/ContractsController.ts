@@ -63,7 +63,7 @@ export default class ContractsController {
         return project.related('contracts').create(
           {
             version: beautifyVersion(newVersion),
-            swagger: stringifySwagger(swagger.data, swagger.wasJSON),
+            swagger: stringifySwagger(swagger.data, swagger.isJSON),
             userId: user.id,
           },
           { client: trx }
@@ -86,15 +86,15 @@ export default class ContractsController {
     const project = await Project.findOrFail(params.id)
     await bouncer.with('ProjectPolicy').authorize('isMember', project, i18n)
 
-    const lastContract = params.version
-      ? await project
-          .related('contracts')
-          .query()
-          .whereColumn('version', String(params.version))
-          .first()
+    const contract = params.version
+      ? await project.related('contracts').query().where('version', String(params.version)).first()
       : await project.related('contracts').query().orderBy('version', 'desc').first()
 
-    return response.ok({ swagger: lastContract?.swagger ?? null })
+    if (!contract && params.version) {
+      throw { status: 404, message: i18n.formatMessage('responses.swagger.get.version_not_found') }
+    }
+
+    return response.ok(contract ?? null)
   }
 
   public async history({ auth, request, params, bouncer, i18n, response }: HttpContextContract) {
@@ -111,7 +111,7 @@ export default class ContractsController {
       .orderBy('version', 'desc')
       .paginate(page ?? 1, perPage ?? 20)
 
-    return response.ok(versions)
+    return response.ok(versions.serialize({ fields: { omit: ['swagger'] } }))
   }
 
   public async rollback({ response, auth, i18n, params, bouncer }: HttpContextContract) {
@@ -122,7 +122,7 @@ export default class ContractsController {
     const version = await project
       .related('contracts')
       .query()
-      .whereColumn('version', params.version)
+      .where('version', params.version)
       .firstOrFail()
 
     await Database.transaction(
@@ -131,13 +131,13 @@ export default class ContractsController {
           .related('contracts')
           .query()
           .useTransaction(trx)
-          .whereColumn('version', '>', version.version)
+          .where('version', '>', version.version)
 
         await trx
           .from('contracts')
           .delete()
           .whereIn(
-            'version',
+            'id',
             newerVersions.map((newerVersion) => newerVersion.id)
           )
       },

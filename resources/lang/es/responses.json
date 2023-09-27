@@ -109,6 +109,9 @@
     },
     "rollback": {
       "rollback_successful": "Tu Swagger se ha bajado a la {version}. ¡Gracias!"
+    },
+    "get": {
+      "version_not_found": "Esta versión específica no existe"
     }
   }
 }
