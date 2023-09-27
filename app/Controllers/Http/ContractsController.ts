@@ -9,6 +9,7 @@ import {
 } from 'App/Helpers/Shared/version.helper'
 import Ws from 'App/Services/Ws'
 import Database from '@ioc:Adonis/Lucid/Database'
+import RollbackSwaggerValidator from 'App/Validators/Swagger/RollbackSwaggerValidator'
 
 export default class ContractsController {
   public async edit({ request, response, auth, params, bouncer, i18n }: HttpContextContract) {
@@ -114,15 +115,17 @@ export default class ContractsController {
     return response.ok(versions.serialize({ fields: { omit: ['swagger'] } }))
   }
 
-  public async rollback({ response, auth, i18n, params, bouncer }: HttpContextContract) {
+  public async rollback({ response, request, auth, i18n, params, bouncer }: HttpContextContract) {
     await auth.authenticate()
     const project = await Project.findOrFail(params.id)
     await bouncer.with('ProjectPolicy').authorize('isMember', project, i18n)
 
+    const selectedVersion = await request.validate(RollbackSwaggerValidator)
+
     const version = await project
       .related('contracts')
       .query()
-      .where('version', params.version)
+      .where('version', selectedVersion.version)
       .firstOrFail()
 
     await Database.transaction(

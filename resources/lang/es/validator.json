@@ -152,6 +152,10 @@
     "update": {
       "originalVersion.required": "Necesitas especificar cuál fue tu versión anterior",
       "swagger.required": "Necesitas enviar tu swagger editado"
+    },
+    "rollback": {
+      "version.required": "Necesitas indicar a qué versión deseas retroceder",
+      "version.exists": "La versión a la que estás intentando retroceder no existe"
     }
   }
 }
