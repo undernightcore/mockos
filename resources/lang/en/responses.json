@@ -101,5 +101,17 @@
     "delete": {
       "token_deleted": "Token deleted successfully"
     }
+  },
+  "swagger": {
+    "edit": {
+      "invalid_swagger": "Swagger is invalid. Please fix it before saving",
+      "outdated_version": "There are changes you need to merge",
+      "invalid_version": "The version you provided does not follow a valid format",
+      "greater_version": "Your version has to be greater than the current one",
+      "swagger_saved": "Your swagger has been updated to {version}. Thank you!"
+    },
+    "rollback": {
+      "rollback_successful": "Your swagger has been downgraded to {version}. Thank you!"
+    }
   }
 }

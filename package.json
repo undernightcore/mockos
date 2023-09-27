@@ -51,7 +51,8 @@
     "prettier": "^2.8.0",
     "typescript": "~4.6",
     "youch": "^3.2.2",
-    "youch-terminal": "^2.1.5"
+    "youch-terminal": "^2.1.5",
+    "@types/js-yaml": "^4.0.6"
   },
   "dependencies": {
     "@adonisjs/auth": "^8.2.3",
@@ -62,6 +63,8 @@
     "@adonisjs/lucid": "^18.3.0",
     "@adonisjs/mail": "^8.1.2",
     "@adonisjs/repl": "^3.1.11",
+    "@apidevtools/swagger-parser": "^10.1.0",
+    "js-yaml": "^4.1.0",
     "luxon": "^3.1.0",
     "pg": "^8.8.0",
     "proxy-addr": "^2.0.7",
