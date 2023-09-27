@@ -147,5 +147,15 @@
       "name.minLength": "El nombre tiene que tener al menos 3 carácteres",
       "name.maxLength": "El nombre no puede tener más de 30 carácteres"
     }
+  },
+  "swagger": {
+    "update": {
+      "originalVersion.required": "Necesitas especificar cuál fue tu versión anterior",
+      "swagger.required": "Necesitas enviar tu swagger editado"
+    },
+    "rollback": {
+      "version.required": "Necesitas indicar a qué versión deseas retroceder",
+      "version.exists": "La versión a la que estás intentando retroceder no existe"
+    }
   }
 }

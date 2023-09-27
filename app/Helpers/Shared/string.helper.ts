@@ -13,6 +13,14 @@ export function isValidJson(value: string) {
   }
 }
 
+export function parseJsonIfPossible(value: string) {
+  try {
+    return JSON.parse(value)
+  } catch {
+    return value
+  }
+}
+
 export function randomString(size: number) {
   return randomBytes(size / 2).toString('hex')
 }

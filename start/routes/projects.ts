@@ -17,7 +17,7 @@ Route.group(() => {
   Route.post(':id/tokens', 'TokensController.create')
   Route.get(':id/tokens', 'TokensController.getList')
   Route.get(':id/contracts/:version', 'ContractsController.get')
-  Route.get(':id/contracts/:version/rollback', 'ContractsController.rollback')
+  Route.post(':id/contracts/rollback', 'ContractsController.rollback')
   Route.get(':id/contracts', 'ContractsController.get')
   Route.put(':id/contracts', 'ContractsController.edit')
   Route.get(':id/contract-versions', 'ContractsController.history')
