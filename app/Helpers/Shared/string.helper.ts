@@ -1,4 +1,5 @@
 import { randomBytes } from 'crypto'
+import { load } from 'js-yaml'
 
 export function prettifyJson(value: string) {
   return isValidJson(value) ? JSON.stringify(JSON.parse(value)) : value
@@ -13,11 +14,11 @@ export function isValidJson(value: string) {
   }
 }
 
-export function parseJsonIfPossible(value: string) {
+export function parseFromJsonOnYaml(value: string) {
   try {
-    return JSON.parse(value)
+    return { value: JSON.parse(value), wasJSON: true }
   } catch {
-    return value
+    return { value: load(value), wasJSON: false }
   }
 }
 
