@@ -25,7 +25,7 @@ export default class ContractsController {
           .related('contracts')
           .query()
           .useTransaction(trx)
-          .orderBy('version', 'desc')
+          .orderByRaw("string_to_array(version, '.')::int[] desc")
           .first()
 
         const swagger = await parseSwagger(data.swagger).catch(() => {
@@ -89,7 +89,11 @@ export default class ContractsController {
 
     const contract = params.version
       ? await project.related('contracts').query().where('version', String(params.version)).first()
-      : await project.related('contracts').query().orderBy('version', 'desc').first()
+      : await project
+          .related('contracts')
+          .query()
+          .orderByRaw("string_to_array(version, '.')::int[] desc")
+          .first()
 
     if (!contract && params.version) {
       throw { status: 404, message: i18n.formatMessage('responses.swagger.get.version_not_found') }
@@ -109,7 +113,7 @@ export default class ContractsController {
     const versions = await project
       .related('contracts')
       .query()
-      .orderBy('version', 'desc')
+      .orderByRaw("string_to_array(version, '.')::int[] desc")
       .paginate(page ?? 1, perPage ?? 20)
 
     return response.ok(versions.serialize({ fields: { omit: ['swagger'] } }))
@@ -134,7 +138,9 @@ export default class ContractsController {
           .related('contracts')
           .query()
           .useTransaction(trx)
-          .where('version', '>', version.version)
+          .whereRaw(
+            `string_to_array(version, '.')::int[] > string_to_array('${version.version}', '.')::int[]`
+          )
 
         await trx
           .from('contracts')
