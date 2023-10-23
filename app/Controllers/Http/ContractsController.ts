@@ -120,10 +120,11 @@ export default class ContractsController {
       .related('contracts')
       .query()
       .preload('author')
+      .select(['id', 'version', 'createdAt', 'updatedAt', 'userId'])
       .orderByRaw("string_to_array(version, '.')::int[] desc")
       .paginate(page ?? 1, perPage ?? 20)
 
-    return response.ok(versions.serialize({ fields: { omit: ['swagger'] } }))
+    return response.ok(versions)
   }
 
   public async rollback({ response, request, auth, i18n, params, bouncer }: HttpContextContract) {
