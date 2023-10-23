@@ -88,10 +88,16 @@ export default class ContractsController {
     await bouncer.with('ProjectPolicy').authorize('isMember', project, i18n)
 
     const contract = params.version
-      ? await project.related('contracts').query().where('version', String(params.version)).first()
+      ? await project
+          .related('contracts')
+          .query()
+          .preload('author')
+          .where('version', String(params.version))
+          .first()
       : await project
           .related('contracts')
           .query()
+          .preload('author')
           .orderByRaw("string_to_array(version, '.')::int[] desc")
           .first()
 
@@ -113,6 +119,7 @@ export default class ContractsController {
     const versions = await project
       .related('contracts')
       .query()
+      .preload('author')
       .orderByRaw("string_to_array(version, '.')::int[] desc")
       .paginate(page ?? 1, perPage ?? 20)
 
