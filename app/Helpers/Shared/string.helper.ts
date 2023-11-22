@@ -14,7 +14,7 @@ export function isValidJson(value: string) {
   }
 }
 
-export function parseFromJsonOnYaml(value: string) {
+export function parseFromJsonOrYaml(value: string) {
   try {
     return { value: JSON.parse(value), wasJSON: true }
   } catch {
