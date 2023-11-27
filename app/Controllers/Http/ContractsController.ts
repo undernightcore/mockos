@@ -1,7 +1,7 @@
 import { HttpContextContract } from '@ioc:Adonis/Core/HttpContext'
 import Project from 'App/Models/Project'
 import UpdateSwaggerValidator from 'App/Validators/Swagger/UpdateSwaggerValidator'
-import { parseSwagger, stringifySwagger } from 'App/Helpers/Shared/swagger.helper'
+import { parseSwagger } from 'App/Helpers/Shared/swagger.helper'
 import {
   beautifyVersion,
   isVersionGreater,
@@ -36,7 +36,7 @@ export default class ContractsController {
         })
 
         const currentVersion = lastContract?.version ?? null
-        const newVersion = swagger.data.info.version
+        const newVersion = swagger.parsed.info.version
 
         if (data.originalVersion !== currentVersion) {
           throw {
@@ -59,12 +59,10 @@ export default class ContractsController {
           }
         }
 
-        swagger.data.info.version = beautifyVersion(newVersion)
-
         return project.related('contracts').create(
           {
             version: beautifyVersion(newVersion),
-            swagger: stringifySwagger(swagger.data, swagger.isJSON),
+            swagger: swagger.raw,
             userId: user.id,
           },
           { client: trx }
