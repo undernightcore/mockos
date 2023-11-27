@@ -1,7 +1,7 @@
 import { randomBytes } from 'crypto'
 import { load } from 'js-yaml'
 
-export function prettifyJson(value: string) {
+export function compressJson(value: string) {
   return isValidJson(value) ? JSON.stringify(JSON.parse(value)) : value
 }
 

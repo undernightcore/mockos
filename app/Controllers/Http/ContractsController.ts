@@ -36,9 +36,10 @@ export default class ContractsController {
         })
 
         const currentVersion = lastContract?.version ?? null
+        const originalVersion = data.originalVersion ? beautifyVersion(data.originalVersion) : null
         const newVersion = swagger.parsed.info.version
 
-        if (data.originalVersion !== currentVersion) {
+        if (originalVersion !== currentVersion) {
           throw {
             status: 409,
             message: i18n.formatMessage('responses.swagger.edit.outdated_version'),
