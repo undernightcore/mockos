@@ -7,9 +7,9 @@ import EditResponseValidator from 'App/Validators/Response/EditResponseValidator
 import Ws from 'App/Services/Ws'
 import { MultipartFileContract } from '@ioc:Adonis/Core/BodyParser'
 import { deleteIfOnceUsed, getFileName } from 'App/Helpers/Shared/file.helper'
-import { prettifyJson } from 'App/Helpers/Shared/string.helper'
 import Project from 'App/Models/Project'
 import DuplicateResponseValidator from 'App/Validators/Response/DuplicateResponseValidator'
+import { compressJson } from 'App/Helpers/Shared/string.helper'
 
 export default class ResponsesController {
   public async create({ request, response, auth, bouncer, params, i18n }: HttpContextContract) {
@@ -28,7 +28,7 @@ export default class ResponsesController {
         await file.moveToDisk('responses')
         data.body = getFileName(file.fileName ?? '')
       } else {
-        data.body = prettifyJson(data.body as string)
+        data.body = compressJson(data.body as string)
       }
       await route.related('responses').create({ ...data, isFile, body: data.body as string })
     })
@@ -107,7 +107,7 @@ export default class ResponsesController {
           ? routeResponse.body
           : isFileNow
           ? (data.body as string)
-          : prettifyJson(data.body as string)
+          : compressJson(data.body as string)
       await routeResponse
         .merge({
           ...data,
