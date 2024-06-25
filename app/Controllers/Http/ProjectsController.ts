@@ -82,6 +82,7 @@ export default class ProjectsController {
     const project = await Project.findOrFail(params.id)
     await bouncer.with('ProjectPolicy').authorize('isMember', project, i18n)
     await Database.transaction(async (trx) => {
+      const previousIds = new Map<number, number>()
       const newProject = await Project.create(
         { ...data, forkedProjectId: project.id },
         { client: trx }
@@ -89,18 +90,28 @@ export default class ProjectsController {
       const oldRoutes = await project
         .related('routes')
         .query()
+        .orderBy('order')
         .useTransaction(trx)
         .preload('responses')
       await Promise.all(
         oldRoutes.map(async (oldRoute) => {
           const { name, endpoint, method, enabled, order, responses, parentFolderId, isFolder } =
             oldRoute
-          const newRoute = await newProject
-            .related('routes')
-            .create(
-              { name, endpoint, method, enabled, order, parentFolderId, isFolder },
-              { client: trx }
-            )
+          const newRoute = await newProject.related('routes').create(
+            {
+              name,
+              endpoint,
+              method,
+              enabled,
+              order,
+              parentFolderId: parentFolderId !== null ? previousIds.get(parentFolderId) : null,
+              isFolder,
+            },
+            { client: trx }
+          )
+
+          previousIds.set(oldRoute.id, newRoute.id)
+
           const newResponses = responses.map(({ name, body, status, enabled, isFile }) => ({
             name,
             body,
