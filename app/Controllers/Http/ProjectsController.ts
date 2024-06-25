@@ -93,37 +93,38 @@ export default class ProjectsController {
         .orderBy('order')
         .useTransaction(trx)
         .preload('responses')
-      await Promise.all(
-        oldRoutes.map(async (oldRoute) => {
-          const { name, endpoint, method, enabled, order, responses, parentFolderId, isFolder } =
-            oldRoute
-          const newRoute = await newProject.related('routes').create(
-            {
-              name,
-              endpoint,
-              method,
-              enabled,
-              order,
-              parentFolderId: parentFolderId !== null ? previousIds.get(parentFolderId) : null,
-              isFolder,
-            },
-            { client: trx }
-          )
 
-          previousIds.set(oldRoute.id, newRoute.id)
-
-          const newResponses = responses.map(({ name, body, status, enabled, isFile }) => ({
+      for (const oldRoute of oldRoutes) {
+        const { name, endpoint, method, enabled, order, responses, parentFolderId, isFolder } =
+          oldRoute
+        const newRoute = await newProject.related('routes').create(
+          {
             name,
-            body,
-            status,
+            endpoint,
+            method,
             enabled,
-            isFile,
-          }))
-          await newRoute.related('responses').createMany(newResponses, { client: trx })
-        })
-      )
+            order,
+            parentFolderId: parentFolderId !== null ? previousIds.get(parentFolderId) : null,
+            isFolder,
+          },
+          { client: trx }
+        )
+
+        previousIds.set(oldRoute.id, newRoute.id)
+
+        const newResponses = responses.map(({ name, body, status, enabled, isFile }) => ({
+          name,
+          body,
+          status,
+          enabled,
+          isFile,
+        }))
+        await newRoute.related('responses').createMany(newResponses, { client: trx })
+      }
+
       await newProject.related('members').attach({ [user.id]: { verified: true } }, trx)
     })
+
     return response.created({ message: i18n.formatMessage('responses.project.fork.fork_created') })
   }
 
