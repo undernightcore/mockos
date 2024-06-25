@@ -93,10 +93,14 @@ export default class ProjectsController {
         .preload('responses')
       await Promise.all(
         oldRoutes.map(async (oldRoute) => {
-          const { name, endpoint, method, enabled, order, responses } = oldRoute
+          const { name, endpoint, method, enabled, order, responses, parentFolderId, isFolder } =
+            oldRoute
           const newRoute = await newProject
             .related('routes')
-            .create({ name, endpoint, method, enabled, order }, { client: trx })
+            .create(
+              { name, endpoint, method, enabled, order, parentFolderId, isFolder },
+              { client: trx }
+            )
           const newResponses = responses.map(({ name, body, status, enabled, isFile }) => ({
             name,
             body,
