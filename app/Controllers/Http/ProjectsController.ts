@@ -46,12 +46,15 @@ export default class ProjectsController {
     const user = await auth.authenticate()
     const page = await request.input('page')
     const perPage = await request.input('perPage')
+    const sortBy = await request.input('sortBy')
+    const onlyBranches = await request.input('onlyBranches', 'false')
     const projectList = await user
       .related('projects')
       .query()
       .preload('forkedProject')
       .wherePivot('verified', true)
-      .orderBy('created_at')
+      [onlyBranches === 'true' ? 'whereNotNull' : 'whereNull']('forkedProjectId')
+      .orderBy(sortBy ?? 'created_at')
       .paginate(page ?? 1, perPage ?? 10)
     return response.ok(projectList)
   }
