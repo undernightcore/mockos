@@ -65,28 +65,11 @@ export default class RoutesController {
     return response.ok(route)
   }
 
-  public async getList({ response, request, auth, params, bouncer, i18n }: HttpContextContract) {
+  public async getList({ response, auth, params, bouncer, i18n }: HttpContextContract) {
     await auth.authenticate()
     const project = await Project.findOrFail(params.id)
-    const page = await request.input('page')
-    const perPage = await request.input('perPage')
-    const search = await request.input('search')
-    const folderParam = await request.input('folderId', null)
-    const folderId = folderParam !== null ? Number(folderParam) : null
     await bouncer.with('ProjectPolicy').authorize('isMember', project, i18n)
-    const routes = await project
-      .related('routes')
-      .query()
-      .orderBy('order')
-      .where((query) => {
-        query.whereILike('name', `%${search ?? ''}%`).orWhereILike('endpoint', `%${search ?? ''}%`)
-      })
-      .andWhere((query) => {
-        folderId === null || isNaN(folderId)
-          ? query.whereNull('parentFolderId')
-          : query.where('parentFolderId', folderId)
-      })
-      .paginate(page ?? 1, perPage ?? 10)
+    const routes = await project.related('routes').query().orderBy('order')
     return response.ok(routes)
   }
 
