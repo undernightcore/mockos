@@ -45,16 +45,16 @@ export default class ProjectsController {
 
   public async getList({ response, request, auth }: HttpContextContract) {
     const user = await auth.authenticate()
-    const { page, perPage, sortBy, onlyBranches } = await request.validate(GetProjectsValidator)
+    const options = await request.validate(GetProjectsValidator)
 
     const projectList = await user
       .related('projects')
       .query()
       .preload('forkedProject')
       .wherePivot('verified', true)
-      [onlyBranches ? 'whereNotNull' : 'whereNull']('forkedProjectId')
-      .orderBy(sortBy ?? 'created_at')
-      .paginate(page ?? 1, perPage ?? 10)
+      [options.onlyBranches ? 'whereNotNull' : 'whereNull']('forkedProjectId')
+      .orderBy(options.sortBy ?? 'created_at', options.direction as 'asc' | 'desc')
+      .paginate(options.page ?? 1, options.perPage ?? 10)
 
     return response.ok(projectList)
   }

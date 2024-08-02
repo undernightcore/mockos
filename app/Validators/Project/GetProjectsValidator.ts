@@ -6,5 +6,6 @@ export default class GetProjectsValidator {
     perPage: schema.number.optional(),
     sortBy: schema.enum.optional(['created_at', 'updated_at', 'name']),
     onlyBranches: schema.boolean.optional(),
+    direction: schema.enum.optional(['desc', 'asc']),
   })
 }
