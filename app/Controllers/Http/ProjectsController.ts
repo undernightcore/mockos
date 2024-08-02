@@ -4,6 +4,7 @@ import EditProjectValidator from 'App/Validators/Project/EditProjectValidator'
 import CreateProjectValidator from 'App/Validators/Project/CreateProjectValidator'
 import Member from 'App/Models/Member'
 import Database from '@ioc:Adonis/Lucid/Database'
+import GetProjectsValidator from 'App/Validators/Project/GetProjectsValidator'
 
 export default class ProjectsController {
   public async create({ request, response, auth }: HttpContextContract) {
@@ -44,18 +45,17 @@ export default class ProjectsController {
 
   public async getList({ response, request, auth }: HttpContextContract) {
     const user = await auth.authenticate()
-    const page = await request.input('page')
-    const perPage = await request.input('perPage')
-    const sortBy = await request.input('sortBy')
-    const onlyBranches = await request.input('onlyBranches', 'false')
+    const { page, perPage, sortBy, onlyBranches } = await request.validate(GetProjectsValidator)
+
     const projectList = await user
       .related('projects')
       .query()
       .preload('forkedProject')
       .wherePivot('verified', true)
-      [onlyBranches === 'true' ? 'whereNotNull' : 'whereNull']('forkedProjectId')
+      [onlyBranches ? 'whereNotNull' : 'whereNull']('forkedProjectId')
       .orderBy(sortBy ?? 'created_at')
       .paginate(page ?? 1, perPage ?? 10)
+
     return response.ok(projectList)
   }
 
