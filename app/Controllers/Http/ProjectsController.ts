@@ -5,6 +5,7 @@ import CreateProjectValidator from 'App/Validators/Project/CreateProjectValidato
 import Member from 'App/Models/Member'
 import Database from '@ioc:Adonis/Lucid/Database'
 import GetProjectsValidator from 'App/Validators/Project/GetProjectsValidator'
+import Ws from 'App/Services/Ws'
 
 export default class ProjectsController {
   public async create({ request, response, auth }: HttpContextContract) {
@@ -12,14 +13,16 @@ export default class ProjectsController {
     const data = await request.validate(CreateProjectValidator)
     const project = await Project.create(data)
     await project.related('members').attach({ [user.id]: { verified: true } })
+    Ws.io.emit(`projects:${user.id}`, `updated`)
     return response.created(project)
   }
 
   public async delete({ response, params, bouncer, auth, i18n }: HttpContextContract) {
-    await auth.authenticate()
+    const user = await auth.authenticate()
     const project = await Project.findOrFail(params.id)
     await bouncer.with('ProjectPolicy').authorize('isMember', project, i18n)
     await project.delete()
+    Ws.io.emit(`projects:${user.id}`, `updated`)
     return response.ok({
       message: i18n.formatMessage('responses.project.delete.project_deleted', {
         project: project.name,
@@ -28,11 +31,12 @@ export default class ProjectsController {
   }
 
   public async edit({ request, params, response, auth, bouncer, i18n }: HttpContextContract) {
-    await auth.authenticate()
+    const user = await auth.authenticate()
     const data = await request.validate(EditProjectValidator)
     const project = await Project.findOrFail(params.id)
     await bouncer.with('ProjectPolicy').authorize('isMember', project, i18n)
     const newProject = await project?.merge(data).save()
+    Ws.io.emit(`projects:${user.id}`, `updated`)
     return response.ok(newProject)
   }
 
@@ -128,6 +132,7 @@ export default class ProjectsController {
       await newProject.related('members').attach({ [user.id]: { verified: true } }, trx)
     })
 
+    Ws.io.emit(`projects:${user.id}`, `updated`)
     return response.created({ message: i18n.formatMessage('responses.project.fork.fork_created') })
   }
 
@@ -142,6 +147,8 @@ export default class ProjectsController {
     } else {
       await project.delete()
     }
+
+    Ws.io.emit(`projects:${user.id}`, `updated`)
     return response.ok({
       message: i18n.formatMessage('responses.project.leave.left_project', {
         project: project.name,

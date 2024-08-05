@@ -2,6 +2,7 @@ import { HttpContextContract } from '@ioc:Adonis/Core/HttpContext'
 import Member from 'App/Models/Member'
 import Project from 'App/Models/Project'
 import User from 'App/Models/User'
+import Ws from 'App/Services/Ws'
 
 export default class InvitationsController {
   public async getList({ request, response, auth }: HttpContextContract) {
@@ -24,6 +25,7 @@ export default class InvitationsController {
     await invitation.load('project')
     invitation.verified = true
     await invitation.save()
+    Ws.io.emit(`projects:${user.id}`, `updated`)
     return response.ok({
       message: i18n.formatMessage('responses.invitation.accept.welcome_user', {
         project: invitation.project.name,
@@ -61,6 +63,7 @@ export default class InvitationsController {
         verified: false,
       },
     })
+    Ws.io.emit(`invitations:${user.id}`, `updated`)
     return response.ok({
       message: i18n.formatMessage('responses.invitation.invite.user_invited', {
         name: user.name,
