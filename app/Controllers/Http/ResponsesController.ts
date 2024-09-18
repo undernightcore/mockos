@@ -38,12 +38,10 @@ export default class ResponsesController {
     })
   }
 
-  public async getList({ request, response, auth, bouncer, params, i18n }: HttpContextContract) {
+  public async getList({ response, auth, bouncer, params, i18n }: HttpContextContract) {
     await auth.authenticate()
     const route = await Route.findOrFail(params.id)
     const project = await Project.findOrFail(route.projectId)
-    const page = request.input('page', 1)
-    const perPage = request.input('perPage', 10)
     await bouncer.with('RoutePolicy').authorize('isNotFolder', route, i18n)
     await bouncer.with('ProjectPolicy').authorize('isMember', project, i18n)
     const responses = await route
@@ -52,7 +50,6 @@ export default class ResponsesController {
       .select(['id', 'name', 'enabled', 'status'])
       .orderBy('enabled', 'desc')
       .orderBy('created_at', 'desc')
-      .paginate(page, perPage)
     return response.ok(responses)
   }
 
