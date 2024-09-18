@@ -37,7 +37,7 @@ export default class Route extends BaseModel {
   @column({ serializeAs: null })
   public projectId: number
 
-  @column({ serializeAs: null })
+  @column()
   public parentFolderId: number | null
 
   @column.dateTime({ autoCreate: true })
