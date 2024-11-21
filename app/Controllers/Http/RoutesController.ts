@@ -103,7 +103,14 @@ export default class RoutesController {
         const siblingIndex =
           data.before !== null
             ? routes.findIndex((route) => route.id === data.before)
-            : routes.length
+            : data.into === null
+            ? routes.length
+            : routes.reduce(
+                (last, current, index) =>
+                  current.id === data.into || current.parentFolderId === data.into ? index + 1 : last,
+                -1
+              )
+
         if (siblingIndex === -1)
           throw new HttpError(500, i18n.formatMessage('responses.route.moveandsort.missing_data'))
 
