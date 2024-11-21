@@ -93,7 +93,7 @@ export default class RoutesController {
 
     await Database.transaction(
       async (trx) => {
-        const routes = await project.related('routes').query().useTransaction(trx)
+        const routes = await project.related('routes').query().orderBy('order').useTransaction(trx)
 
         const whatIndex = routes.findIndex((route) => route.id === data.what)
         if (whatIndex === -1)
@@ -119,7 +119,8 @@ export default class RoutesController {
         what.parentFolderId = data.into
 
         await recalculateRouteOrder(routes, trx)
-      }
+      },
+      { isolationLevel: 'repeatable read' }
     )
 
     Ws.io.emit(`project:${project.id}`, `updated`)
