@@ -45,9 +45,6 @@
     }
   },
   "project": {
-    "delete": {
-      "project_deleted": "The {project} project has been successfully deleted"
-    },
     "fork": {
       "fork_created": "Branch created successfully"
     },
@@ -77,13 +74,10 @@
     "delete": {
       "route_deleted": "The route has been deleted"
     },
-    "sort": {
-      "route_mismatch": "The routes don't correspond to the correct project",
-      "context_mismatch": "You can only sort routes at the same depth",
-      "route_sorted": "Moved successfully"
-    },
-    "move": {
-      "route_moved": "Moved successfully"
+    "moveandsort": {
+      "successfully": "Moved successfully",
+      "folder_in_folder": "You can't put a folder into another folder",
+      "missing_data": "The route you were trying to move has dissapeared"
     }
   },
   "header": {

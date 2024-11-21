@@ -45,9 +45,6 @@
     }
   },
   "project": {
-    "delete": {
-      "project_deleted": "Se ha eliminado el projecto {project} correctamente"
-    },
     "fork": {
       "fork_created": "Rama creada correctamente"
     },
@@ -77,13 +74,10 @@
     "delete": {
       "route_deleted": "Se ha eliminado la ruta"
     },
-    "sort": {
-      "route_mismatch": "Las rutas no corresponden al projecto correcto",
-      "context_mismatch": "Solo puedes ordenar rutas dentro de una misma profundidad",
-      "route_sorted": "Se ha movido correctamente"
-    },
-    "move": {
-      "route_moved": "Se ha movido correctamente"
+    "moveandsort": {
+      "successfully": "Se ha movido correctamente",
+      "folder_in_folder": "No puedes mover una carpeta dentro de otra carpeta",
+      "missing_data": "La ruta que intentabas mover ha desaparecido"
     }
   },
   "header": {

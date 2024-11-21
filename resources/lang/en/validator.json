@@ -115,15 +115,13 @@
       "name.minLength": "The name must have at least 3 characters",
       "name.maxLength": "The name can't be more than 200 characters long"
     },
-    "sort": {
-      "origin.required": "You need to indicate which route you are going to move",
-      "destination.required": "You need to indicate where you are going to move the route"
-    },
-    "move": {
-      "origin.required": "You need to indicate which route you are going to move",
-      "origin.exists": "The route you are trying to move does not exist",
-      "destination.required": "You need to indicate where you are going to move the route",
-      "destination.exists": "You need to move to an existing folder or root"
+    "moveandsort": {
+      "what.required": "You must specify the route you want to move",
+      "what.exists": "This route does not exist",
+      "into.required": "You must specify the folder where you want to drop the route",
+      "into.exists": "The folder you are trying to drop the route into does not exist",
+      "before.required": "You must specify before which route you want to drop the item",
+      "before.exists": "The route you indicate that should come after yours does not exist"
     }
   },
   "header": {
