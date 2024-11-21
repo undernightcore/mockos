@@ -119,8 +119,7 @@ export default class RoutesController {
         what.parentFolderId = data.into
 
         await recalculateRouteOrder(routes, trx)
-      },
-      { isolationLevel: 'repeatable read' }
+      }
     )
 
     Ws.io.emit(`project:${project.id}`, `updated`)
