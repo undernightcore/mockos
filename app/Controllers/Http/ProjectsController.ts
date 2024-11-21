@@ -17,19 +17,6 @@ export default class ProjectsController {
     return response.created(project)
   }
 
-  public async delete({ response, params, bouncer, auth, i18n }: HttpContextContract) {
-    const user = await auth.authenticate()
-    const project = await Project.findOrFail(params.id)
-    await bouncer.with('ProjectPolicy').authorize('isMember', project, i18n)
-    await project.delete()
-    Ws.io.emit(`projects:${user.id}`, `updated`)
-    return response.ok({
-      message: i18n.formatMessage('responses.project.delete.project_deleted', {
-        project: project.name,
-      }),
-    })
-  }
-
   public async edit({ request, params, response, auth, bouncer, i18n }: HttpContextContract) {
     const user = await auth.authenticate()
     const data = await request.validate(EditProjectValidator)
