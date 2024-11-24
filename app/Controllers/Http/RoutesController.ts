@@ -98,7 +98,11 @@ export default class RoutesController {
         const whatIndex = routes.findIndex((route) => route.id === data.what)
         if (whatIndex === -1)
           throw new HttpError(500, i18n.formatMessage('responses.route.moveandsort.missing_data'))
-        const what = routes.splice(whatIndex, 1)[0]
+        const whatChildren = routes.reduce(
+          (acc, route) => (route.parentFolderId === data.what ? acc + 1 : acc),
+          0
+        )
+        const what = routes.splice(whatIndex, whatChildren + 1)
 
         const siblingIndex =
           data.before !== null
@@ -107,16 +111,18 @@ export default class RoutesController {
             ? routes.length
             : routes.reduce(
                 (last, current, index) =>
-                  current.id === data.into || current.parentFolderId === data.into ? index + 1 : last,
+                  current.id === data.into || current.parentFolderId === data.into
+                    ? index + 1
+                    : last,
                 -1
               )
 
         if (siblingIndex === -1)
           throw new HttpError(500, i18n.formatMessage('responses.route.moveandsort.missing_data'))
 
-        routes.splice(siblingIndex, 0, what)
+        routes.splice(siblingIndex, 0, ...what)
 
-        what.parentFolderId = data.into
+        if (!what[0].isFolder) what[0].parentFolderId = data.into
 
         await recalculateRouteOrder(routes, trx)
       },
