@@ -1,5 +1,5 @@
 import Route from '@ioc:Adonis/Core/Route'
 
 Route.group(() => {
-  Route.post('', 'HeadersController.edit')
+  Route.post('', 'SwaggerController.parse')
 }).prefix('swagger')
