@@ -6,7 +6,6 @@ import Database from '@ioc:Adonis/Lucid/Database'
 import Ws from 'App/Services/Ws'
 import { recalculateRouteOrder } from 'App/Helpers/Shared/sort.helper'
 import { getLastIndex } from 'App/Helpers/Shared/array.helper'
-import { DateTime } from 'luxon'
 import { RouteInterface } from 'App/Interfaces/RouteInterface'
 
 export default class RoutesController {
@@ -32,16 +31,33 @@ export default class RoutesController {
       },
     ]
 
-    const route = await (data.parentFolderId
-      ? this.createNewRouteInFolder(project, data.parentFolderId, data)
-      : this.createNewRouteInRoot(project, isFolder, data))
+    await this.insertRoutes(routes)
 
     Ws.io.emit(`project:${project.id}`, `updated`)
-    return response.created(route)
+    return response.created(routes)
+  }
+
+  private async insertRoutes(routes: RouteInterface[]) {
+    const folders = routes.filter((route) => route.isFolder)
+    const regularRoutes = routes.filter((route) => !route.isFolder)
+    await Database.transaction(async (trx) => {
+      for (const folderData of folders) {
+        const project = await Project.findOrFail(folderData.projectId, { client: trx })
+        await this.createNewRouteInRoot(project, true, folderData)
+      }
+
+      for (const routeData of regularRoutes) {
+        const project = await Project.findOrFail(routeData.projectId, { client: trx })
+        if (routeData.parentFolderId) {
+          await this.createNewRouteInFolder(project, routeData.parentFolderId, routeData)
+        } else {
+          await this.createNewRouteInRoot(project, false, routeData)
+        }
+      }
+    })
   }
 
   // Helper functions
-
   private async createNewRouteInRoot(
     project: Project,
     isFolder: boolean,
