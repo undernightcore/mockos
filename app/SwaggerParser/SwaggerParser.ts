@@ -143,14 +143,13 @@ class OpenAPIConverter {
               const headers = this.buildResponseHeaders(contentTypeHeaders, routeResponse.headers)
 
               if (examples) {
-                const routeResponseExamples = this.parseOpenAPIExamples(examples, version).map(
-                  (example) =>
-                    this.buildResponse(
-                      example.body,
-                      example.label,
-                      responseStatus === 'default' ? 200 : statusCode,
-                      headers
-                    )
+                const routeResponseExamples = this.parseOpenAPIExamples(examples).map((example) =>
+                  this.buildResponse(
+                    example.body,
+                    example.label,
+                    responseStatus === 'default' ? 200 : statusCode,
+                    headers
+                  )
                 )
                 routeResponses.push(...routeResponseExamples)
               } else if (example) {
@@ -400,23 +399,15 @@ class OpenAPIConverter {
   /**
    * Extract bodies and labels from OpenAPI examples
    * @param examples
-   * @param version
    * @private
    */
-  private parseOpenAPIExamples(
-    examples: OpenAPIV2.ExampleObject | OpenAPIV3.ExampleObject,
-    version: string
-  ) {
+  private parseOpenAPIExamples(examples: any) {
     const responses: { label: string; body: any }[] = []
 
-    Object.keys(examples).forEach((exampleName) => {
-      // @ts-ignore
-      const example = examples[exampleName]
-      const exampleBody = version === 'SWAGGER' ? example : example.value
-
+    examples.forEach((example: OpenAPIV2.ExampleObject | OpenAPIV3.ExampleObject) => {
       const exampleResponse = {
-        body: exampleBody,
-        label: exampleName,
+        body: example,
+        label: '',
       }
 
       responses.push(exampleResponse)
