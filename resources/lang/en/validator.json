@@ -154,6 +154,9 @@
     "rollback": {
       "version.required": "You need to indicate what version you want to rollback to",
       "version.exists": "The version you are trying to rollback to does not exist"
+    },
+    "parse": {
+      "swagger.required": "You need to indicate the swagger content to parse"
     }
   }
 }
