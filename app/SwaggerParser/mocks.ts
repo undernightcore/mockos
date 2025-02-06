@@ -1,4 +1,6 @@
-export const swaggerMock = [
+import { RouteInterface } from 'App/Interfaces/RouteInterface'
+
+export const swaggerMock: RouteInterface[] = [
   {
     id: 0,
     name: 'sentryEvents',
