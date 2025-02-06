@@ -1,40 +1,16 @@
 import { HttpContextContract } from '@ioc:Adonis/Core/HttpContext'
-import Project from 'App/Models/Project'
-import Route from 'App/Models/Route'
-import CreateRouteValidator from 'App/Validators/Route/CreateRouteValidator'
-import Database from '@ioc:Adonis/Lucid/Database'
-import Ws from 'App/Services/Ws'
-import { recalculateRouteOrder } from 'App/Helpers/Shared/sort.helper'
-import { getLastIndex } from 'App/Helpers/Shared/array.helper'
-import { RouteInterface } from 'App/Interfaces/RouteInterface'
+import ImportSwaggerValidator from 'App/Validators/Swagger/ImportSwaggerValidator'
+import { parseSwagger } from 'App/SwaggerParser/SwaggerParser'
+//import { swaggerMock } from 'App/SwaggerParser/mocks'
 
-export default class RoutesController {
-  public async parse({ request, response, auth, params, bouncer, i18n }: HttpContextContract) {
-    await auth.authenticate()
-    const project = await Project.findOrFail(params.id)
-    const isFolder = Boolean(request.input('isFolder', false))
-    await bouncer.with('ProjectPolicy').authorize('isMember', project, i18n)
-    const data = await request.validate(CreateRouteValidator)
-    const routes: RouteInterface[] = [
-      {
-        id: 1,
-        name: 'Test',
-        endpoint: '/test',
-        method: 'GET',
-        enabled: true,
-        isFolder: false,
-        order: 1,
-        responses: [],
-        headers: [],
-        projectId: 1,
-        parentFolderId: null,
-      },
-    ]
+export default class SwaggerController {
+  public async parse({ request, response }: HttpContextContract) {
+    const data = await request.validate(ImportSwaggerValidator)
 
-    await this.insertRoutes(routes)
+    const result = await parseSwagger(data.swagger)
+    //const resultMock = swaggerMock()
 
-    Ws.io.emit(`project:${project.id}`, `updated`)
-    return response.created(routes)
+    return response.created(result)
   }
 
   private async insertRoutes(routes: RouteInterface[]) {

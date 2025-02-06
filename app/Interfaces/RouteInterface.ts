@@ -1,3 +1,5 @@
+import { ResponseInterface } from 'App/Interfaces/ResponseInterface'
+
 export interface RouteInterface {
   id: number
   name: string
@@ -6,8 +8,7 @@ export interface RouteInterface {
   enabled: boolean
   isFolder: boolean
   order: number
-  responses: any
-  headers: any
-  projectId: number
+  responses: ResponseInterface[]
   parentFolderId: number | null
+  tag?: string
 }
