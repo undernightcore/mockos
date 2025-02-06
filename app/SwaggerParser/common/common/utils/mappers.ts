@@ -6,6 +6,7 @@ export function mapHeader(header: Header): HeaderInterface {
   return {
     key: header.key,
     value: header.value,
+    responseId: 0,
   }
 }
 
