@@ -6,15 +6,16 @@ import Database from '@ioc:Adonis/Lucid/Database'
 import Project from 'App/Models/Project'
 import { swaggerMock } from 'App/SwaggerParser/mocks'
 import Route from 'App/Models/Route'
+import { ResponseInterface } from 'App/Interfaces/ResponseInterface'
 
 export default class SwaggerController {
-  public async parse({ request, response }: HttpContextContract) {
+  public async parse({ auth, params, request, response }: HttpContextContract) {
+    console.log('PARAMS:', request)
     const data = await request.validate(ImportSwaggerValidator)
 
     const result = await parseSwagger(data.swagger)
     const resultMock = swaggerMock
-    const projectId: number = 1
-    await this.insertRoutes(resultMock, projectId)
+    //await this.insertRoutes(resultMock, params.id)
 
     return response.created(result)
   }
@@ -29,20 +30,24 @@ export default class SwaggerController {
       const newRoutes = regularRoutes.filter((route) => !existingEndpoints.has(route.endpoint))
 
       for (const routeData of newRoutes) {
-        await this.createNewRouteInRoot(project, false, routeData)
+        const newRoute = await this.createNewRouteInRoot(project, false, routeData, trx)
+        await this.insertResponses(newRoute.responses, newRoute.id, trx)
       }
     })
   }
+
+  private async insertResponses(responses: ResponseInterface[], routeId: number, trx: any) {}
 
   // Helper functions
   private async createNewRouteInRoot(
     project: Project,
     isFolder: boolean,
-    data: { [p: string]: any }
+    data: { [p: string]: any },
+    trx: any
   ) {
     const lastOrder = await project.related('routes').query().orderBy('order', 'desc').first()
     return project
       .related('routes')
-      .create({ ...data, isFolder, order: (lastOrder?.order ?? 0) + 1 })
+      .create({ ...data, isFolder, order: (lastOrder?.order ?? 0) + 1 }, { client: trx })
   }
 }
