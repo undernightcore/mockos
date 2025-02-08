@@ -24,7 +24,7 @@ export default class SwaggerController {
   }
 
   private async insertRoutes(routes: RouteInterface[], projectId: number) {
-    const project = await Project.findOrFail(projectId)
+    const project = await Project.findOrFail(projectId) //TODO when no project is created it throws error (“findOrFail” expects a value. Received undefined)
     const regularRoutes = routes.filter((route) => !route.isFolder)
 
     await Database.transaction(async (trx) => {
