@@ -1,5 +1,4 @@
-export interface HeaderInterface {
+export interface ParsedHeaderInterface {
   key: string
   value: string
-  responseId: number
 }

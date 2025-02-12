@@ -1,14 +1,8 @@
-import { ResponseInterface } from 'App/Interfaces/ResponseInterface'
+import { ParsedResponseInterface } from 'App/Interfaces/ResponseInterface'
 
-export interface RouteInterface {
-  id: number
+export interface ParsedRouteInterface {
   name: string
   endpoint: string
   method: string
-  enabled: boolean
-  isFolder: boolean
-  order: number
-  responses: ResponseInterface[]
-  parentFolderId: number | null
-  tag?: string
+  responses: ParsedResponseInterface[]
 }

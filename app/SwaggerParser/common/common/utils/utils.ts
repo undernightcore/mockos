@@ -1,5 +1,3 @@
-export const RemoveLeadingSlash = (str: string): string => str.replace(/^\//g, '')
-
 export const generateUUID = (): string => 'uuid'
 
 export function getRandomEnumValue<T>(enumObj: T): T[keyof T] {

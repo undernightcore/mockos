@@ -1,12 +1,8 @@
-import { HeaderInterface } from 'App/Interfaces/HeaderInterface'
+import { ParsedHeaderInterface } from 'App/Interfaces/HeaderInterface'
 
-export interface ResponseInterface {
-  id: number
+export interface ParsedResponseInterface {
   status: number
   body: string
   name: string
-  isFile: boolean
-  enabled: boolean
-  headers: HeaderInterface[]
-  routeId: number
+  headers: ParsedHeaderInterface[]
 }

@@ -2,7 +2,7 @@ import openAPI from '@apidevtools/swagger-parser'
 import { OpenAPI, OpenAPIV2, OpenAPIV3, OpenAPIV3_1 } from 'openapi-types'
 import { faker } from '@faker-js/faker'
 import TagObject = OpenAPIV3_1.TagObject
-import { RouteInterface } from 'App/Interfaces/RouteInterface'
+import { ParsedRouteInterface } from 'App/Interfaces/RouteInterface'
 import {
   BuildHeader,
   BuildHTTPRoute,
@@ -10,91 +10,66 @@ import {
   getRandomEnumValue,
   Header,
   Methods,
-  RemoveLeadingSlash,
   Route,
   RouteResponse,
 } from 'App/SwaggerParser/common/common'
 import { mapRoute } from 'App/SwaggerParser/common/common/utils/mappers'
+import { load } from 'js-yaml'
 
 type SpecificationVersions = 'SWAGGER' | 'OPENAPI_V3'
 
-export function parseSwagger(swagger: string): Promise<RouteInterface[]> {
-  return new OpenAPIConverter().convertFromOpenAPI(swagger)
+export function parseSwagger(swagger: string, basePath?: string): Promise<ParsedRouteInterface[]> {
+  return new OpenAPIConverter().convertFromOpenAPI(swagger, basePath)
 }
 
-/**
- * Convert to and from Swagger/OpenAPI formats
- *
- * OpenAPI specifications: https://github.com/OAI/OpenAPI-Specification/blob/master/versions/3.0.1.md
- * Swagger specifications: https://github.com/OAI/OpenAPI-Specification/blob/master/versions/2.0.md
- *
- */
 class OpenAPIConverter {
-  /**
-   * Import Swagger or OpenAPI format
-   *
-   * @param swagger
-   * @throws {Error}
-   */
-  public async convertFromOpenAPI(swagger: string): Promise<RouteInterface[]> {
+  public async convertFromOpenAPI(
+    swagger: string,
+    basePath?: string
+  ): Promise<ParsedRouteInterface[]> {
     let routes: Route[] = []
+    let api: OpenAPIV3.Document | undefined = undefined
 
-    //If swagger is a yaml file
-    //const api = yaml.load(swagger) as OpenAPIV3.Document
-
-    const api = JSON.parse(swagger)
+    try {
+      api = JSON.parse(swagger) as OpenAPIV3.Document
+    } catch {
+      api = load(swagger) as OpenAPIV3.Document
+    }
 
     const parsedAPI: OpenAPI.Document = await openAPI.dereference.bind(openAPI)(api, {
       dereference: { circular: 'ignore' },
     })
 
     if (this.isSwagger(parsedAPI)) {
-      routes = this.convertFromSwagger(parsedAPI)
+      routes = this.createRoutes(parsedAPI, 'SWAGGER', basePath)
     } else if (this.isOpenAPIV3(parsedAPI)) {
-      routes = this.convertFromOpenAPIV3(parsedAPI)
+      routes = this.createRoutes(parsedAPI, 'OPENAPI_V3', basePath)
     }
 
     return routes.map(mapRoute)
   }
 
-  /**
-   * Convert Swagger 2.0 format
-   *
-   * @param parsedAPI
-   */
-  private convertFromSwagger(parsedAPI: OpenAPIV2.Document): Route[] {
-    return this.createRoutes(parsedAPI, 'SWAGGER')
-  }
-
-  /**
-   * Convert OpenAPI 3.0 format
-   *
-   * @param parsedAPI
-   */
-  private convertFromOpenAPIV3(parsedAPI: OpenAPIV3.Document): Route[] {
-    return this.createRoutes(parsedAPI, 'OPENAPI_V3')
-  }
-
-  /**
-   * Creates routes from imported swagger/OpenAPI document
-   *
-   * @param parsedAPI
-   * @param version
-   */
-  private createRoutes(parsedAPI: OpenAPIV2.Document, version: 'SWAGGER'): Route[]
-  private createRoutes(parsedAPI: OpenAPIV3.Document, version: 'OPENAPI_V3'): Route[]
+  private createRoutes(
+    parsedAPI: OpenAPIV2.Document,
+    version: 'SWAGGER',
+    basePath?: string
+  ): Route[]
+  private createRoutes(
+    parsedAPI: OpenAPIV3.Document,
+    version: 'OPENAPI_V3',
+    basePath?: string
+  ): Route[]
   private createRoutes(
     parsedAPI: OpenAPIV2.Document & OpenAPIV3.Document,
-    version: SpecificationVersions
+    version: SpecificationVersions,
+    basePath?: string
   ): Route[] {
     const routes: Route[] = []
     const tags: TagObject[] = parsedAPI.tags ?? []
 
     Object.keys(parsedAPI.paths).forEach((routePath) => {
       Object.keys(parsedAPI.paths[routePath]).forEach((routeMethod) => {
-        // @ts-ignore
         const parsedRoute: OpenAPIV2.OperationObject & OpenAPIV3.OperationObject =
-          // @ts-ignore
           parsedAPI.paths[routePath][routeMethod]
 
         if (routeMethod in Methods) {
@@ -102,8 +77,7 @@ class OpenAPIConverter {
 
           Object.keys(parsedRoute.responses).forEach((responseStatus) => {
             const statusCode = parseInt(responseStatus, 10)
-            // filter unsupported status codes (i.e. ranges containing "X", 4XX, 5XX, etc)
-            // consider 'default' as 200
+
             if ((statusCode >= 100 && statusCode <= 999) || responseStatus === 'default') {
               const routeResponse: OpenAPIV2.ResponseObject & OpenAPIV3.ResponseObject = parsedRoute
                 .responses[responseStatus] as OpenAPIV2.ResponseObject & OpenAPIV3.ResponseObject
@@ -124,7 +98,6 @@ class OpenAPIConverter {
                 contentTypeHeaders = Object.keys(routeResponse.content)
               }
 
-              // extract schema
               const contentTypeHeader = contentTypeHeaders.find((header) =>
                 header.includes('application/json')
               )
@@ -182,7 +155,6 @@ class OpenAPIConverter {
             })
           }
 
-          // mark the first route response as default
           routeResponses[0].default = true
 
           const newRoute: Route = {
@@ -190,7 +162,7 @@ class OpenAPIConverter {
             name: parsedRoute.operationId || '',
             documentation: parsedRoute.summary || parsedRoute.description || '',
             method: routeMethod as Methods,
-            endpoint: RemoveLeadingSlash(this.v2ParametersReplace(routePath)),
+            endpoint: this.v2ParametersReplace(basePath ? basePath + routePath : routePath),
             responses: routeResponses,
             tags: tags.map((tag) => tag.name),
           }
@@ -255,14 +227,6 @@ class OpenAPIConverter {
     return [routeContentTypeHeader]
   }
 
-  /**
-   * Build route response from label, status code, headers and unformatted body.
-   * @param body
-   * @param label
-   * @param statusCode
-   * @param headers
-   * @private
-   */
   private buildResponse(
     body: object | undefined,
     label: string,

@@ -1,9 +1,8 @@
 {
   "api": {
     "mock": {
-      "missing_project_header": "We need you to submit the project of the request",
-      "missing_token_header": "You need to authenticate using the token header",
-      "wrong_token": "Invalid token for this project",
+      "missing_token": "You need to authenticate using a token",
+      "wrong_token": "Invalid token",
       "missing_route": "No route found with that endpoint and methods",
       "missing_response": "No response available for that route and method",
       "invalid_json": "JSON response has invalid structure, please fix response body"
@@ -109,6 +108,9 @@
     },
     "get": {
       "version_not_found": "This specific version does not exist"
+    },
+    "parse": {
+      "success": "Swagger imported successfully"
     }
   }
 }
