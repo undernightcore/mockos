@@ -38,7 +38,6 @@
   },
   "devDependencies": {
     "@adonisjs/assembler": "^5.9.5",
-    "@faker-js/faker": "^9.4.0",
     "@japa/preset-adonis": "^1.2.0",
     "@japa/runner": "^2.2.2",
     "@types/js-yaml": "^4.0.6",
@@ -64,6 +63,7 @@
     "@adonisjs/lucid": "^18.3.0",
     "@adonisjs/mail": "^8.1.2",
     "@adonisjs/repl": "^3.1.11",
+    "@faker-js/faker": "^8.4.1",
     "@apidevtools/swagger-parser": "^10.1.0",
     "js-yaml": "^4.1.0",
     "luxon": "^3.1.0",
