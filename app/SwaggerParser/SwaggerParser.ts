@@ -365,18 +365,13 @@ class OpenAPIConverter {
    * @param examples
    * @private
    */
-  private parseOpenAPIExamples(examples: any) {
-    const responses: { label: string; body: any }[] = []
-
-    examples?.forEach((example: OpenAPIV2.ExampleObject | OpenAPIV3.ExampleObject) => {
-      const exampleResponse = {
-        body: example,
-        label: '',
-      }
-
-      responses.push(exampleResponse)
-    })
-
-    return responses
+  private parseOpenAPIExamples(examples: OpenAPIV2.ExampleObject | OpenAPIV3.ExampleObject) {
+    return Object.entries(examples)
+      .map(([label, example]) => ({ label, example }))
+      .filter(({ example }) => example?.value?.data)
+      .map(({ label, example }) => ({
+        body: example.value.data,
+        label,
+      }))
   }
 }
