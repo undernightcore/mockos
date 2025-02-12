@@ -20,4 +20,5 @@ Route.group(() => {
   Route.get(':id/contracts', 'ContractsController.get')
   Route.put(':id/contracts', 'ContractsController.edit')
   Route.get(':id/contract-versions', 'ContractsController.history')
+  Route.post(':id/swagger', 'SwaggerController.parse')
 }).prefix('projects')
