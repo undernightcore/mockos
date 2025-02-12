@@ -156,7 +156,9 @@
       "version.exists": "The version you are trying to rollback to does not exist"
     },
     "parse": {
-      "swagger.required": "You need to indicate the swagger content to parse"
+      "swagger.required": "You need to indicate the swagger content to parse",
+      "reset.required": "You need to indicate if you want to reset the project",
+      "basePath.regex": "The basePath must begin with / and not end with /"
     }
   }
 }

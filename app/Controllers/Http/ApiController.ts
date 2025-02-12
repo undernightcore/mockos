@@ -8,6 +8,7 @@ import { I18nContract } from '@ioc:Adonis/Addons/I18n'
 import Route from 'App/Models/Route'
 import Response from 'App/Models/Response'
 import { Buffer } from 'buffer'
+import Token from 'App/Models/Token'
 
 export default class ApiController {
   public async mock({ request, params, response, i18n }: HttpContextContract) {
@@ -33,23 +34,22 @@ export default class ApiController {
   }
 
   // Helper functions
-
   async #authenticateProject(request: RequestContract, i18n: I18nContract) {
-    const token = request.header('token')
-    const projectId = request.header('project')
-    if (projectId === undefined) {
-      throw new HttpError(400, i18n.formatMessage('responses.api.mock.missing_project_header'))
+    const requestToken: string | undefined = request.param('token') || request.header('token')
+    if (!requestToken) {
+      throw new HttpError(400, i18n.formatMessage('responses.api.mock.missing_token'))
     }
-    if (token === undefined) {
-      throw new HttpError(400, i18n.formatMessage('responses.api.mock.missing_token_header'))
-    }
-    const project = await Project.findOrFail(projectId)
-    const isTokenValid = Boolean(
-      await project.related('tokens').query().where('token', token).first()
-    )
-    if (!isTokenValid) {
+
+    const token = await Token.findBy('token', requestToken)
+    if (!token) {
       throw new HttpError(400, i18n.formatMessage('responses.api.mock.wrong_token'))
     }
+
+    const project = await Project.find(token.projectId)
+    if (!project) {
+      throw new HttpError(400, i18n.formatMessage('responses.api.mock.wrong_token'))
+    }
+
     return project
   }
 

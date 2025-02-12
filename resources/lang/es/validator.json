@@ -154,6 +154,11 @@
     "rollback": {
       "version.required": "Necesitas indicar a qué versión deseas retroceder",
       "version.exists": "La versión a la que estás intentando retroceder no existe"
+    },
+    "parse": {
+      "swagger.required": "Es necesario indicar el contenido swagger a parsear",
+      "reset.required": "Debe indicar si desea restablecer el proyecto",
+      "basePath.regex": "La ruta base debe empezar por / y no terminar por /"
     }
   }
 }
