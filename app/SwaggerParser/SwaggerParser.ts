@@ -368,7 +368,7 @@ class OpenAPIConverter {
   private parseOpenAPIExamples(examples: any) {
     const responses: { label: string; body: any }[] = []
 
-    examples.forEach((example: OpenAPIV2.ExampleObject | OpenAPIV3.ExampleObject) => {
+    examples?.forEach((example: OpenAPIV2.ExampleObject | OpenAPIV3.ExampleObject) => {
       const exampleResponse = {
         body: example,
         label: '',
