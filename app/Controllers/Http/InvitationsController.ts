@@ -55,7 +55,13 @@ export default class InvitationsController {
     const user = await User.findByOrFail('email', params.email)
     await bouncer.with('ProjectPolicy').authorize('isMember', project, i18n)
     await bouncer.forUser(user).with('ProjectPolicy').authorize('isAlreadyMember', project, i18n)
-    await bouncer.forUser(user).with('GlobalPolicy').authorize('isVerified', i18n)
+
+    if (!user.verified) {
+      return response.ok({
+        message: i18n.formatMessage('bouncer.global.is_verified'),
+      })
+    }
+
     await project.related('members').attach({
       [user.id]: {
         verified: false,
