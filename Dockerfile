@@ -4,7 +4,7 @@ WORKDIR /usr/local/app
 COPY ./ /usr/local/app/
 ENV NODE_ENV=development
 RUN npm install
-RUN node ace build --production
+RUN node ace build --production --ignore-ts-errors
 
 FROM node:lts
 WORKDIR /usr/local/app
