@@ -95,14 +95,14 @@ export default class SwaggerController {
     enabled: boolean
   ) {
     await Promise.all(
-      responses.map(async (response) => {
+      responses.map(async (response, index) => {
         const newResponse = await Response.create(
           {
             ...response,
             name: `${response.name} - Imported from Swagger ${new Date().getTime()}`,
             routeId,
             isFile: false,
-            enabled,
+            enabled: index === 0 && enabled,
             body: response.body,
           },
           { client: trx }
