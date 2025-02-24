@@ -162,7 +162,7 @@ class OpenAPIConverter {
             name: parsedRoute.operationId || '',
             documentation: parsedRoute.summary || parsedRoute.description || '',
             method: routeMethod as Methods,
-            endpoint: this.v2ParametersReplace(basePath ? basePath + routePath : routePath),
+            endpoint: basePath ? basePath + routePath : routePath,
             responses: routeResponses,
             tags: tags.map((tag) => tag.name),
           }
@@ -240,15 +240,6 @@ class OpenAPIConverter {
       statusCode,
       headers,
     }
-  }
-
-  /**
-   * Replace parameters in `str`
-   *
-   * @param str
-   */
-  private v2ParametersReplace(str: string) {
-    return str.replace(/{(\w+)}/gi, (_searchValue, _replaceValue) => `{param}`)
   }
 
   /**
