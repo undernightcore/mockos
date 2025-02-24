@@ -39,17 +39,15 @@ export default class SwaggerController {
         const existingRoutes = await project.related('routes').query().useTransaction(trx)
         const existingEndpoints = toMap(
           existingRoutes,
-          (route) => `${route.method} ${this.normalizeEndpoint(route.endpoint)}`
+          (route) => `${route.method} ${route.endpoint}`
         )
 
         const parsedNewRoutes = routes.filter(
-          (route) =>
-            !existingEndpoints.has(`${route.method} ${this.normalizeEndpoint(route.endpoint)}`)
+          (route) => !existingEndpoints.has(`${route.method} ${route.endpoint}`)
         )
         const parsedExistingRoutes = routes
           .map((route) => ({
-            id: existingEndpoints.get(`${route.method} ${this.normalizeEndpoint(route.endpoint)}`)
-              ?.id,
+            id: existingEndpoints.get(`${route.method} ${route.endpoint}`)?.id,
             ...route,
           }))
           .filter((route) => route.id !== undefined)
@@ -124,9 +122,5 @@ export default class SwaggerController {
       headers.map((header) => ({ ...header, responseId })),
       { client: trx }
     )
-  }
-
-  private normalizeEndpoint(endpoint: string): string {
-    return endpoint.replace(/{[^}]+}/g, '{param}')
   }
 }
