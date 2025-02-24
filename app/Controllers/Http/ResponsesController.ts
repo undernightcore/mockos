@@ -10,6 +10,8 @@ import { deleteIfOnceUsed, getFileName } from 'App/Helpers/Shared/file.helper'
 import Project from 'App/Models/Project'
 import DuplicateResponseValidator from 'App/Validators/Response/DuplicateResponseValidator'
 import { compressJson } from 'App/Helpers/Shared/string.helper'
+import Processor from 'App/Models/Processor'
+import CreateProcessorValidator from 'App/Validators/Processor/CreateProcessorValidator'
 
 export default class ResponsesController {
   public async create({ request, response, auth, bouncer, params, i18n }: HttpContextContract) {
@@ -184,6 +186,42 @@ export default class ResponsesController {
     return response.ok({
       message: i18n.formatMessage('responses.response.delete.response_deleted'),
     })
+  }
+
+  public async getProcessor({ auth, params, bouncer, i18n, response }: HttpContextContract) {
+    await auth.authenticate()
+    const routeResponse = await Response.findOrFail(params.id)
+    const route = await Route.findOrFail(routeResponse.routeId)
+    const project = await Project.findOrFail(route.projectId)
+    await bouncer.with('RoutePolicy').authorize('isNotFolder', route, i18n)
+    await bouncer.with('ProjectPolicy').authorize('isMember', project, i18n)
+
+    const [processor] = await routeResponse.related('processor').query()
+    return response.ok(processor)
+  }
+
+  public async editProcessor({
+    auth,
+    params,
+    bouncer,
+    i18n,
+    response,
+    request,
+  }: HttpContextContract) {
+    await auth.authenticate()
+    const data = await request.validate(CreateProcessorValidator)
+    const routeResponse = await Response.findOrFail(params.id)
+    const route = await Route.findOrFail(routeResponse.routeId)
+    const project = await Project.findOrFail(route.projectId)
+    await bouncer.with('RoutePolicy').authorize('isNotFolder', route, i18n)
+    await bouncer.with('ProjectPolicy').authorize('isMember', project, i18n)
+
+    const processor = await Processor.updateOrCreate(
+      { responseId: routeResponse.id },
+      { ...data, responseId: routeResponse.id }
+    )
+
+    return response.ok(processor)
   }
 
   // Helper functions

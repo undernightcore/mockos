@@ -79,6 +79,12 @@
       "name.unique": "Este nombre de respuesta ya existe"
     }
   },
+  "processor": {
+    "create": {
+      "enabled.required": "Es necesario que indiques si el procesado está activado",
+      "code.required": "Es necesario que envies el código a ejecutar en el procesado"
+    }
+  },
   "route": {
     "create": {
       "name.required": "Se necesita una pequeña descripción para la ruta",
