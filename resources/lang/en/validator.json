@@ -79,6 +79,12 @@
       "name.unique": "This response name already exists"
     }
   },
+  "processor": {
+    "create": {
+      "enabled.required": "You need to indicate if the processor is enabled",
+      "code.required": "You need to send the code the processor will execute"
+    }
+  },
   "route": {
     "create": {
       "name.required": "A brief description for the route is needed",
