@@ -17,7 +17,7 @@ export default class Processor extends BaseModel {
   })
   public response: BelongsTo<typeof Response>
 
-  @column({ serializeAs: null })
+  @column({ serializeAs: 'responseId' })
   public responseId: number
 
   @column.dateTime({ autoCreate: true })
