@@ -233,6 +233,7 @@ export default class ResponsesController {
     await bouncer.with('RoutePolicy').authorize('isNotFolder', route, i18n)
     await bouncer.with('ProjectPolicy').authorize('isMember', project, i18n)
 
+    Ws.io.emit(`route:${route.id}`, 'updated')
     const processor = await Processor.updateOrCreate(
       { responseId: routeResponse.id },
       { ...data, responseId: routeResponse.id }
