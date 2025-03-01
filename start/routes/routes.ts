@@ -6,4 +6,5 @@ Route.group(() => {
   Route.delete(':id', 'RoutesController.delete')
   Route.post(':id/responses', 'ResponsesController.create')
   Route.get(':id/responses', 'ResponsesController.getList')
+  Route.get(':id/processors', 'ResponsesController.getProcessorList')
 }).prefix('routes')

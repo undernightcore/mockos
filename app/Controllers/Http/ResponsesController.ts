@@ -188,6 +188,23 @@ export default class ResponsesController {
     })
   }
 
+  public async getProcessorList({ auth, params, bouncer, i18n, response }: HttpContextContract) {
+    await auth.authenticate()
+    const route = await Route.findOrFail(params.id)
+    const project = await Project.findOrFail(route.projectId)
+    await bouncer.with('RoutePolicy').authorize('isNotFolder', route, i18n)
+    await bouncer.with('ProjectPolicy').authorize('isMember', project, i18n)
+
+    const responses = await route.related('responses').query()
+
+    const processors = await Processor.query().whereIn(
+      'response_id',
+      responses.map((r) => r.id)
+    )
+
+    return response.ok(processors)
+  }
+
   public async getProcessor({ auth, params, bouncer, i18n, response }: HttpContextContract) {
     await auth.authenticate()
     const routeResponse = await Response.findOrFail(params.id)
