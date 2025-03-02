@@ -151,6 +151,7 @@ export default class ResponsesController {
     const routeResponse = await Response.findOrFail(params.id)
     const route = await Route.findOrFail(routeResponse.routeId)
     const project = await Project.findOrFail(route.projectId)
+    const processor = await routeResponse.related('processor').query().first()
     await bouncer.with('RoutePolicy').authorize('isNotFolder', route, i18n)
     await bouncer.with('ProjectPolicy').authorize('isMember', project, i18n)
     const headers = await routeResponse.related('headers').query()
@@ -164,6 +165,13 @@ export default class ResponsesController {
       status: routeResponse.status,
       enabled: false,
     })
+    if (processor) {
+      await Processor.create({
+        responseId: newResponse.id,
+        code: processor.code,
+        enabled: processor.enabled,
+      })
+    }
     const newHeaders = headers.map(({ key, value }) => ({ key, value }))
     await newResponse.related('headers').createMany(newHeaders)
     Ws.io.emit(`route:${route.id}`, 'updated')
@@ -177,10 +185,12 @@ export default class ResponsesController {
     const routeResponse = await Response.findOrFail(params.id)
     const route = await Route.findOrFail(routeResponse.routeId)
     const project = await Project.findOrFail(route.projectId)
+    const processor = await routeResponse.related('processor').query().first()
     await bouncer.with('RoutePolicy').authorize('isNotFolder', route, i18n)
     await bouncer.with('ProjectPolicy').authorize('isMember', project, i18n)
     if (routeResponse.isFile) await deleteIfOnceUsed('responses', routeResponse.body)
     await routeResponse.delete()
+    if (processor) await processor.delete()
     Ws.io.emit(`route:${route.id}`, 'updated')
     Ws.io.emit(`response:${routeResponse.id}`, 'deleted')
     return response.ok({
