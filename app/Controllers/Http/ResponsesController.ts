@@ -201,6 +201,47 @@ export default class ResponsesController {
     })
   }
 
+  public async deleteMultiple({ request, response, auth, bouncer, i18n }: HttpContextContract) {
+    await auth.authenticate()
+    console.log('ENTRAAAA')
+
+    const responseIds = request.input('ids', []) || []
+
+    if (!Array.isArray(responseIds) || responseIds.length === 0) {
+      return response.badRequest({
+        message: i18n.formatMessage('responses.response.delete.no_ids_provided'),
+      })
+    }
+
+    const responses = await Response.query().whereIn('id', responseIds)
+
+    if (responses.length === 0) {
+      return response.notFound({
+        message: i18n.formatMessage('responses.response.delete.responses_not_found'),
+      })
+    }
+
+    for (const routeResponse of responses) {
+      const route = await Route.findOrFail(routeResponse.routeId)
+      const project = await Project.findOrFail(route.projectId)
+
+      await bouncer.with('RoutePolicy').authorize('isNotFolder', route, i18n)
+      await bouncer.with('ProjectPolicy').authorize('isMember', project, i18n)
+
+      if (routeResponse.isFile) {
+        await deleteIfOnceUsed('responses', routeResponse.body)
+      }
+      await routeResponse.delete()
+
+      Ws.io.emit(`route:${route.id}`, 'updated')
+      Ws.io.emit(`response:${routeResponse.id}`, 'deleted')
+    }
+
+    return response.ok({
+      message: i18n.formatMessage('responses.response.delete.responses_deleted'),
+    })
+  }
+
   public async getProcessor({ auth, params, bouncer, i18n, response }: HttpContextContract) {
     await auth.authenticate()
     const routeResponse = await Response.findOrFail(params.id)
