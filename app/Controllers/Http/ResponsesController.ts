@@ -185,12 +185,10 @@ export default class ResponsesController {
     const routeResponse = await Response.findOrFail(params.id)
     const route = await Route.findOrFail(routeResponse.routeId)
     const project = await Project.findOrFail(route.projectId)
-    const processor = await routeResponse.related('processor').query().first()
     await bouncer.with('RoutePolicy').authorize('isNotFolder', route, i18n)
     await bouncer.with('ProjectPolicy').authorize('isMember', project, i18n)
     if (routeResponse.isFile) await deleteIfOnceUsed('responses', routeResponse.body)
     await routeResponse.delete()
-    if (processor) await processor.delete()
     Ws.io.emit(`route:${route.id}`, 'updated')
     Ws.io.emit(`response:${routeResponse.id}`, 'deleted')
     return response.ok({
@@ -243,11 +241,12 @@ export default class ResponsesController {
     await bouncer.with('RoutePolicy').authorize('isNotFolder', route, i18n)
     await bouncer.with('ProjectPolicy').authorize('isMember', project, i18n)
 
-    Ws.io.emit(`route:${route.id}`, 'updated')
     const processor = await Processor.updateOrCreate(
       { responseId: routeResponse.id },
       { ...data, responseId: routeResponse.id }
     )
+
+    Ws.io.emit(`route:${route.id}`, 'updated')
 
     return response.ok(processor)
   }
