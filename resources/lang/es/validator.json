@@ -77,6 +77,11 @@
       "name.required": "Es necesario un nombre para tu respuesta",
       "name.maxLength": "El nombre no puede tener más de 200 carácteres",
       "name.unique": "Este nombre de respuesta ya existe"
+    },
+    "deleteMany": {
+      "ids.required": "Es necesario que indiques el listado de respuestas a eliminar",
+      "ids.minLength": "Tienes que indicar al menos una respuesta",
+      "ids.exists": "Hay una respuesta que no existe"
     }
   },
   "processor": {
