@@ -77,6 +77,11 @@
       "name.required": "A name is necessary for your response",
       "name.maxLength": "The name can't be more than 200 characters long",
       "name.unique": "This response name already exists"
+    },
+    "deleteMany": {
+      "ids.required": "You need to indicate which responses you want to delete",
+      "ids.minLength": "You need to indicate at least one response",
+      "ids.exists": "There is a response that does not exist"
     }
   },
   "processor": {
