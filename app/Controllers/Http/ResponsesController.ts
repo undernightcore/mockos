@@ -10,6 +10,7 @@ import Route from 'App/Models/Route'
 import Ws from 'App/Services/Ws'
 import CreateProcessorValidator from 'App/Validators/Processor/CreateProcessorValidator'
 import CreateResponseValidator from 'App/Validators/Response/CreateResponseValidator'
+import DeleteMultipleResponseValidator from 'App/Validators/Response/DeleteMultipleResponseValidator'
 import DuplicateResponseValidator from 'App/Validators/Response/DuplicateResponseValidator'
 import EditResponseValidator from 'App/Validators/Response/EditResponseValidator'
 
@@ -201,41 +202,33 @@ export default class ResponsesController {
     })
   }
 
-  public async deleteMultiple({ request, response, auth, bouncer, i18n }: HttpContextContract) {
+  public async deleteMultiple({
+    request,
+    response,
+    auth,
+    bouncer,
+    i18n,
+    params,
+  }: HttpContextContract) {
     await auth.authenticate()
-    console.log('ENTRAAAA')
 
-    const responseIds = request.input('ids', []) || []
+    const route = await Route.findOrFail(params.id)
+    await bouncer.with('RoutePolicy').authorize('isNotFolder', route, i18n)
 
-    if (!Array.isArray(responseIds) || responseIds.length === 0) {
-      return response.badRequest({
-        message: i18n.formatMessage('responses.response.delete.no_ids_provided'),
-      })
-    }
+    const project = await Project.findOrFail(route.projectId)
+    await bouncer.with('ProjectPolicy').authorize('isMember', project, i18n)
 
-    const responses = await Response.query().whereIn('id', responseIds)
+    const { ids } = await request.validate(DeleteMultipleResponseValidator)
 
-    if (responses.length === 0) {
-      return response.notFound({
-        message: i18n.formatMessage('responses.response.delete.responses_not_found'),
-      })
-    }
-
-    for (const routeResponse of responses) {
-      const route = await Route.findOrFail(routeResponse.routeId)
-      const project = await Project.findOrFail(route.projectId)
-
-      await bouncer.with('RoutePolicy').authorize('isNotFolder', route, i18n)
-      await bouncer.with('ProjectPolicy').authorize('isMember', project, i18n)
-
-      if (routeResponse.isFile) {
-        await deleteIfOnceUsed('responses', routeResponse.body)
-      }
+    for (const id of ids) {
+      const routeResponse = await Response.findOrFail(id)
       await routeResponse.delete()
+      if (routeResponse.isFile) await deleteIfOnceUsed('responses', routeResponse.body)
 
-      Ws.io.emit(`route:${route.id}`, 'updated')
-      Ws.io.emit(`response:${routeResponse.id}`, 'deleted')
+      Ws.io.emit(`response:${id}`, 'deleted')
     }
+
+    Ws.io.emit(`route:${route.id}`, 'updated')
 
     return response.ok({
       message: i18n.formatMessage('responses.response.delete.responses_deleted'),
