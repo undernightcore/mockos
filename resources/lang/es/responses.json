@@ -93,19 +93,6 @@
     }
   },
   "swagger": {
-    "edit": {
-      "invalid_swagger": "El Swagger no es válido. Por favor, corrígelo antes de guardar",
-      "outdated_version": "Existen cambios que necesitas mergear",
-      "invalid_version": "La versión que proporcionaste no sigue un formato válido",
-      "greater_version": "Tu versión debe ser mayor que la actual",
-      "swagger_saved": "Tu Swagger se ha actualizado a la {version}. ¡Gracias!"
-    },
-    "rollback": {
-      "rollback_successful": "Tu Swagger se ha bajado a la {version}. ¡Gracias!"
-    },
-    "get": {
-      "version_not_found": "Esta versión específica no existe"
-    },
     "parse": {
       "success": "El swagger ha sido importado correctamente"
     }
