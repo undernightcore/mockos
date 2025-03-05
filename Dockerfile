@@ -2,15 +2,15 @@ FROM node:lts as build
 
 WORKDIR /usr/local/app
 
-COPY ./app /usr/local/app/
-COPY ./commands /usr/local/app/
-COPY ./config /usr/local/app/
-COPY ./contracts /usr/local/app/
-COPY ./database /usr/local/app/
-COPY ./providers /usr/local/app/
-COPY ./resources /usr/local/app/
-COPY ./start /usr/local/app/
-COPY ./tests /usr/local/app/
+COPY ./app /usr/local/app/app
+COPY ./commands /usr/local/app/commands
+COPY ./config /usr/local/app/config
+COPY ./contracts /usr/local/app/contracts
+COPY ./database /usr/local/app/database
+COPY ./providers /usr/local/app/providers
+COPY ./resources /usr/local/app/resources
+COPY ./start /usr/local/app/start
+COPY ./tests /usr/local/app/tests
 COPY ./.adonisrc.json /usr/local/app/
 COPY ./ace /usr/local/app/
 COPY ./ace-manifest.json /usr/local/app/
