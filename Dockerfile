@@ -17,8 +17,8 @@ COPY ./ace-manifest.json /usr/local/app/
 COPY ./env.ts /usr/local/app/
 COPY ./package.json /usr/local/app/
 COPY ./package-lock.json /usr/local/app/
-COPY ./server /usr/local/app/
-COPY ./tests /usr/local/app/
+COPY ./server.ts /usr/local/app/
+COPY ./test.ts /usr/local/app/
 COPY ./tsconfig.json /usr/local/app/
 
 ENV NODE_ENV=development
