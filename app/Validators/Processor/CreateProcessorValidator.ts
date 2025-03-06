@@ -1,13 +1,13 @@
 import { schema, CustomMessages } from '@ioc:Adonis/Core/Validator'
 import type { HttpContextContract } from '@ioc:Adonis/Core/HttpContext'
 
-export default class UpdateSwaggerValidator {
+export default class CreateProcessorValidator {
   constructor(protected ctx: HttpContextContract) {}
 
   public schema = schema.create({
-    originalVersion: schema.string.nullable({}),
-    swagger: schema.string({}),
+    enabled: schema.boolean(),
+    code: schema.string(),
   })
 
-  public messages: CustomMessages = this.ctx.i18n.validatorMessages('validator.swagger.update')
+  public messages: CustomMessages = this.ctx.i18n.validatorMessages('validator.processor.create')
 }

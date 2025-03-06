@@ -12,7 +12,6 @@ import {
 import User from 'App/Models/User'
 import Route from 'App/Models/Route'
 import Token from 'App/Models/Token'
-import Contract from 'App/Models/Contract'
 
 export default class Project extends BaseModel {
   @column({ isPrimary: true })
@@ -42,9 +41,6 @@ export default class Project extends BaseModel {
     pivotTable: 'members',
   })
   public members: ManyToMany<typeof User>
-
-  @hasMany(() => Contract)
-  public contracts: HasMany<typeof Contract>
 
   @column.dateTime({ autoCreate: true })
   public createdAt: DateTime

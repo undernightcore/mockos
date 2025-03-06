@@ -77,6 +77,17 @@
       "name.required": "A name is necessary for your response",
       "name.maxLength": "The name can't be more than 200 characters long",
       "name.unique": "This response name already exists"
+    },
+    "deleteMany": {
+      "ids.required": "You need to indicate which responses you want to delete",
+      "ids.minLength": "You need to indicate at least one response",
+      "ids.exists": "There is a response that does not exist"
+    }
+  },
+  "processor": {
+    "create": {
+      "enabled.required": "You need to indicate if the processor is enabled",
+      "code.required": "You need to send the code the processor will execute"
     }
   },
   "route": {
@@ -115,15 +126,13 @@
       "name.minLength": "The name must have at least 3 characters",
       "name.maxLength": "The name can't be more than 200 characters long"
     },
-    "sort": {
-      "origin.required": "You need to indicate which route you are going to move",
-      "destination.required": "You need to indicate where you are going to move the route"
-    },
-    "move": {
-      "origin.required": "You need to indicate which route you are going to move",
-      "origin.exists": "The route you are trying to move does not exist",
-      "destination.required": "You need to indicate where you are going to move the route",
-      "destination.exists": "You need to move to an existing folder or root"
+    "moveandsort": {
+      "what.required": "You must specify the route you want to move",
+      "what.exists": "This route does not exist",
+      "into.required": "You must specify the folder where you want to drop the route",
+      "into.exists": "The folder you are trying to drop the route into does not exist",
+      "before.required": "You must specify before which route you want to drop the item",
+      "before.exists": "The route you indicate that should come after yours does not exist"
     }
   },
   "header": {
@@ -149,13 +158,10 @@
     }
   },
   "swagger": {
-    "update": {
-      "originalVersion.required": "You need to specify what your previous version was",
-      "swagger.required": "You need to send your edited swagger"
-    },
-    "rollback": {
-      "version.required": "You need to indicate what version you want to rollback to",
-      "version.exists": "The version you are trying to rollback to does not exist"
+    "parse": {
+      "swagger.required": "You need to indicate the swagger content to parse",
+      "reset.required": "You need to indicate if you want to reset the project",
+      "basePath.regex": "The basePath must begin with / and not end with /"
     }
   }
 }

@@ -77,6 +77,17 @@
       "name.required": "Es necesario un nombre para tu respuesta",
       "name.maxLength": "El nombre no puede tener más de 200 carácteres",
       "name.unique": "Este nombre de respuesta ya existe"
+    },
+    "deleteMany": {
+      "ids.required": "Es necesario que indiques el listado de respuestas a eliminar",
+      "ids.minLength": "Tienes que indicar al menos una respuesta",
+      "ids.exists": "Hay una respuesta que no existe"
+    }
+  },
+  "processor": {
+    "create": {
+      "enabled.required": "Es necesario que indiques si el procesado está activado",
+      "code.required": "Es necesario que envies el código a ejecutar en el procesado"
     }
   },
   "route": {
@@ -115,15 +126,13 @@
       "name.minLength": "Es necesario que el nombre tenga como mínimo 3 carácteres",
       "name.maxLength": "El nombre no puede tener más de 200 carácteres"
     },
-    "sort": {
-      "origin.required": "Es necesario que indiques que ruta vas a mover",
-      "destination.required": "Es necesario que indiques donde vas a mover la ruta"
-    },
-    "move": {
-      "origin.required": "Debes indicar qué ruta deseas mover",
-      "origin.exists": "La ruta que estás intentando mover no existe",
-      "destination.required": "Debes indicar a dónde deseas mover la ruta",
-      "destination.exists": "Debes moverla a una carpeta o raíz existente"
+    "moveandsort": {
+      "what.required": "Debes indicar la ruta que quieres mover",
+      "what.exists": "Esta ruta no existe",
+      "into.required": "Debes indicar en que carpeta quieres soltar la ruta",
+      "into.exists": "La carpeta donde estás intentado soltar la ruta no existe",
+      "before.required": "Debes indicar antes de que ruta quieres soltar el elemento",
+      "before.exists": "La ruta que indicas que quieres que sea la posterior a la tuya no existe"
     }
   },
   "header": {
@@ -149,13 +158,10 @@
     }
   },
   "swagger": {
-    "update": {
-      "originalVersion.required": "Necesitas especificar cuál fue tu versión anterior",
-      "swagger.required": "Necesitas enviar tu swagger editado"
-    },
-    "rollback": {
-      "version.required": "Necesitas indicar a qué versión deseas retroceder",
-      "version.exists": "La versión a la que estás intentando retroceder no existe"
+    "parse": {
+      "swagger.required": "Es necesario indicar el contenido swagger a parsear",
+      "reset.required": "Debe indicar si desea restablecer el proyecto",
+      "basePath.regex": "La ruta base debe empezar por / y no terminar por /"
     }
   }
 }

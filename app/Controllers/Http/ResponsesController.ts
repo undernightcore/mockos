@@ -1,15 +1,18 @@
-import { HttpContextContract } from '@ioc:Adonis/Core/HttpContext'
-import Route from 'App/Models/Route'
-import CreateResponseValidator from 'App/Validators/Response/CreateResponseValidator'
-import Database from '@ioc:Adonis/Lucid/Database'
-import Response from 'App/Models/Response'
-import EditResponseValidator from 'App/Validators/Response/EditResponseValidator'
-import Ws from 'App/Services/Ws'
 import { MultipartFileContract } from '@ioc:Adonis/Core/BodyParser'
+import { HttpContextContract } from '@ioc:Adonis/Core/HttpContext'
+import Database from '@ioc:Adonis/Lucid/Database'
 import { deleteIfOnceUsed, getFileName } from 'App/Helpers/Shared/file.helper'
-import Project from 'App/Models/Project'
-import DuplicateResponseValidator from 'App/Validators/Response/DuplicateResponseValidator'
 import { compressJson } from 'App/Helpers/Shared/string.helper'
+import Processor from 'App/Models/Processor'
+import Project from 'App/Models/Project'
+import Response from 'App/Models/Response'
+import Route from 'App/Models/Route'
+import Ws from 'App/Services/Ws'
+import CreateProcessorValidator from 'App/Validators/Processor/CreateProcessorValidator'
+import CreateResponseValidator from 'App/Validators/Response/CreateResponseValidator'
+import DeleteMultipleResponseValidator from 'App/Validators/Response/DeleteMultipleResponseValidator'
+import DuplicateResponseValidator from 'App/Validators/Response/DuplicateResponseValidator'
+import EditResponseValidator from 'App/Validators/Response/EditResponseValidator'
 
 export default class ResponsesController {
   public async create({ request, response, auth, bouncer, params, i18n }: HttpContextContract) {
@@ -38,21 +41,19 @@ export default class ResponsesController {
     })
   }
 
-  public async getList({ request, response, auth, bouncer, params, i18n }: HttpContextContract) {
+  public async getList({ response, auth, bouncer, params, i18n }: HttpContextContract) {
     await auth.authenticate()
     const route = await Route.findOrFail(params.id)
     const project = await Project.findOrFail(route.projectId)
-    const page = request.input('page', 1)
-    const perPage = request.input('perPage', 10)
     await bouncer.with('RoutePolicy').authorize('isNotFolder', route, i18n)
     await bouncer.with('ProjectPolicy').authorize('isMember', project, i18n)
     const responses = await route
       .related('responses')
       .query()
       .select(['id', 'name', 'enabled', 'status'])
+      .preload('processor')
       .orderBy('enabled', 'desc')
       .orderBy('created_at', 'desc')
-      .paginate(page, perPage)
     return response.ok(responses)
   }
 
@@ -152,6 +153,7 @@ export default class ResponsesController {
     const routeResponse = await Response.findOrFail(params.id)
     const route = await Route.findOrFail(routeResponse.routeId)
     const project = await Project.findOrFail(route.projectId)
+    const processor = await routeResponse.related('processor').query().first()
     await bouncer.with('RoutePolicy').authorize('isNotFolder', route, i18n)
     await bouncer.with('ProjectPolicy').authorize('isMember', project, i18n)
     const headers = await routeResponse.related('headers').query()
@@ -165,6 +167,13 @@ export default class ResponsesController {
       status: routeResponse.status,
       enabled: false,
     })
+    if (processor) {
+      await Processor.create({
+        responseId: newResponse.id,
+        code: processor.code,
+        enabled: processor.enabled,
+      })
+    }
     const newHeaders = headers.map(({ key, value }) => ({ key, value }))
     await newResponse.related('headers').createMany(newHeaders)
     Ws.io.emit(`route:${route.id}`, 'updated')
@@ -175,18 +184,96 @@ export default class ResponsesController {
 
   public async delete({ response, auth, bouncer, params, i18n }: HttpContextContract) {
     await auth.authenticate()
+
     const routeResponse = await Response.findOrFail(params.id)
     const route = await Route.findOrFail(routeResponse.routeId)
     const project = await Project.findOrFail(route.projectId)
     await bouncer.with('RoutePolicy').authorize('isNotFolder', route, i18n)
     await bouncer.with('ProjectPolicy').authorize('isMember', project, i18n)
+
     if (routeResponse.isFile) await deleteIfOnceUsed('responses', routeResponse.body)
     await routeResponse.delete()
+
     Ws.io.emit(`route:${route.id}`, 'updated')
     Ws.io.emit(`response:${routeResponse.id}`, 'deleted')
+
     return response.ok({
       message: i18n.formatMessage('responses.response.delete.response_deleted'),
     })
+  }
+
+  public async deleteMultiple({
+    request,
+    response,
+    auth,
+    bouncer,
+    i18n,
+    params,
+  }: HttpContextContract) {
+    await auth.authenticate()
+
+    const route = await Route.findOrFail(params.id)
+    await bouncer.with('RoutePolicy').authorize('isNotFolder', route, i18n)
+
+    const project = await Project.findOrFail(route.projectId)
+    await bouncer.with('ProjectPolicy').authorize('isMember', project, i18n)
+
+    const { ids } = await request.validate(DeleteMultipleResponseValidator)
+
+    for (const id of ids) {
+      const routeResponse = await Response.findOrFail(id)
+      await routeResponse.delete()
+      if (routeResponse.isFile) await deleteIfOnceUsed('responses', routeResponse.body)
+
+      Ws.io.emit(`response:${id}`, 'deleted')
+    }
+
+    Ws.io.emit(`route:${route.id}`, 'updated')
+
+    return response.ok({
+      message: i18n.formatMessage('responses.response.delete.responses_deleted'),
+    })
+  }
+
+  public async getProcessor({ auth, params, bouncer, i18n, response }: HttpContextContract) {
+    await auth.authenticate()
+    const routeResponse = await Response.findOrFail(params.id)
+    const route = await Route.findOrFail(routeResponse.routeId)
+    const project = await Project.findOrFail(route.projectId)
+    await bouncer.with('RoutePolicy').authorize('isNotFolder', route, i18n)
+    await bouncer.with('ProjectPolicy').authorize('isMember', project, i18n)
+
+    const [processor] = await routeResponse.related('processor').query()
+    return response.ok(processor)
+  }
+
+  public async editProcessor({
+    auth,
+    params,
+    bouncer,
+    i18n,
+    response,
+    request,
+  }: HttpContextContract) {
+    await auth.authenticate()
+
+    const data = await request.validate(CreateProcessorValidator)
+
+    const routeResponse = await Response.findOrFail(params.id)
+    const route = await Route.findOrFail(routeResponse.routeId)
+    const project = await Project.findOrFail(route.projectId)
+
+    await bouncer.with('RoutePolicy').authorize('isNotFolder', route, i18n)
+    await bouncer.with('ProjectPolicy').authorize('isMember', project, i18n)
+
+    const processor = await Processor.updateOrCreate(
+      { responseId: routeResponse.id },
+      { ...data, responseId: routeResponse.id }
+    )
+
+    Ws.io.emit(`route:${route.id}`, 'updated')
+
+    return response.ok(processor)
   }
 
   // Helper functions
