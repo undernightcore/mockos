@@ -1,14 +1,14 @@
-import { HttpContextContract } from '@ioc:Adonis/Core/HttpContext'
-import Project from 'App/Models/Project'
+import { I18nContract } from '@ioc:Adonis/Addons/I18n'
 import Drive from '@ioc:Adonis/Core/Drive'
-import { HttpError } from 'App/Models/HttpError'
+import { HttpContextContract } from '@ioc:Adonis/Core/HttpContext'
 import { RequestContract } from '@ioc:Adonis/Core/Request'
 import { ResponseContract } from '@ioc:Adonis/Core/Response'
-import { I18nContract } from '@ioc:Adonis/Addons/I18n'
-import Route from 'App/Models/Route'
+import { HttpError } from 'App/Models/HttpError'
+import Project from 'App/Models/Project'
 import Response from 'App/Models/Response'
-import { Buffer } from 'buffer'
+import Route from 'App/Models/Route'
 import Token from 'App/Models/Token'
+import { Buffer } from 'buffer'
 import Sandbox from 'v8-sandbox'
 
 export default class ApiController {
@@ -147,6 +147,7 @@ export default class ApiController {
           queryParams: request.qs(),
           url: request.url(),
           params,
+          body: request.body(),
           headers: request.headers(),
           content: enabledResponse.body,
         },
