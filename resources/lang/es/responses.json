@@ -1,9 +1,8 @@
 {
   "api": {
     "mock": {
-      "missing_project_header": "Necesitamos que envíes el proyecto de la petición",
-      "missing_token_header": "Necesitamos que te autentiques usando la cabecera 'token'",
-      "wrong_token": "Este token no es válido para este proyecto",
+      "missing_token": "Necesitamos que te autentiques usando un token",
+      "wrong_token": "Este token no es válido",
       "missing_route": "No se ha encontrado ninguna ruta con ese endpoint y métodos",
       "missing_response": "No se ha encontrado ninguna respuesta disponible para esa ruta y método",
       "invalid_json": "La respuesta JSON tiene una estructura inválida, por favor corrige el cuerpo de la respuesta"
@@ -45,9 +44,6 @@
     }
   },
   "project": {
-    "delete": {
-      "project_deleted": "Se ha eliminado el projecto {project} correctamente"
-    },
     "fork": {
       "fork_created": "Rama creada correctamente"
     },
@@ -77,13 +73,10 @@
     "delete": {
       "route_deleted": "Se ha eliminado la ruta"
     },
-    "sort": {
-      "route_mismatch": "Las rutas no corresponden al projecto correcto",
-      "context_mismatch": "Solo puedes ordenar rutas dentro de una misma profundidad",
-      "route_sorted": "Se ha movido correctamente"
-    },
-    "move": {
-      "route_moved": "Se ha movido correctamente"
+    "moveandsort": {
+      "successfully": "Se ha movido correctamente",
+      "folder_in_folder": "No puedes mover una carpeta dentro de otra carpeta",
+      "missing_data": "La ruta que intentabas mover ha desaparecido"
     }
   },
   "header": {
@@ -100,18 +93,8 @@
     }
   },
   "swagger": {
-    "edit": {
-      "invalid_swagger": "El Swagger no es válido. Por favor, corrígelo antes de guardar",
-      "outdated_version": "Existen cambios que necesitas mergear",
-      "invalid_version": "La versión que proporcionaste no sigue un formato válido",
-      "greater_version": "Tu versión debe ser mayor que la actual",
-      "swagger_saved": "Tu Swagger se ha actualizado a la {version}. ¡Gracias!"
-    },
-    "rollback": {
-      "rollback_successful": "Tu Swagger se ha bajado a la {version}. ¡Gracias!"
-    },
-    "get": {
-      "version_not_found": "Esta versión específica no existe"
+    "parse": {
+      "success": "El swagger ha sido importado correctamente"
     }
   }
 }

@@ -1,7 +1,17 @@
 import { DateTime } from 'luxon'
-import { BaseModel, BelongsTo, belongsTo, column, HasMany, hasMany } from '@ioc:Adonis/Lucid/Orm'
+import {
+  BaseModel,
+  BelongsTo,
+  belongsTo,
+  column,
+  HasMany,
+  hasMany,
+  HasOne,
+  hasOne,
+} from '@ioc:Adonis/Lucid/Orm'
 import Route from 'App/Models/Route'
 import Header from 'App/Models/Header'
+import Processor from './Processor'
 
 export default class Response extends BaseModel {
   @column({ isPrimary: true })
@@ -27,6 +37,9 @@ export default class Response extends BaseModel {
 
   @hasMany(() => Header)
   public headers: HasMany<typeof Header>
+
+  @hasOne(() => Processor)
+  public processor: HasOne<typeof Processor>
 
   @column({ serializeAs: null })
   public routeId: number

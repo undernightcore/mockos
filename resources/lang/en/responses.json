@@ -1,9 +1,8 @@
 {
   "api": {
     "mock": {
-      "missing_project_header": "We need you to submit the project of the request",
-      "missing_token_header": "You need to authenticate using the token header",
-      "wrong_token": "Invalid token for this project",
+      "missing_token": "You need to authenticate using a token",
+      "wrong_token": "Invalid token",
       "missing_route": "No route found with that endpoint and methods",
       "missing_response": "No response available for that route and method",
       "invalid_json": "JSON response has invalid structure, please fix response body"
@@ -45,9 +44,6 @@
     }
   },
   "project": {
-    "delete": {
-      "project_deleted": "The {project} project has been successfully deleted"
-    },
     "fork": {
       "fork_created": "Branch created successfully"
     },
@@ -77,13 +73,10 @@
     "delete": {
       "route_deleted": "The route has been deleted"
     },
-    "sort": {
-      "route_mismatch": "The routes don't correspond to the correct project",
-      "context_mismatch": "You can only sort routes at the same depth",
-      "route_sorted": "Moved successfully"
-    },
-    "move": {
-      "route_moved": "Moved successfully"
+    "moveandsort": {
+      "successfully": "Moved successfully",
+      "folder_in_folder": "You can't put a folder into another folder",
+      "missing_data": "The route you were trying to move has dissapeared"
     }
   },
   "header": {
@@ -103,18 +96,8 @@
     }
   },
   "swagger": {
-    "edit": {
-      "invalid_swagger": "Swagger is invalid. Please fix it before saving",
-      "outdated_version": "There are changes you need to merge",
-      "invalid_version": "The version you provided does not follow a valid format",
-      "greater_version": "Your version has to be greater than the current one",
-      "swagger_saved": "Your swagger has been updated to {version}. Thank you!"
-    },
-    "rollback": {
-      "rollback_successful": "Your swagger has been downgraded to {version}. Thank you!"
-    },
-    "get": {
-      "version_not_found": "This specific version does not exist"
+    "parse": {
+      "success": "Swagger imported successfully"
     }
   }
 }
