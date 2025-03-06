@@ -1,8 +1,10 @@
-![Banner](resources/images/graphics/mockos-banner.png)
+<div align="center">
+    <img alt="mockos" height="200px" src="https://github.com/undernightcore/mockos-ui/blob/assets/mockos.png?raw=true">
+</div>
 
-## Mockos - Build mocks for your API without code or config files
+## Mockos
 
-Mockos is a **useful and practical tool for developers** looking to test their applications with **custom API mocks**, in a **collaborative way and without the need to install anything** on their computer.
+Create API mocks **collaboratively**, **fully online** and with **custom code logic**.
 
 ## Deployments
 
@@ -14,72 +16,21 @@ If you find any bugs/vulnerabilities feel free to open a new issue or/and contac
 ## Features
 
 - Create API responses using a **simple JSON editor**.
-- Stay in sync with other people thanks to **realtime and compare capabilities**. 
+- Create **fully dynamic responses** with our **JS sandbox**, like a **real API**!
+- Stay in sync with other people thanks to **realtime and compare capabilities**.
 - Create **multiple projects** and invite **multiple members** to help you mock API responses.
-- Simplified **branch system** in case you introduce **breaking changes**.
-
-## Run for development (only backend)
-
-Clone the project
-
-```bash
-  git clone https://github.com/undernightcore/mockos-back.git
-```
-
-Install dependencies
-
-```bash
-  npm install
-```
-
-Set up DB connection in .env
-
-```bash
-  cp .env.example .env
-```
-
-Only need to change following variables
-```bash
-PG_HOST=<change me> 
-PG_PORT=<change me>
-PG_USER=<change me>
-PG_PASSWORD=<change me>
-PG_DB_NAME=<change me>
-```
-
-Run migrations
-
-```bash
-  node ace migration:run
-```
-
-Start the server
-
-```bash
-  node ace serve --watch
-```
+- **Import OpenAPI/Swagger** contracts and _create mocks automatically_.
 
 ## Host your own instance using Docker
 
 - Check our [self-hosting guide.](https://docs.mockos.io/docs/getting-started/self-hosting)
 
-## Roadmap
+## Screenshots
 
-- Check what I'm working on here -> https://github.com/users/undernightcore/projects/1
+![Projects](https://github.com/undernightcore/mockos-ui/blob/assets/projects.png?raw=true)
 
+![Routes](https://github.com/undernightcore/mockos-ui/blob/assets/routes.png?raw=true)
 
-## FAQ
+![Response](https://github.com/undernightcore/mockos-ui/blob/assets/response.png?raw=true)
 
-#### What tech stack is this using?
-
-For the Frontend: Angular, Angular Material, JSON editor, Socket.io, Luxon, Swal and Ngrx Translate.
-
-For the Backend: AdonisJS, Socket.io and PostgreSQL.
-
-#### How can I contribute?
-
-Thank you for considering contributing! I am working in an easy contributing guide that you can easily follow. 
-## Support
-
-For support, email undernightcore@gmail.com or my twitter @undernightcore. I will happily solve any issue that you may encounter, but first check if there is an already open one. 
-
+![Live](https://github.com/undernightcore/mockos-ui/blob/assets/live.png?raw=true)
