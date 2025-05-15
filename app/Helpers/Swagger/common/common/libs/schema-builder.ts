@@ -1,4 +1,4 @@
-import { RouteDefault, RouteResponseDefault } from 'App/SwaggerParser/common/common'
+import { RouteDefault, RouteResponseDefault } from 'App/Helpers/Swagger/common/common'
 import { Header, Methods, Route, RouteResponse, RouteType } from '../models/route.model'
 
 /**
