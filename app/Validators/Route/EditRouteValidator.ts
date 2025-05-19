@@ -1,5 +1,5 @@
-import { schema, rules } from '@ioc:Adonis/Core/Validator'
 import { HttpContextContract } from '@ioc:Adonis/Core/HttpContext'
+import { rules, schema } from '@ioc:Adonis/Core/Validator'
 
 export default class EditRouteValidator {
   constructor(private ctx: HttpContextContract) {}
@@ -23,7 +23,7 @@ export default class EditRouteValidator {
       ]
     ),
     endpoint: schema.string({}, [
-      rules.regex(new RegExp('^/([a-zA-Z0-9{}-]+)*(/[a-zA-Z0-9{}-]+)*$')),
+      rules.regex(new RegExp('^/([a-zA-Z0-9{}_-]+)*(/[a-zA-Z0-9{}_-]+)*$')),
       rules.maxLength(2000),
     ]),
     enabled: schema.boolean(),

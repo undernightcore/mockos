@@ -1,5 +1,5 @@
-import { schema, rules } from '@ioc:Adonis/Core/Validator'
 import { HttpContextContract } from '@ioc:Adonis/Core/HttpContext'
+import { rules, schema } from '@ioc:Adonis/Core/Validator'
 
 export default class CreateRouteValidator {
   private isFolder = Boolean(this.ctx.request.input('isFolder', false))
@@ -27,7 +27,7 @@ export default class CreateRouteValidator {
             ]
           ),
           endpoint: schema.string({}, [
-            rules.regex(new RegExp('^/([a-zA-Z0-9{}-]+)*(/[a-zA-Z0-9{}-]+)*$')),
+            rules.regex(new RegExp('^/([a-zA-Z0-9{}_-]+)*(/[a-zA-Z0-9{}_-]+)*$')),
             rules.maxLength(2000),
           ]),
           parentFolderId: schema.number.nullable([
