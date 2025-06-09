@@ -161,6 +161,6 @@ export default class ApiController {
       return String(value)
     }
 
-    return enabledResponse.body
+    return file ?? enabledResponse.body
   }
 }
