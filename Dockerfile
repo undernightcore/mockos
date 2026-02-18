@@ -1,4 +1,4 @@
-FROM node:20 as build
+FROM node:22 as build
 
 WORKDIR /usr/local/app
 
@@ -25,7 +25,7 @@ ENV NODE_ENV=development
 RUN npm install
 RUN node ace build --production --ignore-ts-errors
 
-FROM node:lts
+FROM node:22
 WORKDIR /usr/local/app
 COPY --from=build /usr/local/app/build/ /usr/local/app/
 ENV NODE_ENV=production
