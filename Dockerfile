@@ -1,4 +1,4 @@
-FROM node:22 as build
+FROM node:20 as build
 
 WORKDIR /usr/local/app
 
