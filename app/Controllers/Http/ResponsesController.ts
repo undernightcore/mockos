@@ -333,7 +333,7 @@ export default class ResponsesController {
     ${
       isValidJson(response.body)
         ? `The content is a JSON string implementing this JSON schema: ${JSON.stringify(
-            toJsonSchema(JSON.parse(response.body))
+            toJsonSchema(JSON.parse(response.body), { arrays: { mode: 'first' } })
           )}`
         : `The content string will be exactly: "${response.body}"`
     }
