@@ -2,17 +2,19 @@ import { MultipartFileContract } from '@ioc:Adonis/Core/BodyParser'
 import { HttpContextContract } from '@ioc:Adonis/Core/HttpContext'
 import Database from '@ioc:Adonis/Lucid/Database'
 import { deleteIfOnceUsed, getFileName } from 'App/Helpers/Shared/file.helper'
-import { compressJson } from 'App/Helpers/Shared/string.helper'
+import { compressJson, isValidJson } from 'App/Helpers/Shared/string.helper'
 import Processor from 'App/Models/Processor'
 import Project from 'App/Models/Project'
 import Response from 'App/Models/Response'
 import Route from 'App/Models/Route'
 import Ws from 'App/Services/Ws'
+import CreateProcessorPromptValidator from 'App/Validators/Processor/CreateProcessorPromptValidator'
 import CreateProcessorValidator from 'App/Validators/Processor/CreateProcessorValidator'
 import CreateResponseValidator from 'App/Validators/Response/CreateResponseValidator'
 import DeleteMultipleResponseValidator from 'App/Validators/Response/DeleteMultipleResponseValidator'
 import DuplicateResponseValidator from 'App/Validators/Response/DuplicateResponseValidator'
 import EditResponseValidator from 'App/Validators/Response/EditResponseValidator'
+import toJsonSchema from 'to-json-schema'
 
 export default class ResponsesController {
   public async create({ request, response, auth, bouncer, params, i18n }: HttpContextContract) {
@@ -276,6 +278,21 @@ export default class ResponsesController {
     return response.ok(processor)
   }
 
+  public async getPrompt({ auth, params, bouncer, i18n, response, request }: HttpContextContract) {
+    await auth.authenticate()
+
+    const data = await request.validate(CreateProcessorPromptValidator)
+
+    const routeResponse = await Response.findOrFail(params.id)
+    const route = await Route.findOrFail(routeResponse.routeId)
+    const project = await Project.findOrFail(route.projectId)
+
+    await bouncer.with('RoutePolicy').authorize('isNotFolder', route, i18n)
+    await bouncer.with('ProjectPolicy').authorize('isMember', project, i18n)
+
+    return response.ok({ prompt: this.#preparePrompt(routeResponse, data.request) })
+  }
+
   // Helper functions
 
   async #uploadFile(file: MultipartFileContract) {
@@ -291,5 +308,36 @@ export default class ResponsesController {
       .first()
     if (!contentType) return
     await contentType.delete()
+  }
+
+  #preparePrompt(response: Response, prompt: string) {
+    return `You are generating JavaScript code that will run inside a highly restricted mock API environment. 
+    Your response MUST follow these rules strictly: 
+    
+    * Return ONLY a JavaScript code snippet. 
+    * Do NOT include explanations, comments, markdown, or any extra text. 
+    * The code must always call: setResult({ value: <string> }). 
+    * The value must always be a string. If returning JSON, you MUST use JSON.stringify(...).
+    * The request body (content) is ALWAYS a string. Parse it if needed. 
+    * You only have access to standard built-in JavaScript methods.
+    * There is NO HTTP access, NO external libraries, and NO system APIs. 
+    
+    Available global variables: 
+    
+    * queryParams: Record<string, string | undefined> 
+    * params: Record<string, string | undefined> 
+    * headers: Record<string, string | undefined> 
+    * url: string 
+    * content: string 
+    
+    ${
+      isValidJson(response.body)
+        ? `The content is a JSON string implementing this JSON schema: ${toJsonSchema(
+            JSON.parse(response.body)
+          )}`
+        : `The content string will be exactly: "${response.body}"`
+    }
+
+    User request: ${prompt}`
   }
 }

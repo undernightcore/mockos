@@ -88,6 +88,9 @@
     "create": {
       "enabled.required": "You need to indicate if the processor is enabled",
       "code.required": "You need to send the code the processor will execute"
+    },
+    "prompt": {
+      "request.required": "You need to send the user request for the prompt"
     }
   },
   "route": {

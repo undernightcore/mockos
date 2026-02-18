@@ -9,5 +9,6 @@ Route.group(() => {
   Route.get(':id/headers', 'HeadersController.getList')
   Route.post(':id/headers', 'HeadersController.create')
   Route.get(':id/processor', 'ResponsesController.getProcessor')
+  Route.get(':id/prompt', 'ResponsesController.getPrompt')
   Route.post(':id/processor', 'ResponsesController.editProcessor')
 }).prefix('responses')

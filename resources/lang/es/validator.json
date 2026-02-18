@@ -88,6 +88,9 @@
     "create": {
       "enabled.required": "Es necesario que indiques si el procesado está activado",
       "code.required": "Es necesario que envies el código a ejecutar en el procesado"
+    },
+    "prompt": {
+      "request.required": "Es necesario la petición del usuario para el prompt"
     }
   },
   "route": {
