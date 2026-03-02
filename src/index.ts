@@ -7,12 +7,14 @@ import { httpErrorHandler } from "./handlers/http";
 import { zodErrorHandler } from "./handlers/zod";
 import { getBanner } from "./helpers/banner";
 import { authRouter } from "./routes/auth";
+import { projectsRouter } from "./routes/projects";
 
 const app = express();
 
 app.use(json());
 
 app.use("/auth", authRouter);
+app.use("/projects", projectsRouter);
 
 app.use(zodErrorHandler);
 app.use(httpErrorHandler);
