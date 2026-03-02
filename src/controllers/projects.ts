@@ -46,7 +46,12 @@ export const createProject: RequestHandler = async (req, res) => {
     });
 
     await tx.members.create({
-      data: { projectId: created.id, userId: user.id, verified: true },
+      data: {
+        projectId: created.id,
+        userId: user.id,
+        verified: true,
+        role: "ADMIN",
+      },
     });
 
     return created;
@@ -60,12 +65,20 @@ export const editProject: RequestHandler = async (req, res) => {
   const data = createProjectValidator.parse(req.body);
 
   const existing = await prisma.project.findUnique({
+    include: { members: true },
     where: {
       id: Number(req.params.projectId),
       members: { some: { userId: user.id, verified: true } },
     },
   });
   if (!existing) throw new HttpError(404, "Project not found");
+
+  const editor = existing.members.some(
+    (member) =>
+      member.userId === user.id &&
+      (member.role === "ADMIN" || member.role === "EDITOR")
+  );
+  if (!editor) throw new HttpError(403, "You cannot edit this project");
 
   const updated = await prisma.project.update({
     where: {

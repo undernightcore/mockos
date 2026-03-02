@@ -32,12 +32,19 @@ model Project {
   members      Members[]
 }
 
+enum MemberRole {
+  VIEWER
+  EDITOR
+  ADMIN
+}
+
 model Members {
-  id        Int     @id @default(autoincrement())
-  user      User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+  id        Int        @id @default(autoincrement())
+  user      User       @relation(fields: [userId], references: [id], onDelete: Cascade)
   userId    Int
-  project   Project @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  project   Project    @relation(fields: [projectId], references: [id], onDelete: Cascade)
   projectId Int
+  role      MemberRole
   verified  Boolean
 
   @@unique([projectId, userId])
