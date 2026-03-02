@@ -1,4 +1,5 @@
 .env
+.DS_Store
 node_modules
 dist
 /prisma/generated/prisma
