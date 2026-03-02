@@ -1,0 +1,36 @@
+{
+  "name": "mockos",
+  "version": "3.0.0",
+  "description": "",
+  "homepage": "https://github.com/undernightcore/mockos#readme",
+  "bugs": {
+    "url": "https://github.com/undernightcore/mockos/issues"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/undernightcore/mockos.git"
+  },
+  "license": "ISC",
+  "author": "undernightcore@gmail.com",
+  "type": "module",
+  "main": "dist/index.mjs",
+  "scripts": {
+    "start": "tsx ./src/index.ts",
+    "build": "pkgroll .",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "devDependencies": {
+    "@types/node": "^25.3.3",
+    "@types/pg": "^8.18.0",
+    "pkgroll": "^2.27.0",
+    "prisma": "^7.4.2",
+    "tsx": "^4.21.0",
+    "typescript": "^5.9.3"
+  },
+  "dependencies": {
+    "@prisma/adapter-pg": "^7.4.2",
+    "@prisma/client": "^7.4.2",
+    "dotenv": "^17.3.1",
+    "pg": "^8.19.0"
+  }
+}

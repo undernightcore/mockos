@@ -1,0 +1,113 @@
+generator client {
+  provider = "prisma-client"
+  output   = "./generated"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+model User {
+  id        Int       @id @default(autoincrement())
+  name      String
+  email     String    @unique
+  password  String?
+  verified  Boolean
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+  members   Members[]
+}
+
+model Project {
+  id           Int       @id @default(autoincrement())
+  name         String
+  description  String?
+  forkedFrom   Project?  @relation(name: "forks", fields: [forkedFromId], references: [id])
+  forkedFromId Int?
+  forks        Project[] @relation(name: "forks")
+  createdAt    DateTime  @default(now())
+  updatedAt    DateTime  @updatedAt
+  routes       Route[]
+  tokens       Token[]
+  members      Members[]
+}
+
+model Members {
+  id        Int     @id @default(autoincrement())
+  user      User    @relation(fields: [userId], references: [id])
+  userId    Int
+  project   Project @relation(fields: [projectId], references: [id])
+  projectId Int
+  verified  Boolean
+}
+
+model Token {
+  id        Int      @id @default(autoincrement())
+  name      String
+  token     String
+  project   Project  @relation(fields: [projectId], references: [id])
+  projectId Int
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+enum RouteMethod {
+  GET
+  POST
+  DELETE
+  PATCH
+  PUT
+}
+
+model Route {
+  id             Int          @id @default(autoincrement())
+  name           String
+  method         RouteMethod?
+  endpoint       String?
+  enabled        Boolean
+  order          Int
+  folder         Boolean
+  parentFolder   Route?       @relation(name: "children", fields: [parentFolderId], references: [id])
+  parentFolderId Int?
+  children       Route[]      @relation(name: "children")
+  project        Project      @relation(fields: [projectId], references: [id])
+  projectId      Int
+  createdAt      DateTime     @default(now())
+  updatedAt      DateTime     @updatedAt
+  responses      Response[]
+}
+
+model Response {
+  id         Int         @id @default(autoincrement())
+  name       String
+  status     Int
+  body       String
+  file       Boolean
+  enabled    Boolean
+  route      Route       @relation(fields: [routeId], references: [id])
+  routeId    Int
+  createdAt  DateTime    @default(now())
+  updatedAt  DateTime    @updatedAt
+  processors Processor[]
+  headers    Header[]
+}
+
+model Header {
+  id         Int      @id @default(autoincrement())
+  key        String
+  value      String
+  response   Response @relation(fields: [responseId], references: [id])
+  responseId Int
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+
+  @@unique([key, responseId])
+}
+
+model Processor {
+  id         Int      @id @default(autoincrement())
+  code       String
+  enabled    Boolean
+  response   Response @relation(fields: [responseId], references: [id])
+  responseId Int
+}
