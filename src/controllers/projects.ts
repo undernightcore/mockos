@@ -73,12 +73,10 @@ export const editProject: RequestHandler = async (req, res) => {
   });
   if (!existing) throw new HttpError(404, "Project not found");
 
-  const editor = existing.members.some(
-    (member) =>
-      member.userId === user.id &&
-      (member.role === "ADMIN" || member.role === "EDITOR")
+  const admin = existing.members.some(
+    (member) => member.userId === user.id && member.role === "ADMIN"
   );
-  if (!editor) throw new HttpError(403, "You cannot edit this project");
+  if (!admin) throw new HttpError(403, "Only the admin can edit a project");
 
   const updated = await prisma.project.update({
     where: {
