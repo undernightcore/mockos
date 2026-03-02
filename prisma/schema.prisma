@@ -39,6 +39,8 @@ model Members {
   project   Project @relation(fields: [projectId], references: [id])
   projectId Int
   verified  Boolean
+
+  @@unique([projectId, userId])
 }
 
 model Token {
