@@ -1,7 +1,9 @@
 import { Router } from "express";
 import {
   loginUser,
+  loginWithGoogle,
   registerUser,
+  requestLoginWithGoogle,
   requestResetUser,
   requestVerifyUser,
   resetUser,
@@ -17,5 +19,8 @@ router.post("/verify", verifyUser);
 router.post("/login", loginUser);
 router.post("/send-reset", requestResetUser);
 router.post("/reset", resetUser);
+
+router.get("/glogin", requestLoginWithGoogle);
+router.post("/glogin", loginWithGoogle);
 
 export const authRouter = router;

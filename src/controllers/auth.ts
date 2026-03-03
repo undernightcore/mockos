@@ -3,8 +3,10 @@ import { HttpError } from "../errors/http";
 import { hashPassword, isValidPassword } from "../helpers/bcrypt";
 import { createToken, validateToken } from "../helpers/jwt";
 import { sendConfirmationEmail, sendResetEmail } from "../services/email";
+import { generateGoogleUrl, verifyGoogleToken } from "../services/google";
 import { prisma } from "../services/prisma";
 import { TokenTypeEnum } from "../types/token";
+import { loginWithGoogleValidator } from "../validators/auth/google";
 import { loginValidator } from "../validators/auth/login";
 import { registerValidator } from "../validators/auth/register";
 import { requestResetValidator } from "../validators/auth/request-reset";
@@ -173,4 +175,28 @@ export const resetUser: RequestHandler = async (req, res) => {
   return res
     .status(200)
     .json({ token: createToken(validated.userId, TokenTypeEnum.AUTH) });
+};
+
+export const requestLoginWithGoogle: RequestHandler = async (_, res) => {
+  const url = generateGoogleUrl();
+
+  return res.status(200).json({ url });
+};
+
+export const loginWithGoogle: RequestHandler = async (req, res) => {
+  const data = loginWithGoogleValidator.parse(req.body);
+
+  const token = await verifyGoogleToken(data.code);
+  if (!token || !token.email || !token.name)
+    throw new HttpError(403, "Authentication has failed");
+
+  const user = await prisma.user.upsert({
+    where: { email: token.email },
+    create: { email: token.email, name: token.name, verified: true },
+    update: { email: token.email, name: token.name, verified: true },
+  });
+
+  return res.status(200).json({
+    token: createToken(user.id, TokenTypeEnum.AUTH),
+  });
 };
