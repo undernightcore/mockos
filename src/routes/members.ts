@@ -1,8 +1,16 @@
 import { Router } from "express";
-import { inviteMember } from "../controllers/members";
+import {
+  deleteMember,
+  editMember,
+  getMemberList,
+  inviteMember,
+} from "../controllers/members";
 
 const router = Router({ mergeParams: true });
 
-router.post("/members", inviteMember);
+router.post("/", inviteMember);
+router.get("/", getMemberList);
+router.delete("/:memberId", deleteMember);
+router.put("/:memberId", editMember);
 
 export const membersRouter = router;

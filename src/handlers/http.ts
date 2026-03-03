@@ -4,12 +4,12 @@ import { logHttp } from "../helpers/log";
 
 export const httpErrorHandler: ErrorRequestHandler = (
   error,
-  _req,
+  req,
   res,
   next
 ) => {
   if (error instanceof HttpError) {
-    logHttp(error.status, error.message);
+    logHttp(error.status, req.method, req.path, error.message);
     return res.status(error.status).json({ message: error.message });
   } else {
     next(error);
