@@ -22,7 +22,7 @@ model Project {
   id           Int       @id @default(autoincrement())
   name         String
   description  String?
-  forkedFrom   Project?  @relation(name: "forks", fields: [forkedFromId], references: [id])
+  forkedFrom   Project?  @relation(name: "forks", fields: [forkedFromId], references: [id], onDelete: SetNull)
   forkedFromId Int?
   forks        Project[] @relation(name: "forks")
   createdAt    DateTime  @default(now())
@@ -54,7 +54,7 @@ model Token {
   id        Int      @id @default(autoincrement())
   name      String
   token     String
-  project   Project  @relation(fields: [projectId], references: [id])
+  project   Project  @relation(fields: [projectId], references: [id], onDelete: Cascade)
   projectId Int
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -76,10 +76,10 @@ model Route {
   enabled        Boolean
   order          Int
   folder         Boolean
-  parentFolder   Route?       @relation(name: "children", fields: [parentFolderId], references: [id])
+  parentFolder   Route?       @relation(name: "children", fields: [parentFolderId], references: [id], onDelete: SetNull)
   parentFolderId Int?
   children       Route[]      @relation(name: "children")
-  project        Project      @relation(fields: [projectId], references: [id])
+  project        Project      @relation(fields: [projectId], references: [id], onDelete: Cascade)
   projectId      Int
   createdAt      DateTime     @default(now())
   updatedAt      DateTime     @updatedAt
@@ -93,7 +93,7 @@ model Response {
   body       String
   file       Boolean
   enabled    Boolean
-  route      Route       @relation(fields: [routeId], references: [id])
+  route      Route       @relation(fields: [routeId], references: [id], onDelete: Cascade)
   routeId    Int
   createdAt  DateTime    @default(now())
   updatedAt  DateTime    @updatedAt
@@ -105,7 +105,7 @@ model Header {
   id         Int      @id @default(autoincrement())
   key        String
   value      String
-  response   Response @relation(fields: [responseId], references: [id])
+  response   Response @relation(fields: [responseId], references: [id], onDelete: Cascade)
   responseId Int
   createdAt  DateTime @default(now())
   updatedAt  DateTime @updatedAt
@@ -117,6 +117,6 @@ model Processor {
   id         Int      @id @default(autoincrement())
   code       String
   enabled    Boolean
-  response   Response @relation(fields: [responseId], references: [id])
+  response   Response @relation(fields: [responseId], references: [id], onDelete: Cascade)
   responseId Int
 }

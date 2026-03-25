@@ -82,12 +82,12 @@ export const createRoute: RequestHandler = async (req, res) => {
   });
   if (!project) throw new HttpError(404, "Project not found");
 
-  const admin = project.members.some(
+  const editor = project.members.some(
     (member) =>
       member.userId === user.id &&
       (member.role === "ADMIN" || member.role === "EDITOR")
   );
-  if (!admin) throw new HttpError(403, "You are not allowed to create routes");
+  if (!editor) throw new HttpError(403, "You are not allowed to create routes");
 
   const existing = !data.folder
     ? await prisma.route.findFirst({
@@ -183,12 +183,12 @@ export const editRoute: RequestHandler = async (req, res) => {
   });
   if (!project) throw new HttpError(404, "Project not found");
 
-  const admin = project.members.some(
+  const editor = project.members.some(
     (member) =>
       member.userId === user.id &&
       (member.role === "ADMIN" || member.role === "EDITOR")
   );
-  if (!admin) throw new HttpError(403, "You are not allowed to edit routes");
+  if (!editor) throw new HttpError(403, "You are not allowed to edit routes");
 
   const route = await prisma.route.findUnique({
     where: { id: Number(req.params.routeId), projectId: project.id },
@@ -233,12 +233,12 @@ export const sortRoute: RequestHandler = async (req, res) => {
   });
   if (!project) throw new HttpError(404, "Project not found");
 
-  const admin = project.members.some(
+  const editor = project.members.some(
     (member) =>
       member.userId === user.id &&
       (member.role === "ADMIN" || member.role === "EDITOR")
   );
-  if (!admin) throw new HttpError(403, "You are not allowed to sort routes");
+  if (!editor) throw new HttpError(403, "You are not allowed to sort routes");
 
   await prisma.$transaction(
     async (tx) => {
@@ -286,7 +286,13 @@ export const sortRoute: RequestHandler = async (req, res) => {
           : folder.children.at(-1)?.order ?? folder.order;
 
         await tx.route.updateMany({
-          where: { projectId: project.id, order: { gt: last } },
+          where: {
+            projectId: project.id,
+            order: { gt: last },
+            id: {
+              not: route.id,
+            },
+          },
           data: { order: { increment: 1 } },
         });
 
@@ -317,20 +323,33 @@ export const sortRoute: RequestHandler = async (req, res) => {
           throw new HttpError(404, "The route that comes after was not found");
 
         const lastRoute = await tx.route.findFirst({
-          where: { projectId: project.id },
+          where: {
+            projectId: project.id,
+            id: {
+              notIn: [route.id, ...route.children.map((child) => child.id)],
+            },
+          },
           orderBy: { order: "asc" },
         });
 
         const last = before ? before.order - 1 : lastRoute?.order ?? 0;
 
         await tx.route.updateMany({
-          where: { projectId: project.id, order: { gt: last } },
-          data: { order: { increment: 1 } },
+          where: {
+            projectId: project.id,
+            order: { gt: last },
+            id: {
+              notIn: [route.id, ...route.children.map((child) => child.id)],
+            },
+          },
+          data: { order: { increment: (route.children.length ?? 0) + 1 } },
         });
 
-        await tx.route.update({
-          where: { id: route.id },
-          data: { order: last + 1 },
+        await tx.route.updateMany({
+          where: {
+            id: { in: [route.id, ...route.children.map((child) => child.id)] },
+          },
+          data: { order: { increment: last + 1 - route.order } },
         });
       }
     },
@@ -338,4 +357,48 @@ export const sortRoute: RequestHandler = async (req, res) => {
       isolationLevel: "Serializable",
     }
   );
+
+  return res.status(200).json({ message: "Sorted successfully!" });
+};
+
+export const deleteRoute: RequestHandler = async (req, res) => {
+  const user = await authenticateUser(req);
+
+  const project = await prisma.project.findUnique({
+    include: { members: true },
+    where: {
+      id: Number(req.params.projectId),
+      members: { some: { userId: user.id, verified: true } },
+    },
+  });
+  if (!project) throw new HttpError(404, "Project not found");
+
+  const editor = project.members.some(
+    (member) =>
+      member.userId === user.id &&
+      (member.role === "ADMIN" || member.role === "EDITOR")
+  );
+  if (!editor) throw new HttpError(403, "You are not allowed to delete routes");
+
+  await prisma.$transaction(
+    async (tx) => {
+      const route = await tx.route.findUnique({
+        where: { id: Number(req.params.routeId), projectId: project.id },
+      });
+      if (!route) throw new HttpError(404, "Route not found");
+
+      await tx.route.delete({ where: { id: route.id } });
+
+      await tx.route.updateMany({
+        where: {
+          projectId: project.id,
+          order: { gt: route.order },
+        },
+        data: { order: { decrement: 1 } },
+      });
+    },
+    { isolationLevel: "Serializable" }
+  );
+
+  return res.status(200).json({ message: "Deleted succesfully!" });
 };
