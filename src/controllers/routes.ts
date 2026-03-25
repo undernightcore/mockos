@@ -1,3 +1,4 @@
+import { findLastIndex } from "es-toolkit/compat";
 import { RequestHandler } from "express";
 import { HttpError } from "../errors/http";
 import { authenticateUser } from "../helpers/auth";
@@ -242,116 +243,67 @@ export const sortRoute: RequestHandler = async (req, res) => {
 
   await prisma.$transaction(
     async (tx) => {
-      const route = await tx.route.findUnique({
-        include: { children: { orderBy: { order: "asc" } } },
-        where: { id: Number(req.params.routeId), projectId: project.id },
+      const routes = await tx.route.findMany({
+        where: { projectId: project.id },
+        orderBy: { order: "asc" },
       });
+
+      const route = routes.find((r) => r.id === Number(req.params.routeId));
       if (!route) throw new HttpError(404, "Route not found");
 
-      if (data.into) {
-        // When introducing something into a folder
-        if (route.folder)
-          throw new HttpError(400, "You cannot introduce folders into folders");
+      if (data.into && route.folder)
+        throw new HttpError(400, "You cannot introduce folders into folders");
 
-        await tx.route.updateMany({
-          where: { projectId: project.id, order: { gt: route.order } },
-          data: { order: { decrement: 1 } },
-        });
+      const folder = data.into
+        ? routes.find((r) => r.id === data.into && r.folder)
+        : undefined;
 
-        const folder = await tx.route.findUnique({
-          include: { children: { orderBy: { order: "asc" } } },
-          where: { id: data.into, projectId: project.id, folder: true },
-        });
+      if (data.into && !folder)
+        throw new HttpError(
+          404,
+          "The folder you are trying to put the route into does not exist"
+        );
 
-        if (!folder)
-          throw new HttpError(
-            404,
-            "The folder you are trying to put the route into does not exist"
-          );
+      const before = data.before
+        ? routes.find(
+            (r) =>
+              r.id === data.before && r.parentFolderId === (folder?.id ?? null)
+          )
+        : undefined;
+      if (data.before && !before)
+        throw new HttpError(404, "The route that comes after was not found");
 
-        const before = data.before
-          ? await tx.route.findUnique({
-              where: {
-                id: data.before,
-                projectId: project.id,
-                parentFolderId: folder.id,
-              },
-            })
-          : undefined;
-        if (data.before && !before)
-          throw new HttpError(404, "The route that comes after was not found");
+      const from = routes.findIndex((r) => r.id === route.id);
+      const moving = routes.splice(
+        from,
+        routes.reduce(
+          (acc, r) => (r.parentFolderId === route.id ? acc + 1 : acc),
+          1
+        )
+      );
+      const to = before
+        ? routes.findIndex((r) => r.id === before.id)
+        : folder
+        ? findLastIndex(
+            routes,
+            (r) => r.parentFolderId === folder.id || r.id === folder.id
+          ) + 1
+        : routes.length;
+      routes.splice(to, 0, ...moving);
 
-        const last = before
-          ? before.order - 1
-          : folder.children.at(-1)?.order ?? folder.order;
-
-        await tx.route.updateMany({
-          where: {
-            projectId: project.id,
-            order: { gt: last },
-            id: {
-              not: route.id,
-            },
+      await tx.project.update({
+        where: {
+          id: Number(req.params.projectId),
+        },
+        data: {
+          routes: {
+            updateMany: routes.map((r, i) => ({
+              where: { id: r.id },
+              data: { order: i + 1, parentFolderId: r.parentFolderId },
+            })),
           },
-          data: { order: { increment: 1 } },
-        });
-
-        await tx.route.update({
-          where: { id: route.id },
-          data: { order: last + 1 },
-        });
-      } else {
-        // When not introduced into a folder
-        await tx.route.updateMany({
-          where: {
-            projectId: project.id,
-            order: { gt: route.children.at(-1)?.order ?? route.order },
-          },
-          data: { order: { decrement: (route.children.length ?? 0) + 1 } },
-        });
-
-        const before = data.before
-          ? await tx.route.findUnique({
-              where: {
-                id: data.before,
-                projectId: project.id,
-                parentFolderId: null,
-              },
-            })
-          : undefined;
-        if (data.before && !before)
-          throw new HttpError(404, "The route that comes after was not found");
-
-        const lastRoute = await tx.route.findFirst({
-          where: {
-            projectId: project.id,
-            id: {
-              notIn: [route.id, ...route.children.map((child) => child.id)],
-            },
-          },
-          orderBy: { order: "asc" },
-        });
-
-        const last = before ? before.order - 1 : lastRoute?.order ?? 0;
-
-        await tx.route.updateMany({
-          where: {
-            projectId: project.id,
-            order: { gt: last },
-            id: {
-              notIn: [route.id, ...route.children.map((child) => child.id)],
-            },
-          },
-          data: { order: { increment: (route.children.length ?? 0) + 1 } },
-        });
-
-        await tx.route.updateMany({
-          where: {
-            id: { in: [route.id, ...route.children.map((child) => child.id)] },
-          },
-          data: { order: { increment: last + 1 - route.order } },
-        });
-      }
+        },
+      });
     },
     {
       isolationLevel: "Serializable",

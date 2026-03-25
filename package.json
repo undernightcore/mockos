@@ -36,6 +36,7 @@
     "bcrypt": "^6.0.0",
     "chalk": "^5.6.2",
     "dotenv": "^17.3.1",
+    "es-toolkit": "^1.45.1",
     "express": "^5.2.1",
     "google-auth-library": "^10.6.1",
     "jsonwebtoken": "^9.0.3",
