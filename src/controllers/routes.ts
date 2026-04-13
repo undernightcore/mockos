@@ -138,7 +138,7 @@ export const createRoute: RequestHandler = async (req, res) => {
       : async (tx) => {
           const lastRoute = await tx.route.findFirst({
             where: { projectId: project.id },
-            orderBy: { order: "asc" },
+            orderBy: { order: "desc" },
           });
 
           return await tx.route.create({
