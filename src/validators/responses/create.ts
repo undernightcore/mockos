@@ -11,7 +11,10 @@ export const createResponseValidator = object({
       .min(100, "The status code cannot be less than 100")
       .max(599, "The status code cannot be more than 599")
   ),
-  enabled: boolean("You must indicate if the response is enabled"),
+  enabled: preprocess(
+    (val) => String(val) === "true",
+    boolean("You must indicate if the response is enabled")
+  ),
   body: string("A body or file is required").or(
     file("A body or file is required")
   ),

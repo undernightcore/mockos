@@ -9,6 +9,7 @@ import { getBanner } from "./helpers/banner";
 import { authRouter } from "./routes/auth";
 import { membersRouter } from "./routes/members";
 import { projectsRouter } from "./routes/projects";
+import { responsesRouter } from "./routes/responses";
 import { routesRouter } from "./routes/routes";
 
 const app = express();
@@ -17,6 +18,7 @@ app.use(json());
 
 app.use("/auth", authRouter);
 
+app.use("/projects/:projectId/routes/:routeId/responses", responsesRouter);
 app.use("/projects/:projectId/routes", routesRouter);
 app.use("/projects/:projectId/members", membersRouter);
 app.use("/projects", projectsRouter);

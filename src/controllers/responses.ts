@@ -1,8 +1,14 @@
 import { RequestHandler } from "express";
+import { v4 } from "uuid";
 import { HttpError } from "../errors/http";
 import { authenticateUser } from "../helpers/auth";
 import { prisma } from "../services/prisma";
-import { subscribeToChannel, unsubscribeFromChannel } from "../services/redis";
+import {
+  sendMessageToChannel,
+  subscribeToChannel,
+  unsubscribeFromChannel,
+} from "../services/redis";
+import { uploadFile } from "../services/s3";
 import { createResponseValidator } from "../validators/responses/create";
 
 export const getResponses: RequestHandler = async (req, res) => {
@@ -76,9 +82,9 @@ export const createResponse: RequestHandler = async (req, res) => {
   const user = await authenticateUser(req);
   const data = createResponseValidator.parse({
     ...req.body,
-    body: req.file
-      ? new File([req.file.buffer], req.file.originalname)
-      : undefined,
+    ...(req.file
+      ? { body: new File([req.file.buffer], req.file.originalname) }
+      : {}),
   });
 
   const project = await prisma.project.findUnique({
@@ -106,23 +112,45 @@ export const createResponse: RequestHandler = async (req, res) => {
   });
   if (!route) throw new HttpError(404, "Route not found");
 
-  const existing = await prisma.response.findMany({
+  const existing = await prisma.response.findFirst({
     where: { routeId: route.id, name: data.name },
   });
   if (existing)
     throw new HttpError(409, "A response with that name already exists");
 
+  const created = await prisma.$transaction(async (tx) => {
+    const fileName =
+      data.body instanceof File
+        ? `projects/${project.id}/route/${route.id}/responses/${v4()}/${
+            data.body.name
+          }`
+        : "";
+
+    const response = await tx.response.create({
+      data: {
+        ...data,
+        routeId: route.id,
+        file: data.body instanceof File,
+        body: data.body instanceof File ? fileName : data.body,
+      },
+    });
+
+    if (data.body instanceof File) {
+      await uploadFile(fileName, data.body);
+    }
+
+    return response;
+  });
+
   res.status(200).json(created);
 
   // Send to realtime
-  prisma.route
+  prisma.response
     .findMany({
-      include: { children: { orderBy: { order: "asc" } } },
-      where: { projectId: project.id, parentFolderId: null },
-      orderBy: { order: "asc" },
+      where: { routeId: route.id },
     })
-    .then((routes) =>
-      sendMessageToChannel(`project:${project.id}`, JSON.stringify(routes))
+    .then((responses) =>
+      sendMessageToChannel(`route:${route.id}`, JSON.stringify(responses))
     )
     .catch();
 };
