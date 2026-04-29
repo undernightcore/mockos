@@ -17,3 +17,10 @@ export const uploadFile = async (name: string, file: File) => {
     Key: name,
   });
 };
+
+export const removeFile = async (name: string) => {
+  return client.deleteObject({
+    Bucket: process.env.S3_BUCKET,
+    Key: name,
+  });
+};
