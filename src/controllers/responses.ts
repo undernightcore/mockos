@@ -153,7 +153,7 @@ export const createResponse: RequestHandler = async (req, res) => {
     .then((responses) =>
       sendMessageToChannel(`route:${route.id}`, JSON.stringify(responses))
     )
-    .catch();
+    .catch(() => undefined);
 };
 
 export const editResponse: RequestHandler = async (req, res) => {
@@ -234,7 +234,7 @@ export const editResponse: RequestHandler = async (req, res) => {
   });
 
   if (existing.file && data.body instanceof File) {
-    await removeFile(existing.body).catch();
+    await removeFile(existing.body).catch(() => undefined);
   }
 
   res.status(200).json(edited);
@@ -247,5 +247,55 @@ export const editResponse: RequestHandler = async (req, res) => {
     .then((responses) =>
       sendMessageToChannel(`route:${route.id}`, JSON.stringify(responses))
     )
-    .catch();
+    .catch(() => undefined);
+};
+
+export const deleteResponse: RequestHandler = async (req, res) => {
+  const user = await authenticateUser(req);
+
+  const project = await prisma.project.findUnique({
+    include: { members: true },
+    where: {
+      id: Number(req.params.projectId),
+      members: { some: { userId: user.id, verified: true } },
+    },
+  });
+  if (!project) throw new HttpError(404, "Project not found");
+
+  const editor = project.members.some(
+    (member) =>
+      member.userId === user.id &&
+      (member.role === "ADMIN" || member.role === "EDITOR")
+  );
+  if (!editor)
+    throw new HttpError(403, "You are not allowed to remove responses");
+
+  const route = await prisma.route.findUnique({
+    where: {
+      id: Number(req.params.routeId),
+      projectId: project.id,
+    },
+  });
+  if (!route) throw new HttpError(404, "Route not found");
+
+  const existing = await prisma.response.findUnique({
+    where: { routeId: route.id, id: Number(req.params.responseId) },
+  });
+  if (!existing) throw new HttpError(404, "Response not found");
+
+  await prisma.response.delete({ where: { id: existing.id } });
+
+  if (existing.file) await removeFile(existing.body);
+
+  res.status(200).json({ message: "Response deleted successfully" });
+
+  // Send to realtime
+  prisma.response
+    .findMany({
+      where: { routeId: route.id },
+    })
+    .then((responses) =>
+      sendMessageToChannel(`route:${route.id}`, JSON.stringify(responses))
+    )
+    .catch(() => undefined);
 };

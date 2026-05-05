@@ -169,7 +169,7 @@ export const createRoute: RequestHandler = async (req, res) => {
     .then((routes) =>
       sendMessageToChannel(`project:${project.id}`, JSON.stringify(routes))
     )
-    .catch();
+    .catch(() => undefined);
 };
 
 export const editRoute: RequestHandler = async (req, res) => {
@@ -218,7 +218,7 @@ export const editRoute: RequestHandler = async (req, res) => {
     .then((routes) =>
       sendMessageToChannel(`project:${project.id}`, JSON.stringify(routes))
     )
-    .catch();
+    .catch(() => undefined);
 };
 
 export const sortRoute: RequestHandler = async (req, res) => {

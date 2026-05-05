@@ -2,6 +2,7 @@ import { Router } from "express";
 import multer from "multer";
 import {
   createResponse,
+  deleteResponse,
   editResponse,
   getResponses,
   getResponsesRealtime,
@@ -23,5 +24,7 @@ router.put(
   multer({ limits: { fileSize: 1e7 } }).single("body"),
   editResponse
 );
+
+router.delete("/:responseId", deleteResponse);
 
 export const responsesRouter = router;
