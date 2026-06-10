@@ -2,11 +2,13 @@ import "dotenv/config";
 
 import express, { json } from "express";
 import info from "../package.json";
+import { notFoundHandler } from "./handlers/404";
 import { errorHandler } from "./handlers/error";
 import { httpErrorHandler } from "./handlers/http";
 import { zodErrorHandler } from "./handlers/zod";
 import { getBanner } from "./helpers/banner";
 import { authRouter } from "./routes/auth";
+import { contractsRouter } from "./routes/contracts";
 import { membersRouter } from "./routes/members";
 import { projectsRouter } from "./routes/projects";
 import { responsesRouter } from "./routes/responses";
@@ -23,8 +25,10 @@ app.use("/projects/:projectId/routes/:routeId/responses", responsesRouter);
 app.use("/projects/:projectId/routes", routesRouter);
 app.use("/projects/:projectId/members", membersRouter);
 app.use("/projects/:projectId/tokens", tokensRouter);
+app.use("/projects/:projectId/contracts", contractsRouter);
 app.use("/projects", projectsRouter);
 
+app.use(notFoundHandler);
 app.use(zodErrorHandler);
 app.use(httpErrorHandler);
 app.use(errorHandler);
