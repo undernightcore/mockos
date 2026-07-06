@@ -67,8 +67,115 @@ export const importContract: RequestHandler = async (req, res) => {
       });
       break;
     case "MISSING":
+      await prisma.$transaction(async (trx) => {
+        const existingRoutes = await trx.route.findMany({
+          where: { projectId: project.id },
+          orderBy: { order: "asc" },
+        });
+        const mappedExistingRoutes = new Set(
+          existingRoutes
+            .filter((route) => route.method && route.endpoint)
+            .map((route) => `${route.method}-${route.endpoint}`)
+        );
+
+        const routes = await trx.route.createManyAndReturn({
+          data: api
+            .filter(
+              (route) =>
+                !mappedExistingRoutes.has(`${route.method}-${route.path}`)
+            )
+            .map((route, i) => ({
+              enabled: true,
+              name: route.name,
+              order: (existingRoutes.at(-1)?.order ?? 0) + i + 1,
+              projectId: project.id,
+              endpoint: route.path,
+              method: route.method,
+              folder: false,
+            })),
+        });
+
+        await trx.response.createMany({
+          data: routes.flatMap(
+            (route) =>
+              mappedApi
+                .get(`${route.method}-${route.endpoint}`)
+                ?.responses.map((response, i) => ({
+                  name: response.name,
+                  status: response.code,
+                  file: false,
+                  enabled: i === 0,
+                  routeId: route.id,
+                  body: response.example ?? "",
+                })) ?? []
+          ),
+        });
+      });
       break;
     case "MERGE":
+      await prisma.$transaction(async (trx) => {
+        const existingRoutes = await trx.route.findMany({
+          where: { projectId: project.id },
+          orderBy: { order: "asc" },
+        });
+        const mappedExistingRoutes = new Set(
+          existingRoutes
+            .filter((route) => route.method && route.endpoint)
+            .map((route) => `${route.method}-${route.endpoint}`)
+        );
+
+        const newRoutes = await trx.route.createManyAndReturn({
+          data: api
+            .filter(
+              (route) =>
+                !mappedExistingRoutes.has(`${route.method}-${route.path}`)
+            )
+            .map((route, i) => ({
+              enabled: true,
+              name: route.name,
+              order: (existingRoutes.at(-1)?.order ?? 0) + i + 1,
+              projectId: project.id,
+              endpoint: route.path,
+              method: route.method,
+              folder: false,
+            })),
+        });
+
+        await trx.response.createMany({
+          data: [
+            ...newRoutes.flatMap(
+              (route) =>
+                mappedApi
+                  .get(`${route.method}-${route.endpoint}`)
+                  ?.responses.map((response, i) => ({
+                    name: response.name,
+                    status: response.code,
+                    file: false,
+                    enabled: i === 0,
+                    routeId: route.id,
+                    body: response.example ?? "",
+                  })) ?? []
+            ),
+            ...existingRoutes
+              .map((route) => ({
+                ...route,
+                responses:
+                  mappedApi.get(`${route.method}-${route.endpoint}`)
+                    ?.responses ?? [],
+              }))
+              .flatMap((route) =>
+                route.responses?.map((response, i) => ({
+                  name: response.name,
+                  status: response.code,
+                  file: false,
+                  enabled: i === 0,
+                  routeId: route.id,
+                  body: response.example ?? "",
+                }))
+              ),
+          ],
+        });
+      });
       break;
   }
 
