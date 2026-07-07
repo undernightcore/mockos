@@ -14,16 +14,12 @@ import { projectsRouter } from "./routes/projects";
 import { responsesRouter } from "./routes/responses";
 import { routesRouter } from "./routes/routes";
 import { tokensRouter } from "./routes/tokens";
-import { hasChannelSubcribers } from "./services/redis";
 
 const app = express();
 
 app.use(json());
 
 app.use("/auth", authRouter);
-app.get("/test", async (_, res) =>
-  res.json({ amount: await hasChannelSubcribers("project:3") })
-);
 
 app.use("/projects/:projectId/routes/:routeId/responses", responsesRouter);
 app.use("/projects/:projectId/routes", routesRouter);
