@@ -118,5 +118,5 @@ model Processor {
   code       String
   enabled    Boolean
   response   Response @relation(fields: [responseId], references: [id], onDelete: Cascade)
-  responseId Int
+  responseId Int      @unique
 }

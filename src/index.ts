@@ -8,6 +8,7 @@ import { httpErrorHandler } from "./handlers/http";
 import { zodErrorHandler } from "./handlers/zod";
 import { getBanner } from "./helpers/banner";
 import { authRouter } from "./routes/auth";
+import { codeRouter } from "./routes/code";
 import { contractsRouter } from "./routes/contracts";
 import { membersRouter } from "./routes/members";
 import { projectsRouter } from "./routes/projects";
@@ -21,6 +22,10 @@ app.use(json());
 
 app.use("/auth", authRouter);
 
+app.use(
+  "/projects/:projectId/routes/:routeId/responses/:responseId/code",
+  codeRouter
+);
 app.use("/projects/:projectId/routes/:routeId/responses", responsesRouter);
 app.use("/projects/:projectId/routes", routesRouter);
 app.use("/projects/:projectId/members", membersRouter);
