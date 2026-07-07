@@ -4,6 +4,7 @@ import { HttpError } from "../errors/http";
 import { authenticateUser } from "../helpers/auth";
 import { prisma } from "../services/prisma";
 import {
+  hasChannelSubcribers,
   sendMessageToChannel,
   subscribeToChannel,
   unsubscribeFromChannel,
@@ -160,6 +161,7 @@ export const createRoute: RequestHandler = async (req, res) => {
   res.status(200).json(created);
 
   // Send to realtime
+  if (!hasChannelSubcribers(`project:${project.id}`)) return;
   prisma.route
     .findMany({
       include: { children: { orderBy: { order: "asc" } } },
@@ -209,6 +211,7 @@ export const editRoute: RequestHandler = async (req, res) => {
   res.status(200).json(edited);
 
   // Send to realtime
+  if (!hasChannelSubcribers(`project:${project.id}`)) return;
   prisma.route
     .findMany({
       include: { children: { orderBy: { order: "asc" } } },
@@ -310,7 +313,20 @@ export const sortRoute: RequestHandler = async (req, res) => {
     }
   );
 
-  return res.status(200).json({ message: "Sorted successfully!" });
+  res.status(200).json({ message: "Sorted successfully!" });
+
+  // Send to realtime
+  if (!hasChannelSubcribers(`project:${project.id}`)) return;
+  prisma.route
+    .findMany({
+      include: { children: { orderBy: { order: "asc" } } },
+      where: { projectId: project.id, parentFolderId: null },
+      orderBy: { order: "asc" },
+    })
+    .then((routes) =>
+      sendMessageToChannel(`project:${project.id}`, JSON.stringify(routes))
+    )
+    .catch(() => undefined);
 };
 
 export const deleteRoute: RequestHandler = async (req, res) => {
@@ -352,5 +368,18 @@ export const deleteRoute: RequestHandler = async (req, res) => {
     { isolationLevel: "Serializable" }
   );
 
-  return res.status(200).json({ message: "Deleted succesfully!" });
+  res.status(200).json({ message: "Deleted succesfully!" });
+
+  // Send to realtime
+  if (!hasChannelSubcribers(`project:${project.id}`)) return;
+  prisma.route
+    .findMany({
+      include: { children: { orderBy: { order: "asc" } } },
+      where: { projectId: project.id, parentFolderId: null },
+      orderBy: { order: "asc" },
+    })
+    .then((routes) =>
+      sendMessageToChannel(`project:${project.id}`, JSON.stringify(routes))
+    )
+    .catch(() => undefined);
 };

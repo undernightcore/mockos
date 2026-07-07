@@ -3,6 +3,13 @@ import { createClient } from "redis";
 let producer: Promise<ReturnType<typeof createClient>>;
 let subscriber: Promise<ReturnType<typeof createClient>>;
 
+export const hasChannelSubcribers = async (channel: string) => {
+  producer ??= createClient({ url: process.env.REDIS_URL }).connect();
+
+  const channels = await (await producer).PUBSUB_NUMSUB(channel);
+  return channels[channel] ?? 0;
+};
+
 export const sendMessageToChannel = async (
   channel: string,
   message: string

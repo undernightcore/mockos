@@ -2,6 +2,7 @@ import { RequestHandler } from "express";
 import { HttpError } from "../errors/http";
 import { authenticateUser } from "../helpers/auth";
 import { prisma } from "../services/prisma";
+import { hasChannelSubcribers, sendMessageToChannel } from "../services/redis";
 import { editMemberValidator } from "../validators/members/edit";
 import { inviteMemberValidator } from "../validators/members/invite";
 import { filterValidator } from "../validators/shared/filter";
@@ -55,13 +56,14 @@ export const inviteMember: RequestHandler = async (req, res) => {
     include: { members: true },
     where: {
       id: Number(req.params.projectId),
-      members: { some: { userId: user.id, verified: true } },
+      members: { some: { userId: user.id } },
     },
   });
   if (!project) throw new HttpError(404, "Project not found");
 
   const admin = project.members.some(
-    (member) => member.userId === user.id && member.role === "ADMIN"
+    (member) =>
+      member.userId === user.id && member.role === "ADMIN" && member.verified
   );
   if (!admin) throw new HttpError(403, "Only the admin can invite new members");
 
@@ -71,10 +73,16 @@ export const inviteMember: RequestHandler = async (req, res) => {
   if (!invited) throw new HttpError(404, "The user does not exist");
 
   const alreadyInvited = project.members.some(
-    (member) => member.userId === invited.id
+    (member) => member.userId === invited.id && !member.verified
   );
   if (alreadyInvited)
     throw new HttpError(400, "The user has already been invited");
+
+  const alreadyPart = project.members.some(
+    (member) => member.userId === invited.id && member.verified
+  );
+  if (alreadyPart)
+    throw new HttpError(400, "The user is already part of the project");
 
   const member = await prisma.members.create({
     data: {
@@ -84,7 +92,21 @@ export const inviteMember: RequestHandler = async (req, res) => {
       verified: false,
     },
   });
-  return res.status(200).json(member);
+  res.status(200).json(member);
+
+  // Send realtime
+  if (!hasChannelSubcribers(`invitations:${invited.id}`)) return;
+  prisma.project
+    .findMany({
+      where: { members: { some: { userId: invited.id, verified: false } } },
+    })
+    .then((invitations) =>
+      sendMessageToChannel(
+        `invitations:${invited.id}`,
+        JSON.stringify(invitations)
+      )
+    )
+    .catch(() => undefined);
 };
 
 export const deleteMember: RequestHandler = async (req, res) => {
@@ -94,13 +116,14 @@ export const deleteMember: RequestHandler = async (req, res) => {
     include: { members: true },
     where: {
       id: Number(req.params.projectId),
-      members: { some: { userId: user.id, verified: true } },
+      members: { some: { userId: user.id } },
     },
   });
   if (!project) throw new HttpError(404, "Project not found");
 
   const admin = project.members.some(
-    (member) => member.userId === user.id && member.role === "ADMIN"
+    (member) =>
+      member.userId === user.id && member.role === "ADMIN" && member.verified
   );
   if (!admin) throw new HttpError(403, "Only the admin can remove members");
 
@@ -111,7 +134,22 @@ export const deleteMember: RequestHandler = async (req, res) => {
 
   await prisma.members.delete({ where: { id: exists.id } });
 
-  return res.status(200).json({ message: "Member removed successfully" });
+  res.status(200).json({ message: "Member removed successfully" });
+
+  // Send realtime
+  if (exists.verified || !hasChannelSubcribers(`invitations:${exists.id}`))
+    return;
+  prisma.project
+    .findMany({
+      where: { members: { some: { userId: exists.id, verified: false } } },
+    })
+    .then((invitations) =>
+      sendMessageToChannel(
+        `invitations:${exists.id}`,
+        JSON.stringify(invitations)
+      )
+    )
+    .catch(() => undefined);
 };
 
 export const editMember: RequestHandler = async (req, res) => {
@@ -122,13 +160,14 @@ export const editMember: RequestHandler = async (req, res) => {
     include: { members: true },
     where: {
       id: Number(req.params.projectId),
-      members: { some: { userId: user.id, verified: true } },
+      members: { some: { userId: user.id } },
     },
   });
   if (!project) throw new HttpError(404, "Project not found");
 
   const admin = project.members.some(
-    (member) => member.userId === user.id && member.role === "ADMIN"
+    (member) =>
+      member.userId === user.id && member.role === "ADMIN" && member.verified
   );
   if (!admin) throw new HttpError(403, "Only the admin can edit member roles");
 
@@ -142,5 +181,19 @@ export const editMember: RequestHandler = async (req, res) => {
     data: { role: data.role },
   });
 
-  return res.status(200).json(member);
+  res.status(200).json(member);
+
+  if (exists.verified || !hasChannelSubcribers(`invitations:${exists.id}`))
+    return;
+  prisma.project
+    .findMany({
+      where: { members: { some: { userId: exists.id, verified: false } } },
+    })
+    .then((invitations) =>
+      sendMessageToChannel(
+        `invitations:${exists.id}`,
+        JSON.stringify(invitations)
+      )
+    )
+    .catch(() => undefined);
 };

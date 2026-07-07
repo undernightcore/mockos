@@ -4,6 +4,7 @@ import { HttpError } from "../errors/http";
 import { authenticateUser } from "../helpers/auth";
 import { prisma } from "../services/prisma";
 import {
+  hasChannelSubcribers,
   sendMessageToChannel,
   subscribeToChannel,
   unsubscribeFromChannel,
@@ -146,6 +147,7 @@ export const createResponse: RequestHandler = async (req, res) => {
   res.status(200).json(created);
 
   // Send to realtime
+  if (!hasChannelSubcribers(`route:${route.id}`)) return;
   prisma.response
     .findMany({
       where: { routeId: route.id },
@@ -240,6 +242,7 @@ export const editResponse: RequestHandler = async (req, res) => {
   res.status(200).json(edited);
 
   // Send to realtime
+  if (!hasChannelSubcribers(`route:${route.id}`)) return;
   prisma.response
     .findMany({
       where: { routeId: route.id },
@@ -290,6 +293,7 @@ export const deleteResponse: RequestHandler = async (req, res) => {
   res.status(200).json({ message: "Response deleted successfully" });
 
   // Send to realtime
+  if (!hasChannelSubcribers(`route:${route.id}`)) return;
   prisma.response
     .findMany({
       where: { routeId: route.id },
