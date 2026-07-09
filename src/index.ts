@@ -11,6 +11,7 @@ import { authRouter } from "./routes/auth";
 import { codeRouter } from "./routes/code";
 import { contractsRouter } from "./routes/contracts";
 import { membersRouter } from "./routes/members";
+import { mockRouter } from "./routes/mock";
 import { projectsRouter } from "./routes/projects";
 import { responsesRouter } from "./routes/responses";
 import { routesRouter } from "./routes/routes";
@@ -32,6 +33,7 @@ app.use("/projects/:projectId/members", membersRouter);
 app.use("/projects/:projectId/tokens", tokensRouter);
 app.use("/projects/:projectId/contracts", contractsRouter);
 app.use("/projects", projectsRouter);
+app.use("/mock", mockRouter);
 
 app.use(notFoundHandler);
 app.use(zodErrorHandler);

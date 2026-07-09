@@ -10,6 +10,13 @@ const client = new S3({
   forcePathStyle: true,
 });
 
+export const getFile = async (name: string) => {
+  return client.getObject({
+    Bucket: process.env.S3_BUCKET,
+    Key: name,
+  });
+};
+
 export const uploadFile = async (name: string, file: File) => {
   return client.putObject({
     Bucket: process.env.S3_BUCKET,

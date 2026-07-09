@@ -53,7 +53,7 @@ model Members {
 model Token {
   id        Int      @id @default(autoincrement())
   name      String
-  token     String
+  token     String   @unique
   project   Project  @relation(fields: [projectId], references: [id], onDelete: Cascade)
   projectId Int
   createdAt DateTime @default(now())

@@ -2,7 +2,7 @@ import Sandbox from "v8-sandbox";
 
 export const executeUntrustedCode = async (
   code: string,
-  globals: Record<string, string | Record<string, string>>
+  globals: Record<string, unknown>
 ) => {
   const sandbox = new Sandbox();
 
@@ -16,5 +16,5 @@ export const executeUntrustedCode = async (
 
   if (error) throw new Error(error.message);
 
-  return value;
+  return String(value);
 };
