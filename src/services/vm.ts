@@ -1,4 +1,4 @@
-import Sandbox from "v8-sandbox";
+import { Sandbox } from "v8-sandbox";
 
 export const executeUntrustedCode = async (
   code: string,
