@@ -1,5 +1,5 @@
-import { schema, rules } from '@ioc:Adonis/Core/Validator'
 import type { HttpContextContract } from '@ioc:Adonis/Core/HttpContext'
+import { rules, schema } from '@ioc:Adonis/Core/Validator'
 
 export default class EditResponseValidator {
   #isFile = Boolean(this.ctx.request.input('isFile', false))
@@ -11,7 +11,7 @@ export default class EditResponseValidator {
     status: schema.number([rules.range(100, 599)]),
     body: this.#isFile
       ? schema.file.optional({ size: '8MB' })
-      : schema.string({}, [rules.maxLength(500000)]),
+      : schema.string({}, [rules.maxLength(5e6)]),
     name: schema.string({}, [
       rules.unique({
         table: 'responses',
