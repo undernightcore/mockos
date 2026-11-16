@@ -162,6 +162,7 @@ export default class ApiController {
           method: request.method(),
           url: request.url(),
           time: new Date(),
+          id: new Date().getTime(),
           logs: [
             ...(output ?? []),
             ...(error
