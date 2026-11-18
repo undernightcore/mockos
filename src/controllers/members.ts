@@ -128,7 +128,7 @@ export const deleteMember: RequestHandler = async (req, res) => {
   if (!admin) throw new HttpError(403, "Only the admin can remove members");
 
   const exists = project.members.find(
-    (member) => member.userId === Number(req.params.memberId)
+    (member) => member.id === Number(req.params.memberId)
   );
   if (!exists) throw new HttpError(404, "Member not found");
 
@@ -172,7 +172,7 @@ export const editMember: RequestHandler = async (req, res) => {
   if (!admin) throw new HttpError(403, "Only the admin can edit member roles");
 
   const exists = project.members.find(
-    (member) => member.userId === Number(req.params.memberId)
+    (member) => member.id === Number(req.params.memberId)
   );
   if (!exists) throw new HttpError(404, "Member not found");
 

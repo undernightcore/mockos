@@ -58,9 +58,9 @@ export const useMock: RequestHandler = async (req, res) => {
 
   if (file) {
     if (!res.getHeader("content-type"))
-      res.setHeader("content-type", "application/octet-steam");
+      res.setHeader("content-type", "application/octet-stream");
 
-    return res.status(200).send(file);
+    return res.status(response.status).send(file);
   } else if (code) {
     if (!res.getHeader("content-type"))
       res.setHeader("content-type", "application/json");
@@ -78,7 +78,7 @@ export const useMock: RequestHandler = async (req, res) => {
         headers: req.headers,
       });
 
-      return res.status(200).send(result);
+      return res.status(response.status).send(result);
     } catch (e) {
       throw new HttpError(400, `Custom code is throwing errors: ${e.message}`);
     }
@@ -86,6 +86,6 @@ export const useMock: RequestHandler = async (req, res) => {
     if (!res.getHeader("content-type"))
       res.setHeader("content-type", "application/json");
 
-    return res.status(200).send(response.body);
+    return res.status(response.status).send(response.body);
   }
 };
