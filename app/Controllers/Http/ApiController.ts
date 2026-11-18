@@ -8,6 +8,7 @@ import Project from 'App/Models/Project'
 import Response from 'App/Models/Response'
 import Route from 'App/Models/Route'
 import Token from 'App/Models/Token'
+import Ws from 'App/Services/Ws'
 import { Buffer } from 'buffer'
 import Sandbox from 'v8-sandbox'
 
@@ -140,7 +141,7 @@ export default class ApiController {
   ) {
     if (enabledResponse.processor?.enabled && !file) {
       const sandbox = new Sandbox()
-      const { error, value } = await sandbox.execute({
+      const { error, value, output } = await sandbox.execute({
         code: enabledResponse.processor.code,
         timeout: 2000,
         globals: {
@@ -153,6 +154,29 @@ export default class ApiController {
         },
       })
       sandbox.shutdown()
+
+      if (output?.length || error) {
+        Ws.io.emit(`response:${enabledResponse.id}:logs`, {
+          responseId: enabledResponse.id,
+          routeId: enabledResponse.routeId,
+          method: request.method(),
+          url: request.url(),
+          time: new Date(),
+          id: new Date().getTime(),
+          logs: [
+            ...(output ?? []),
+            ...(error
+              ? [
+                  {
+                    type: 'error',
+                    time: new Date(),
+                    message: `${error.message} (line ${error.lineNumber})`,
+                  },
+                ]
+              : []),
+          ],
+        })
+      }
 
       if (error) {
         throw new HttpError(400, `The preprocessor code crashed: ${error.message}`)
