@@ -89,7 +89,7 @@ export const loginUser: RequestHandler = async (req, res) => {
 
   return res
     .status(200)
-    .json({ token: createToken(user.id, TokenTypeEnum.AUTH) });
+    .json({ token: createToken(user.id, TokenTypeEnum.AUTH, 7 * 24 * 3600) });
 };
 
 export const requestVerifyUser: RequestHandler = async (req, res) => {
@@ -129,9 +129,9 @@ export const verifyUser: RequestHandler = async (req, res) => {
     data: { verified: true },
   });
 
-  return res
-    .status(200)
-    .json({ token: createToken(validated.userId, TokenTypeEnum.AUTH) });
+  return res.status(200).json({
+    token: createToken(validated.userId, TokenTypeEnum.AUTH, 7 * 24 * 3600),
+  });
 };
 
 export const requestResetUser: RequestHandler = async (req, res) => {
@@ -172,9 +172,9 @@ export const resetUser: RequestHandler = async (req, res) => {
     data: { password: await hashPassword(password) },
   });
 
-  return res
-    .status(200)
-    .json({ token: createToken(validated.userId, TokenTypeEnum.AUTH) });
+  return res.status(200).json({
+    token: createToken(validated.userId, TokenTypeEnum.AUTH, 7 * 24 * 3600),
+  });
 };
 
 export const requestLoginWithGoogle: RequestHandler = async (_, res) => {
@@ -197,6 +197,6 @@ export const loginWithGoogle: RequestHandler = async (req, res) => {
   });
 
   return res.status(200).json({
-    token: createToken(user.id, TokenTypeEnum.AUTH),
+    token: createToken(user.id, TokenTypeEnum.AUTH, 7 * 24 * 3600),
   });
 };
