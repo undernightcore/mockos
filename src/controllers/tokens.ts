@@ -100,7 +100,7 @@ export const deleteToken: RequestHandler = async (req, res) => {
   if (!admin) throw new HttpError(403, "Only the admin can delete tokens");
 
   const existing = await prisma.token.findUnique({
-    where: { id: Number(req.params.tokenId) },
+    where: { id: Number(req.params.tokenId), projectId: project.id },
   });
   if (!existing) throw new HttpError(404, "Token not found");
 
